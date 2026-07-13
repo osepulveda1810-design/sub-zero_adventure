@@ -151,8 +151,10 @@
         const jumpFrameOffset = [0, 0, 0, 0];
 
         let jumpTimer = 0;
-        // --- TIEMPOS DE SALTO SUGERIDOS (Más lentos, y frames inicial/final más largos) ---
-        const jumpFrameTimes = [150, 120, 120, 180]; 
+        let isLanding = false;
+        let landingTimer = 0;
+        // --- TIEMPOS DE SALTO: frame3 se mantiene mientras esté en el aire; el 4to valor es cuánto dura el frame de aterrizaje ---
+        const jumpFrameTimes = [150, 120, 260, 180]; 
 
         const keys = { right: false, left: false, up: false };
 
@@ -248,6 +250,7 @@
             if(keys.up && wasOnGround) {
                 velocityY = jumpStrength;
                 jumpTimer = 0;
+                isLanding = false;
                 lastJumpFrameTime = time;
                 currentSprite = jumpSprite;
                 currentFrame = 0;
@@ -276,15 +279,26 @@
                 // Usamos los nuevos tiempos sugeridos
                 if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0;
                 else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1]) currentFrame = 1;
-                else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1] + jumpFrameTimes[2]) currentFrame = 2;
-                else currentFrame = 3;
+                else currentFrame = 2;
 
             } else {
                 if (playerY > floorY) { playerY = floorY; velocityY = 0; }
 
-                if (currentSprite === jumpSprite) {
-                    currentSprite = isMoving ? walkSprite : idleSprite;
-                    currentFrame = 0;
+                if (currentSprite === jumpSprite && !isLanding) {
+                    // Momento exacto de tocar el suelo: mostrar el frame 4 (aterrizaje)
+                    isLanding = true;
+                    currentFrame = 3;
+                    landingTimer = 0;
+                }
+
+                if (isLanding) {
+                    landingTimer += jumpDeltaTime;
+                    if (landingTimer >= jumpFrameTimes[3]) {
+                        isLanding = false;
+                        currentSprite = isMoving ? walkSprite : idleSprite;
+                        currentFrame = 0;
+                        lastTime = time;
+                    }
                 } else {
                     if (isMoving) {
                         if (currentSprite !== walkSprite) { currentSprite = walkSprite; currentFrame = 0; }
