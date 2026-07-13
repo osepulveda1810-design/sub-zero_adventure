@@ -2,38 +2,32 @@
 <html lang="es">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sub-Zero - Modo Horizontal</title>
+    <title>Sub-Zero - Horizontal Fullscreen</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; }
+        
         body {
             background-color: #1a1a2e; display: flex; justify-content: center; align-items: center;
-            height: 100vh; width: 100vw; overflow: hidden; font-family: sans-serif; touch-action: none; position: fixed;
+            /* Usamos 100dvh para que se ajuste cuando el navegador oculta la barra */
+            height: 100dvh; width: 100vw; overflow: hidden; font-family: sans-serif; touch-action: none; position: fixed;
         }
 
-        /* --- OVERLAY DE ORIENTACIÓN (Se muestra si estás en vertical) --- */
+        /* --- OVERLAY DE ORIENTACIÓN --- */
         #rotate-overlay {
-            display: none; /* Por defecto oculto */
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: #0f172a; color: #fff; z-index: 9999;
-            flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding: 20px;
+            flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
         }
         #rotate-overlay h2 { font-size: 28px; margin-bottom: 20px; color: #4ecca3; }
         #rotate-overlay p { font-size: 18px; color: #94a3b8; }
         .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: spin 2s infinite linear; }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(90deg); }
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
 
-        /* Si el dispositivo está en formato VERTICAL (portrait), mostramos el overlay y ocultamos el juego */
         @media (orientation: portrait) {
             #rotate-overlay { display: flex; }
             #game-container { display: none; }
         }
-
-        /* Si el dispositivo está en formato HORIZONTAL (landscape), ocultamos el overlay y mostramos el juego */
         @media (orientation: landscape) {
             #rotate-overlay { display: none !important; }
             #game-container { display: flex !important; }
@@ -42,51 +36,78 @@
         /* --- CONTENEDOR DEL JUEGO --- */
         #game-container {
             display: flex; flex-direction: column;
-            width: 100vw; height: 100vh;
-            max-width: 800px; /* Para que en PC no se estire demasiado */
+            width: 100vw; height: 100dvh;
+            max-width: 800px;
             padding: 5px; background-color: #16213e;
         }
+
+        /* --- WRAPPER Y BOTÓN DE FULLSCREEN --- */
         #canvas-wrapper {
             flex: 1; display: flex; justify-content: center; align-items: center;
             background-color: #1a1a2e; border-radius: 10px; margin-bottom: 5px;
             border: 2px solid #0f3460; overflow: hidden;
-            width: 100%; height: 100%;
+            width: 100%; height: 100%; position: relative;
         }
+        
+        /* Botón para forzar pantalla completa y bloquear navegador */
+        #btn-fullscreen {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 20px; width: 40px; height: 40px;
+            border-radius: 8px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; z-index: 10; touch-action: manipulation;
+        }
+        #btn-fullscreen:active { background: rgba(78, 204, 163, 0.4); border-color: #4ecca3; }
+
         canvas { 
             display: block; 
-            width: 100%;
-            height: 100%;
+            width: 100%; height: 100%;
             image-rendering: pixelated; 
             background-color: #16213e; 
         }
+
+        /* --- CONTROLES TÁCTILES CORREGIDOS --- */
         #controls {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 5px 10px 15px 10px; height: 120px; flex-shrink: 0;
+            /* Cambiamos altura fija por flex: 0, min-height y padding dinámico */
+            flex: 0 0 auto; 
+            min-height: 110px;
+            /* bottom environment para evitar la barra de gestos en Android/iOS */
+            padding: 5px 15px calc(15px + env(safe-area-inset-bottom)); 
         }
+
         .btn {
-            width: 65px; height: 65px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.2);
+            width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.2);
             background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 24px;
             display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
             transition: all 0.1s; touch-action: none; cursor: pointer;
         }
         .btn:active, .btn.active { background: rgba(78, 204, 163, 0.4); border-color: rgba(78, 204, 163, 0.8); transform: scale(0.9); }
-        #btn-jump { width: 85px; height: 85px; background: rgba(255, 50, 50, 0.2); border-color: rgba(255, 50, 50, 0.5); font-weight: bold; font-size: 18px; }
+        #btn-jump { width: 90px; height: 90px; background: rgba(255, 50, 50, 0.2); border-color: rgba(255, 50, 50, 0.5); font-weight: bold; font-size: 18px; }
         #btn-jump:active, #btn-jump.active { background: rgba(255, 50, 50, 0.5); }
-        @media (max-width: 400px) { .btn { width: 55px; height: 55px; font-size: 20px; } #btn-jump { width: 70px; height: 70px; } }
+        
+        @media (max-width: 500px) {
+            .btn { width: 60px; height: 60px; font-size: 22px; }
+            #btn-jump { width: 75px; height: 75px; }
+        }
+        @media (max-width: 400px) {
+            .btn { width: 55px; height: 55px; font-size: 20px; }
+            #btn-jump { width: 70px; height: 70px; }
+            #controls { min-height: 90px; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Mensaje para girar el teléfono -->
     <div id="rotate-overlay">
         <div class="rotate-icon">📱</div>
         <h2>Gira tu dispositivo</h2>
-        <p>Pon tu teléfono en modo horizontal para jugar.</p>
+        <p>Pon tu teléfono en modo horizontal.</p>
     </div>
 
-    <!-- El juego oculto en vertical -->
     <div id="game-container">
         <div id="canvas-wrapper">
+            <button id="btn-fullscreen">⛶</button>
             <canvas id="gameCanvas"></canvas>
         </div>
         <div id="controls">
@@ -104,51 +125,53 @@
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        // --- FORZAR BLOQUEO DE ORIENTACIÓN AL TOCAR LA PANTALLA ---
-        document.addEventListener('click', () => {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {
-                    // Si el navegador no permite bloquearlo, no pasa nada, el CSS ya se encarga
-                });
-            }
-        });
-
-        // --- Sprites ---
         const idleSprite = new Image(); idleSprite.src = 'idle_subzero.png';
         const walkSprite = new Image(); walkSprite.src = 'walk_subzero.png';
         const jumpSprite = new Image(); jumpSprite.src = 'jump_subzero.png';
 
         let currentSprite = idleSprite; 
-
-        // --- Variables del Juego ---
         let currentFrame = 0;
         const totalFrames = 4;
         let frameSpeed = 150;
         let lastTime = 0;
         
-        let playerX = 50;
-        let playerY = 50;
-        let velocityX = 0;
-        let velocityY = 0;
-        
-        const speed = 4;
-        const gravity = 0.6;
-        const jumpStrength = -11;
-        let facingRight = true;
-        let scale = 1;
+        let playerX = 50; let playerY = 50;
+        let velocityX = 0; let velocityY = 0;
+        const speed = 4; const gravity = 0.6; const jumpStrength = -11;
+        let facingRight = true; let scale = 1;
 
-        // --- Offsets ---
         const idleFrameOffset = [-5, -2, 2, 6];
         const walkFrameOffset = [0, 0, 0, 0];
         const jumpFrameOffset = [0, 0, 0, 0];
 
-        // --- Variables específicas del salto ---
         let jumpTimer = 0;
         const jumpFrameTimes = [100, 100, 100, 100];
-
-        // --- Controles ---
         const keys = { right: false, left: false, up: false };
 
+        // --- NUEVA FUNCIÓN PARA FORZAR FULLSCREEN Y BLOQUEAR ---
+        const fullscreenBtn = document.getElementById('btn-fullscreen');
+        
+        async function enterFullscreen() {
+            try {
+                // 1. Bloquear orientación horizontal (si el navegador lo permite)
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+                // 2. Forzar pantalla completa (oculta la barra y las pestañas)
+                if (document.fullscreenElement === null && document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+            } catch (err) {
+                // Si algún método falla, simplemente ignoramos. El CSS ya maneja el layout.
+                console.log("Fullscreen u orientación bloqueada por el navegador:", err);
+            }
+        }
+
+        // Activar al hacer clic en el botón de la esquina
+        fullscreenBtn.addEventListener('click', enterFullscreen);
+        fullscreenBtn.addEventListener('touchstart', (e) => { e.preventDefault(); enterFullscreen(); });
+
+        // --- CONTROLES DE TECLADO ---
         document.addEventListener('keydown', (e) => {
             if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
             if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
@@ -160,6 +183,7 @@
             if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
         });
 
+        // --- CONTROLES TÁCTILES ---
         function setupTouchButton(elementId, keyName) {
             const el = document.getElementById(elementId);
             el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; el.classList.add('active'); });
@@ -170,7 +194,7 @@
         setupTouchButton('btn-right', 'right');
         setupTouchButton('btn-jump', 'up');
 
-        // --- Configuración del Canvas ---
+        // --- CONFIGURACIÓN DEL CANVAS ---
         function setupCanvas() {
             const wrapper = document.getElementById('canvas-wrapper');
             const w = wrapper.clientWidth;
@@ -206,7 +230,7 @@
         walkSprite.onerror = () => showError('walk_subzero.png');
         jumpSprite.onerror = () => showError('jump_subzero.png');
 
-        // --- Bucle Principal ---
+        // --- BUCLE PRINCIPAL ---
         function animate(time) {
             if (!lastTime) lastTime = time;
             const deltaTime = time - lastTime; 
@@ -215,7 +239,6 @@
             const frameHeight = currentSprite.height;
             const floorY = canvas.height - (frameHeight * scale) - 10;
 
-            // Inicio de salto
             const wasOnGround = playerY >= floorY;
             if(keys.up && wasOnGround) {
                 velocityY = jumpStrength;
@@ -224,7 +247,6 @@
                 currentFrame = 0;
             }
 
-            // Movimiento y Física
             if (keys.left) { velocityX = -speed; facingRight = false; } 
             else if (keys.right) { velocityX = speed; facingRight = true; } 
             else { velocityX = 0; }
@@ -235,7 +257,6 @@
 
             const isInAir = playerY < floorY - 1;
 
-            // Gestión del sprite y animación
             if (isInAir) {
                 if (currentSprite !== jumpSprite) {
                     currentSprite = jumpSprite;
@@ -275,7 +296,6 @@
             if (playerX < 0) playerX = 0;
             if (playerX > maxX) playerX = maxX;
 
-            // Renderizado
             if (currentSprite.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#4ecca3';
