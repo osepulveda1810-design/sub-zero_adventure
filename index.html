@@ -5,7 +5,7 @@
     <title>Sub-Zero Adventure</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; }
-        
+
         body {
             background-color: #16213e; display: flex; justify-content: center; align-items: center;
             height: 100dvh; width: 100vw; overflow: hidden; font-family: sans-serif; touch-action: none; position: fixed;
@@ -20,7 +20,7 @@
         #rotate-overlay h2 { font-size: 28px; margin-bottom: 20px; color: #4ecca3; }
         #rotate-overlay p { font-size: 18px; color: #94a3b8; }
         .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: spin 2s infinite linear; }
-        
+
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
 
         @media (orientation: portrait) {
@@ -46,7 +46,7 @@
             background-color: #16213e; 
             overflow: hidden;
         }
-        
+
         canvas { 
             display: block; 
             width: 100%; height: 100%;
@@ -73,7 +73,7 @@
             align-items: flex-end; z-index: 10;
             pointer-events: none; 
         }
-        
+
         #controls .control-group, #controls .btn {
             pointer-events: auto; 
         }
@@ -87,10 +87,10 @@
             transition: all 0.1s; touch-action: none; cursor: pointer;
         }
         .btn:active, .btn.active { background: rgba(78, 204, 163, 0.6); border-color: rgba(78, 204, 163, 1); transform: scale(0.9); }
-        
+
         #btn-jump { width: 90px; height: 90px; background: rgba(200, 30, 30, 0.4); border-color: rgba(255, 50, 50, 0.6); font-weight: bold; font-size: 18px; }
         #btn-jump:active, #btn-jump.active { background: rgba(255, 50, 50, 0.8); }
-        
+
         @media (max-width: 500px) {
             .btn { width: 60px; height: 60px; font-size: 22px; }
             #btn-jump { width: 75px; height: 75px; }
@@ -113,7 +113,7 @@
         <div id="canvas-wrapper">
             <button id="btn-fullscreen">⛶</button>
             <canvas id="gameCanvas"></canvas>
-            
+
             <div id="controls">
                 <div class="control-group">
                     <button class="btn" id="btn-left">◀</button>
@@ -139,10 +139,10 @@
         const totalFrames = 4;
         let frameSpeed = 150;
         let lastTime = 0;
-        
+
         let playerX = 50; let playerY = 50;
         let velocityX = 0; let velocityY = 0;
-        const speed = 4; const gravity = 0.6; const jumpStrength = -11;
+        const speed = 4; const gravity = 0.22; const jumpStrength = -6.5;
         let facingRight = true; let scale = 1;
 
         const idleFrameOffset = [-5, -2, 2, 6];
@@ -152,12 +152,12 @@
         let jumpTimer = 0;
         // --- TIEMPOS DE SALTO SUGERIDOS (Más lentos, y frames inicial/final más largos) ---
         const jumpFrameTimes = [150, 120, 120, 180]; 
-        
+
         const keys = { right: false, left: false, up: false };
 
         // --- FUNCIÓN FULLSCREEN ---
         const fullscreenBtn = document.getElementById('btn-fullscreen');
-        
+
         async function enterFullscreen() {
             try {
                 if (screen.orientation && screen.orientation.lock) {
@@ -199,7 +199,7 @@
             const wrapper = document.getElementById('canvas-wrapper');
             const w = wrapper.clientWidth;
             const h = wrapper.clientHeight;
-            
+
             canvas.width = w;
             const frameHeight = idleSprite.height;
             scale = (h * 0.45) / frameHeight; 
@@ -218,7 +218,7 @@
                 requestAnimationFrame(animate);
             }
         }
-        
+
         idleSprite.onload = checkImagesLoaded;
         walkSprite.onload = checkImagesLoaded;
         jumpSprite.onload = checkImagesLoaded;
@@ -264,7 +264,7 @@
                     jumpTimer = 0;
                 }
                 jumpTimer += deltaTime;
-                
+
                 // Usamos los nuevos tiempos sugeridos
                 if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0;
                 else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1]) currentFrame = 1;
@@ -285,7 +285,7 @@
                         if (currentSprite !== idleSprite) { currentSprite = idleSprite; currentFrame = 0; }
                         frameSpeed = 150;
                     }
-                    
+
                     if (time - lastTime >= frameSpeed) {
                         currentFrame = (currentFrame + 1) % totalFrames;
                         lastTime = time; 
