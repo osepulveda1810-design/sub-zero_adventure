@@ -36,12 +36,11 @@
         #game-container {
             display: flex;
             width: 100vw; height: 100dvh;
-            /* Eliminamos el límite de 500px y el padding para que ocupe TODO */
             max-width: none; padding: 0; background-color: #16213e;
         }
 
         #canvas-wrapper {
-            position: relative; /* Clave para que los botones floten sobre el canvas */
+            position: relative; 
             display: flex; justify-content: center; align-items: center;
             width: 100%; height: 100%;
             background-color: #16213e; 
@@ -55,7 +54,7 @@
             background-color: #16213e; 
         }
 
-        /* --- BOTÓN DE PANTALLA COMPLETA (FLOTANDO EN EL ESCENARIO) --- */
+        /* --- BOTÓN DE PANTALLA COMPLETA --- */
         #btn-fullscreen {
             position: absolute; top: 15px; left: 15px;
             background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255,255,255,0.2);
@@ -72,17 +71,16 @@
             left: 0; width: 100%; padding: 0 15px;
             display: flex; justify-content: space-between;
             align-items: flex-end; z-index: 10;
-            /* Permite hacer clic a través del espacio vacío, pero los botones siguen siendo cliqueables */
             pointer-events: none; 
         }
         
         #controls .control-group, #controls .btn {
-            pointer-events: auto; /* Reactivamos el click/touch SOLO en los botones */
+            pointer-events: auto; 
         }
 
         .btn {
             width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3);
-            background: rgba(20, 30, 50, 0.6); /* Fondo un poco más oscuro para resaltar */
+            background: rgba(20, 30, 50, 0.6); 
             backdrop-filter: blur(2px);
             color: #fff; font-size: 24px;
             display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.8);
@@ -116,7 +114,6 @@
             <button id="btn-fullscreen">⛶</button>
             <canvas id="gameCanvas"></canvas>
             
-            <!-- Los controles ahora están DENTRO del #canvas-wrapper -->
             <div id="controls">
                 <div class="control-group">
                     <button class="btn" id="btn-left">◀</button>
@@ -153,10 +150,13 @@
         const jumpFrameOffset = [0, 0, 0, 0];
 
         let jumpTimer = 0;
-        const jumpFrameTimes = [100, 100, 100, 100];
+        // --- CAMBIO AQUÍ: Aumenté la duración total y de los frames extremos ---
+        // [Inicio, Subida, Pico, Caída] en milisegundos
+        const jumpFrameTimes = [150, 120, 120, 180]; 
+        
         const keys = { right: false, left: false, up: false };
 
-        // --- FUNCIÓN PARA FORZAR FULLSCREEN ---
+        // --- FUNCIÓN FULLSCREEN ---
         const fullscreenBtn = document.getElementById('btn-fullscreen');
         
         async function enterFullscreen() {
@@ -266,6 +266,7 @@
                 }
                 jumpTimer += deltaTime;
                 
+                // Lógica actualizada usando los nuevos tiempos
                 if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0;
                 else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1]) currentFrame = 1;
                 else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1] + jumpFrameTimes[2]) currentFrame = 2;
