@@ -139,6 +139,7 @@
         const totalFrames = 4;
         let frameSpeed = 150;
         let lastTime = 0;
+        let lastJumpFrameTime = 0;
 
         let playerX = 50; let playerY = 50;
         let velocityX = 0; let velocityY = 0;
@@ -235,6 +236,10 @@
             if (!lastTime) lastTime = time;
             const deltaTime = time - lastTime; 
 
+            if (!lastJumpFrameTime) lastJumpFrameTime = time;
+            const jumpDeltaTime = time - lastJumpFrameTime;
+            lastJumpFrameTime = time;
+
             const isMoving = keys.left || keys.right;
             const frameHeight = currentSprite.height;
             const floorY = canvas.height - (frameHeight * scale) - 10;
@@ -243,6 +248,7 @@
             if(keys.up && wasOnGround) {
                 velocityY = jumpStrength;
                 jumpTimer = 0;
+                lastJumpFrameTime = time;
                 currentSprite = jumpSprite;
                 currentFrame = 0;
             }
@@ -262,8 +268,10 @@
                     currentSprite = jumpSprite;
                     currentFrame = 0;
                     jumpTimer = 0;
+                    lastJumpFrameTime = time;
+                } else {
+                    jumpTimer += jumpDeltaTime;
                 }
-                jumpTimer += deltaTime;
 
                 // Usamos los nuevos tiempos sugeridos
                 if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0;
