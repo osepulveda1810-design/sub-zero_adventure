@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sub-Zero - Reparado</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-touch-callout: none; }
+        body {
+            background-color: #1a1a2e; display: flex; justify-content: center; align-items: center;
+            height: 100vh; width: 100vw; overflow: hidden; font-family: sans-serif; touch-action: none; position: fixed;
+        }
+        #game-container {
+            display: flex; flex-direction: column;
+            width: 100vw; height: 100vh;
+            max-width: 500px;
+            padding: 5px; background-color: #16213e;
+        }
+        #canvas-wrapper {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            background-color: #1a1a2e; border-radius: 10px; margin-bottom: 5px;
+            border: 2px solid #0f3460; overflow: hidden;
+            width: 100%; height: 100%;
+        }
+        canvas { 
+            display: block; 
+            width: 100%; /* Ensancha el escenario */
+            height: 100%;
+            image-rendering: pixelated; 
+            background-color: #16213e; 
+        }
+        #controls {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 5px 10px 15px 10px; height: 120px; flex-shrink: 0;
+        }
+        .btn {
+            width: 65px; height: 65px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1); color: #fff; font-size: 24px;
+            display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.1s; touch-action: none; cursor: pointer;
+        }
+        .btn:active, .btn.active { background: rgba(78, 204, 163, 0.4); border-color: rgba(78, 204, 163, 0.8); transform: scale(0.9); }
+        #btn-jump { width: 85px; height: 85px; background: rgba(255, 50, 50, 0.2); border-color: rgba(255, 50, 50, 0.5); font-weight: bold; font-size: 18px; }
+        #btn-jump:active, #btn-jump.active { background: rgba(255, 50, 50, 0.5); }
+        @media (max-width: 400px) { .btn { width: 55px; height: 55px; font-size: 20px; } #btn-jump { width: 70px; height: 70px; } }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="canvas-wrapper">
+            <canvas id="gameCanvas"></canvas>
+        </div>
+        <div id="controls">
+            <div class="control-group">
+                <button class="btn" id="btn-left">◀</button>
+                <button class="btn" id="btn-right">▶</button>
+            </div>
+            <div class="control-group">
+                <button class="btn" id="btn-jump">SALTO</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // --- Sprites ---
+        const idleSprite = new Image(); idleSprite.src = 'idle_subzero.png';
+        const walkSprite = new Image(); walkSprite.src = 'walk_subzero.png';
+        const jumpSprite = new Image(); jumpSprite.src = 'jump_subzero.png';
+
+        let currentSprite = idleSprite; 
+
+        // --- Variables del Juego ---
+        let currentFrame = 0;
+        const totalFrames = 4;
+        let frameSpeed = 150;
+        let lastTime = 0; // Variable de tiempo global para Idle y Walk
+        
+        let playerX = 50;
+        let playerY = 50;
+        let velocityX = 0;
+        let velocityY = 0;
+        
+        const speed = 4;
+        const gravity = 0.6;
+        const jumpStrength = -11;
+        let facingRight = true;
+        let scale = 1;
+
+        // --- CORRECCIÓN DE PÍXELES (OFFSETS) ---
+        const idleFrameOffset = [-5, -2, 2, 6];  // Tus ajustes
+        const walkFrameOffset = [0, 0, 0, 0];
+        const jumpFrameOffset = [0, 0, 0, 0];
+
+        // --- Variables específicas del salto ---
+        let jumpTimer = 0;
+        const jumpFrameTimes = [100, 100, 100, 100]; // Tiempo en ms para cada frame de salto
+
+        // --- Estado de los Controles ---
+        const keys = { right: false, left: false, up: false };
+
+        // Teclado (PC)
+        document.addEventListener('keydown', (e) => {
+            if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
+            if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
+            if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { keys.up = true; e.preventDefault(); }
+        });
+        document.addEventListener('keyup', (e) => {
+            if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
+            if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
+            if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
+        });
+
+        // Táctil (Móvil)
+        function setupTouchButton(elementId, keyName) {
+            const el = document.getElementById(elementId);
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); keys[keyName] = true; el.classList.add('active'); });
+            el.addEventListener('touchend', (e) => { e.preventDefault(); keys[keyName] = false; el.classList.remove('active'); });
+            el.addEventListener('touchcancel', (e) => { e.preventDefault(); keys[keyName] = false; el.classList.remove('active'); });
+        }
+        setupTouchButton('btn-left', 'left');
+        setupTouchButton('btn-right', 'right');
+        setupTouchButton('btn-jump', 'up');
+
+        // --- Configuración del Canvas ---
+        function setupCanvas() {
+            const wrapper = document.getElementById('canvas-wrapper');
+            const w = wrapper.clientWidth;
+            const h = wrapper.clientHeight;
+            
+            canvas.width = w;
+            
+            // La ESCALA se fija en base a la ALTURA para NO estirar al personaje
+            const frameHeight = idleSprite.height;
+            scale = (h * 0.45) / frameHeight; 
+            canvas.height = (frameHeight * scale) + 50;
+
+            const floorY = canvas.height - (frameHeight * scale) - 10;
+            if (playerY > floorY) playerY = floorY;
+        }
+
+        let imagesLoaded = 0;
+        function checkImagesLoaded() {
+            imagesLoaded++;
+            if (imagesLoaded === 3) {
+                setupCanvas();
+                window.addEventListener('resize', setupCanvas);
+                requestAnimationFrame(animate);
+            }
+        }
+        
+        idleSprite.onload = checkImagesLoaded;
+        walkSprite.onload = checkImagesLoaded;
+        jumpSprite.onload = checkImagesLoaded;
+
+        const showError = (name) => {
+            document.querySelector('#canvas-wrapper').innerHTML = `<h2 style='color:red; text-align:center; padding:20px;'>❌ ERROR: No se encontró '${name}'.</h2>`;
+        };
+        idleSprite.onerror = () => showError('idle_subzero.png');
+        walkSprite.onerror = () => showError('walk_subzero.png');
+        jumpSprite.onerror = () => showError('jump_subzero.png');
+
+        // --- Bucle Principal (CORREGIDO) ---
+        function animate(time) {
+            if (!lastTime) lastTime = time;
+            const deltaTime = time - lastTime; 
+            // NOTA: NO actualizamos lastTime globalmente aquí, 
+            // solo se actualiza en el modo Idle/Walk cuando cambia el frame.
+
+            const isMoving = keys.left || keys.right;
+            const frameHeight = currentSprite.height;
+            const floorY = canvas.height - (frameHeight * scale) - 10;
+
+            // 1. Lógica de Inicio de Salto
+            const wasOnGround = playerY >= floorY;
+            if(keys.up && wasOnGround) {
+                velocityY = jumpStrength;
+                jumpTimer = 0;
+                currentSprite = jumpSprite;
+                currentFrame = 0;
+            }
+
+            // 2. Lógica de Movimiento
+            if (keys.left) {
+                velocityX = -speed;
+                facingRight = false;
+            } else if (keys.right) {
+                velocityX = speed;
+                facingRight = true;
+            } else {
+                velocityX = 0;
+            }
+
+            // 3. Física
+            velocityY += gravity;
+            playerX += velocityX;
+            playerY += velocityY;
+
+            const isInAir = playerY < floorY - 1;
+
+            // 4. Gestión del estado actual del sprite
+            if (isInAir) {
+                if (currentSprite !== jumpSprite) {
+                    currentSprite = jumpSprite;
+                    currentFrame = 0;
+                    jumpTimer = 0;
+                }
+
+                // Contador específico para el salto
+                jumpTimer += deltaTime;
+                
+                // Forzamos el paso por cada fotograma de forma temporal
+                if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0; // Inicio / Agachado
+                else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1]) currentFrame = 1; // Subiendo
+                else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1] + jumpFrameTimes[2]) currentFrame = 2; // Pico
+                else currentFrame = 3; // Cayendo (Se queda en este frame hasta aterrizar)
+
+            } else {
+                // Está en el SUELO
+                if (playerY > floorY) { 
+                    playerY = floorY; 
+                    velocityY = 0; 
+                }
+
+                // Si el sprite actual es el de salto, aterrizamos y cambiamos
+                if (currentSprite === jumpSprite) {
+                    currentSprite = isMoving ? walkSprite : idleSprite;
+                    currentFrame = 0;
+                } else {
+                    // Lógica normal de Idle vs Walk con contador de tiempo real
+                    if (isMoving) {
+                        if (currentSprite !== walkSprite) {
+                            currentSprite = walkSprite;
+                            currentFrame = 0;
+                        }
+                        frameSpeed = 120;
+                    } else {
+                        if (currentSprite !== idleSprite) {
+                            currentSprite = idleSprite;
+                            currentFrame = 0;
+                        }
+                        frameSpeed = 150;
+                    }
+                    
+                    // Animación cíclica (Aquí SÍ actualizamos lastTime)
+                    if (time - lastTime >= frameSpeed) {
+                        currentFrame = (currentFrame + 1) % totalFrames;
+                        lastTime = time; // Solo se actualiza cuando el frame cambia
+                    }
+                }
+            }
+
+            // Colisiones con las paredes
+            const maxX = canvas.width - (currentSprite.width / totalFrames * scale);
+            if (playerX < 0) playerX = 0;
+            if (playerX > maxX) playerX = maxX;
+
+            // --- Renderizado ---
+            if (currentSprite.complete) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#4ecca3';
+                ctx.fillRect(0, floorY + (frameHeight * scale), canvas.width, 4);
+
+                const frameWidth = currentSprite.width / totalFrames;
+                const drawWidth = Math.round(frameWidth * scale);
+                const drawHeight = Math.round(frameHeight * scale);
+                const drawX = Math.round(playerX);
+                const drawY = Math.round(playerY);
+
+                let currentOffset = [0,0,0,0];
+                if (currentSprite === idleSprite) currentOffset = idleFrameOffset;
+                else if (currentSprite === walkSprite) currentOffset = walkFrameOffset;
+                else if (currentSprite === jumpSprite) currentOffset = jumpFrameOffset;
+
+                const offset = Math.round(currentOffset[currentFrame] * scale);
+
+                ctx.save(); 
+                if (!facingRight) {
+                    ctx.translate(drawX + drawWidth, drawY);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(
+                        currentSprite,
+                        currentFrame * frameWidth, 0, frameWidth, frameHeight,
+                        -offset, 0, drawWidth, drawHeight
+                    );
+                } else {
+                    ctx.drawImage(
+                        currentSprite,
+                        currentFrame * frameWidth, 0, frameWidth, frameHeight,
+                        drawX + offset, drawY, drawWidth, drawHeight
+                    );
+                }
+                ctx.restore();
+            }
+
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+</html>
