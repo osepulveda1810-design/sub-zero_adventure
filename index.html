@@ -295,7 +295,7 @@
             const jumpDeltaTime = time - lastJumpFrameTime;
             lastJumpFrameTime = time;
 
-            const isMoving = keys.left || keys.right;
+            const isMoving = keys.left || keys.right || keys.forward || keys.backward;
             const frameHeight = currentSprite.height;
 
             // Movimiento de carril arriba/abajo (estilo Final Fight)
