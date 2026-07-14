@@ -89,6 +89,15 @@
         }
         .btn:active, .btn.active { background: rgba(78, 204, 163, 0.6); border-color: rgba(78, 204, 163, 1); transform: scale(0.9); }
 
+        .attack-group { display: flex; gap: 10px; align-items: flex-end; }
+        #btn-punch, #btn-kick {
+            background: rgba(30, 80, 200, 0.4); border-color: rgba(80, 160, 255, 0.6);
+            font-weight: bold; font-size: 14px;
+        }
+        #btn-punch:active, #btn-punch.active, #btn-kick:active, #btn-kick.active {
+            background: rgba(80, 160, 255, 0.8);
+        }
+
         #btn-jump { width: 90px; height: 90px; background: rgba(200, 30, 30, 0.4); border-color: rgba(255, 50, 50, 0.6); font-weight: bold; font-size: 18px; }
         #btn-jump:active, #btn-jump.active { background: rgba(255, 50, 50, 0.8); }
 
@@ -117,7 +126,9 @@
                     </div>
                     <button class="btn-small" id="btn-backward">▼</button>
                 </div>
-                <div class="control-group">
+                <div class="control-group attack-group">
+                    <button class="btn" id="btn-punch">GOLPE</button>
+                    <button class="btn" id="btn-kick">PATADA</button>
                     <button class="btn" id="btn-jump">SALTO</button>
                 </div>
             </div>
@@ -131,6 +142,8 @@
         const idleSprite = new Image(); idleSprite.src = 'idle_subzero.png';
         const walkSprite = new Image(); walkSprite.src = 'walk_subzero.png';
         const jumpSprite = new Image(); jumpSprite.src = 'jump_subzero.png';
+        const punchSprite = new Image(); punchSprite.src = 'punch_subzero.png';
+        const kickSprite = new Image(); kickSprite.src = 'kick_subzero.png';
 
         let currentSprite = idleSprite; 
         let currentFrame = 0;
@@ -152,6 +165,8 @@
         const idleFrameOffset = [0, 0, 0, 0];
         const walkFrameOffset = [0, 0, 0, 0];
         const jumpFrameOffset = [0, 0, 0, 0];
+        const punchFrameOffset = [0, 0, 0, 0];
+        const kickFrameOffset = [0, 0, 0, 0];
 
         let jumpTimer = 0;
         let isJumping = false;
@@ -160,8 +175,21 @@
         // --- TIEMPOS DE SALTO: frame3 se mantiene mientras esté en el aire; el 4to valor es cuánto dura el frame de aterrizaje ---
         const jumpFrameTimes = [150, 120, 260, 180]; 
 
+        // --- ATAQUES (golpe y patada) ---
+        const punchFrameTimes = [90, 90, 100, 140];
+        const kickFrameTimes = [100, 110, 100, 160];
+        let isAttacking = false;
+        let attackKind = null; // 'punch' | 'kick'
+        let attackTimer = 0;
+        let lastAttackFrameTime = 0;
+        let attackRequested = null;
+
         const keys = { right: false, left: false, up: false, forward: false, backward: false };
 
+
+        function requestAttack(kind) {
+            if (!isAttacking) attackRequested = kind;
+        }
 
         // --- CONTROLES ---
         document.addEventListener('keydown', (e) => {
@@ -170,6 +198,8 @@
             if(e.code === 'ArrowUp' || e.code === 'KeyW') { keys.forward = true; e.preventDefault(); }
             if(e.code === 'ArrowDown' || e.code === 'KeyS') { keys.backward = true; e.preventDefault(); }
             if(e.code === 'Space') { keys.up = true; e.preventDefault(); }
+            if(e.code === 'KeyJ' && !e.repeat) requestAttack('punch');
+            if(e.code === 'KeyK' && !e.repeat) requestAttack('kick');
         });
         document.addEventListener('keyup', (e) => {
             if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
@@ -190,6 +220,15 @@
         setupTouchButton('btn-jump', 'up');
         setupTouchButton('btn-forward', 'forward');
         setupTouchButton('btn-backward', 'backward');
+
+        function setupAttackButton(elementId, kind) {
+            const el = document.getElementById(elementId);
+            const trigger = (e) => { e.preventDefault(); requestAttack(kind); el.classList.add('active'); setTimeout(() => el.classList.remove('active'), 120); };
+            el.addEventListener('touchstart', trigger);
+            el.addEventListener('click', trigger);
+        }
+        setupAttackButton('btn-punch', 'punch');
+        setupAttackButton('btn-kick', 'kick');
 
         // --- CONFIGURACIÓN DEL CANVAS ---
         function setupCanvas() {
@@ -241,7 +280,7 @@
         let imagesLoaded = 0;
         function checkImagesLoaded() {
             imagesLoaded++;
-            if (imagesLoaded === 3) {
+            if (imagesLoaded === 5) {
                 applyForcedOrientation();
                 window.addEventListener('resize', applyForcedOrientation);
                 window.addEventListener('orientationchange', () => setTimeout(applyForcedOrientation, 100));
@@ -252,6 +291,8 @@
         idleSprite.onload = checkImagesLoaded;
         walkSprite.onload = checkImagesLoaded;
         jumpSprite.onload = checkImagesLoaded;
+        punchSprite.onload = checkImagesLoaded;
+        kickSprite.onload = checkImagesLoaded;
 
         const showError = (name) => {
             document.querySelector('#canvas-wrapper').innerHTML = `<h2 style='color:red; text-align:center; padding:20px;'>❌ ERROR: No se encontró '${name}'.</h2>`;
@@ -259,6 +300,8 @@
         idleSprite.onerror = () => showError('idle_subzero.png');
         walkSprite.onerror = () => showError('walk_subzero.png');
         jumpSprite.onerror = () => showError('jump_subzero.png');
+        punchSprite.onerror = () => showError('punch_subzero.png');
+        kickSprite.onerror = () => showError('kick_subzero.png');
 
         // --- BUCLE PRINCIPAL ---
         function animate(time) {
@@ -269,19 +312,32 @@
             const jumpDeltaTime = time - lastJumpFrameTime;
             lastJumpFrameTime = time;
 
-            const isMoving = keys.left || keys.right || keys.forward || keys.backward;
+            const isMoving = !isAttacking && (keys.left || keys.right || keys.forward || keys.backward);
             const frameHeight = currentSprite.height;
 
-            // Movimiento de carril arriba/abajo (estilo Final Fight)
-            if (keys.forward) playerLaneY -= depthSpeed;
-            if (keys.backward) playerLaneY += depthSpeed;
-            if (playerLaneY < laneTop) playerLaneY = laneTop;
-            if (playerLaneY > laneBottom) playerLaneY = laneBottom;
+            // Iniciar ataque (golpe o patada) si se solicitó y no hay uno en curso ni está saltando
+            if (attackRequested && !isAttacking && !isJumping) {
+                isAttacking = true;
+                attackKind = attackRequested;
+                attackTimer = 0;
+                lastAttackFrameTime = time;
+                currentSprite = attackKind === 'punch' ? punchSprite : kickSprite;
+                currentFrame = 0;
+            }
+            attackRequested = null;
+
+            // Movimiento de carril arriba/abajo (estilo Final Fight) - congelado durante el ataque
+            if (!isAttacking) {
+                if (keys.forward) playerLaneY -= depthSpeed;
+                if (keys.backward) playerLaneY += depthSpeed;
+                if (playerLaneY < laneTop) playerLaneY = laneTop;
+                if (playerLaneY > laneBottom) playerLaneY = laneBottom;
+            }
 
             const floorY = playerLaneY;
 
             const wasOnGround = !isJumping;
-            if(keys.up && wasOnGround) {
+            if(keys.up && wasOnGround && !isAttacking) {
                 velocityY = jumpStrength;
                 jumpTimer = 0;
                 isLanding = false;
@@ -291,7 +347,9 @@
                 currentFrame = 0;
             }
 
-            if (keys.left) { velocityX = -speed; facingRight = false; } 
+            if (isAttacking) {
+                velocityX = 0;
+            } else if (keys.left) { velocityX = -speed; facingRight = false; } 
             else if (keys.right) { velocityX = speed; facingRight = true; } 
             else { velocityX = 0; }
 
@@ -311,7 +369,28 @@
 
             const isInAir = isJumping;
 
-            if (isInAir) {
+            if (isAttacking) {
+                const times = attackKind === 'punch' ? punchFrameTimes : kickFrameTimes;
+                attackTimer += (time - lastAttackFrameTime);
+                lastAttackFrameTime = time;
+
+                let cum = 0, frame = totalFrames - 1;
+                for (let i = 0; i < times.length; i++) {
+                    cum += times[i];
+                    if (attackTimer < cum) { frame = i; break; }
+                }
+                currentFrame = frame;
+
+                const totalAttackTime = times.reduce((a, b) => a + b, 0);
+                if (attackTimer >= totalAttackTime) {
+                    isAttacking = false;
+                    attackKind = null;
+                    currentSprite = (keys.left || keys.right || keys.forward || keys.backward) ? walkSprite : idleSprite;
+                    currentFrame = 0;
+                    lastTime = time;
+                }
+
+            } else if (isInAir) {
                 if (currentSprite !== jumpSprite) {
                     currentSprite = jumpSprite;
                     currentFrame = 0;
@@ -390,6 +469,8 @@
                 if (currentSprite === idleSprite) currentOffset = idleFrameOffset;
                 else if (currentSprite === walkSprite) currentOffset = walkFrameOffset;
                 else if (currentSprite === jumpSprite) currentOffset = jumpFrameOffset;
+                else if (currentSprite === punchSprite) currentOffset = punchFrameOffset;
+                else if (currentSprite === kickSprite) currentOffset = kickFrameOffset;
 
                 const offset = Math.round(currentOffset[currentFrame] * scale);
 
