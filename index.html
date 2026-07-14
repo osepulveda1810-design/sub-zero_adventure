@@ -77,6 +77,18 @@
             pointer-events: auto; 
         }
 
+        .control-group.dpad {
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+        }
+        .dpad-row { display: flex; gap: 10px; }
+        .btn-small {
+            width: 46px; height: 46px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3);
+            background: rgba(20, 30, 50, 0.6); color: #fff; font-size: 18px;
+            display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            transition: all 0.1s; touch-action: none; cursor: pointer;
+        }
+        .btn-small:active, .btn-small.active { background: rgba(78, 204, 163, 0.6); border-color: rgba(78, 204, 163, 1); transform: scale(0.9); }
+
         .btn {
             width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255, 255, 255, 0.3);
             background: rgba(20, 30, 50, 0.6); 
@@ -108,9 +120,13 @@
             <canvas id="gameCanvas"></canvas>
 
             <div id="controls">
-                <div class="control-group">
-                    <button class="btn" id="btn-left">◀</button>
-                    <button class="btn" id="btn-right">▶</button>
+                <div class="control-group dpad">
+                    <button class="btn-small" id="btn-forward">▲</button>
+                    <div class="dpad-row">
+                        <button class="btn" id="btn-left">◀</button>
+                        <button class="btn" id="btn-right">▶</button>
+                    </div>
+                    <button class="btn-small" id="btn-backward">▼</button>
                 </div>
                 <div class="control-group">
                     <button class="btn" id="btn-jump">SALTO</button>
@@ -139,6 +155,11 @@
         const speed = 2.2; const gravity = 0.22; const jumpStrength = -7.5;
         let facingRight = true; let scale = 1;
 
+        // --- CARRIL DE PELEA (estilo Final Fight): el personaje se mueve arriba/abajo dentro de esta franja ---
+        let laneTop = 0; let laneBottom = 0; let playerLaneY = 0;
+        const depthSpeed = 1.6;
+        let positionInitialized = false;
+
         const idleFrameOffset = [0, 0, 0, 0];
         const walkFrameOffset = [0, 0, 0, 0];
         const jumpFrameOffset = [0, 0, 0, 0];
@@ -149,7 +170,7 @@
         // --- TIEMPOS DE SALTO: frame3 se mantiene mientras esté en el aire; el 4to valor es cuánto dura el frame de aterrizaje ---
         const jumpFrameTimes = [150, 120, 260, 180]; 
 
-        const keys = { right: false, left: false, up: false };
+        const keys = { right: false, left: false, up: false, forward: false, backward: false };
 
         // --- FUNCIÓN FULLSCREEN ---
         const fullscreenBtn = document.getElementById('btn-fullscreen');
@@ -172,12 +193,16 @@
         document.addEventListener('keydown', (e) => {
             if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
             if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-            if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') { keys.up = true; e.preventDefault(); }
+            if(e.code === 'ArrowUp' || e.code === 'KeyW') { keys.forward = true; e.preventDefault(); }
+            if(e.code === 'ArrowDown' || e.code === 'KeyS') { keys.backward = true; e.preventDefault(); }
+            if(e.code === 'Space') { keys.up = true; e.preventDefault(); }
         });
         document.addEventListener('keyup', (e) => {
             if(e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
             if(e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = false;
-            if(e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') keys.up = false;
+            if(e.code === 'ArrowUp' || e.code === 'KeyW') keys.forward = false;
+            if(e.code === 'ArrowDown' || e.code === 'KeyS') keys.backward = false;
+            if(e.code === 'Space') keys.up = false;
         });
 
         function setupTouchButton(elementId, keyName) {
@@ -189,6 +214,8 @@
         setupTouchButton('btn-left', 'left');
         setupTouchButton('btn-right', 'right');
         setupTouchButton('btn-jump', 'up');
+        setupTouchButton('btn-forward', 'forward');
+        setupTouchButton('btn-backward', 'backward');
 
         // --- CONFIGURACIÓN DEL CANVAS ---
         function setupCanvas() {
@@ -197,12 +224,23 @@
             const h = wrapper.clientHeight;
 
             canvas.width = w;
-            const frameHeight = idleSprite.height;
-            scale = (h * 0.45) / frameHeight; 
-            canvas.height = (frameHeight * scale) + 50;
+            canvas.height = h;
 
-            const floorY = canvas.height - (frameHeight * scale) - 10;
-            if (playerY > floorY) playerY = floorY;
+            const frameHeight = idleSprite.height;
+            scale = (h * 0.4) / frameHeight;
+
+            laneBottom = canvas.height - (frameHeight * scale) - 20;
+            const laneHeight = Math.min(canvas.height * 0.35, 160);
+            laneTop = Math.max(20, laneBottom - laneHeight);
+
+            if (playerLaneY > laneBottom || playerLaneY === 0) playerLaneY = laneBottom;
+            if (playerLaneY < laneTop) playerLaneY = laneTop;
+
+            if (!positionInitialized) {
+                playerY = playerLaneY;
+                positionInitialized = true;
+            }
+            if (playerY > playerLaneY) playerY = playerLaneY;
         }
 
         // --- FORZAR HORIZONTAL SIN DEPENDER DE ROTACIÓN DEL DISPOSITIVO ---
@@ -259,7 +297,14 @@
 
             const isMoving = keys.left || keys.right;
             const frameHeight = currentSprite.height;
-            const floorY = canvas.height - (frameHeight * scale) - 10;
+
+            // Movimiento de carril arriba/abajo (estilo Final Fight)
+            if (keys.forward) playerLaneY -= depthSpeed;
+            if (keys.backward) playerLaneY += depthSpeed;
+            if (playerLaneY < laneTop) playerLaneY = laneTop;
+            if (playerLaneY > laneBottom) playerLaneY = laneBottom;
+
+            const floorY = playerLaneY;
 
             const wasOnGround = playerY >= floorY;
             if(keys.up && wasOnGround) {
@@ -336,14 +381,27 @@
 
             if (currentSprite.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Franja del carril transitable (arriba/abajo)
+                ctx.fillStyle = 'rgba(78, 204, 163, 0.08)';
+                ctx.fillRect(0, laneTop, canvas.width, (laneBottom - laneTop) + (frameHeight * scale) + 24);
+
                 ctx.fillStyle = '#4ecca3';
                 ctx.fillRect(0, floorY + (frameHeight * scale), canvas.width, 4);
 
                 const frameWidth = currentSprite.width / totalFrames;
-                const drawWidth = Math.round(frameWidth * scale);
-                const drawHeight = Math.round(frameHeight * scale);
+
+                // Perspectiva: más lejos en el carril (arriba) = más pequeño
+                const laneRange = Math.max(1, laneBottom - laneTop);
+                const depthRatio = (laneBottom - playerLaneY) / laneRange; // 0 = adelante, 1 = atrás
+                const perspectiveScale = 1 - depthRatio * 0.15;
+
+                const baseDrawWidth = frameWidth * scale;
+                const baseDrawHeight = frameHeight * scale;
+                const drawWidth = Math.round(baseDrawWidth * perspectiveScale);
+                const drawHeight = Math.round(baseDrawHeight * perspectiveScale);
                 const drawX = Math.round(playerX);
-                const drawY = Math.round(playerY);
+                const drawY = Math.round(playerY + baseDrawHeight - drawHeight);
 
                 let currentOffset = [0,0,0,0];
                 if (currentSprite === idleSprite) currentOffset = idleFrameOffset;
