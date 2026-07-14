@@ -23,22 +23,12 @@
 
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
 
-        @media (orientation: portrait) {
-            #rotate-overlay { display: none !important; }
-            #game-container {
-                display: flex !important;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                width: 100dvh;
-                height: 100dvw;
-                transform: translate(-50%, -50%) rotate(90deg);
-                transform-origin: center center;
-            }
-        }
-        @media (orientation: landscape) {
-            #rotate-overlay { display: none !important; }
-            #game-container { display: flex !important; }
+        #game-container.forced-landscape {
+            display: flex !important;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform-origin: center center;
         }
 
         /* --- CONTENEDOR DEL JUEGO (ESCENARIO COMPLETO) --- */
@@ -215,12 +205,34 @@
             if (playerY > floorY) playerY = floorY;
         }
 
+        // --- FORZAR HORIZONTAL SIN DEPENDER DE ROTACIÓN DEL DISPOSITIVO ---
+        const gameContainer = document.getElementById('game-container');
+        function applyForcedOrientation() {
+            const iw = window.innerWidth;
+            const ih = window.innerHeight;
+            const isPortrait = ih > iw;
+
+            if (isPortrait) {
+                gameContainer.classList.add('forced-landscape');
+                gameContainer.style.width = ih + 'px';
+                gameContainer.style.height = iw + 'px';
+                gameContainer.style.transform = 'translate(-50%, -50%) rotate(90deg)';
+            } else {
+                gameContainer.classList.remove('forced-landscape');
+                gameContainer.style.width = '';
+                gameContainer.style.height = '';
+                gameContainer.style.transform = '';
+            }
+            setupCanvas();
+        }
+
         let imagesLoaded = 0;
         function checkImagesLoaded() {
             imagesLoaded++;
             if (imagesLoaded === 3) {
-                setupCanvas();
-                window.addEventListener('resize', setupCanvas);
+                applyForcedOrientation();
+                window.addEventListener('resize', applyForcedOrientation);
+                window.addEventListener('orientationchange', () => setTimeout(applyForcedOrientation, 100));
                 requestAnimationFrame(animate);
             }
         }
