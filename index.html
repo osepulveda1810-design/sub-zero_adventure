@@ -11,27 +11,6 @@
             height: 100dvh; width: 100vw; overflow: hidden; font-family: sans-serif; touch-action: none; position: fixed;
         }
 
-        /* --- OVERLAY DE ORIENTACIÓN --- */
-        #rotate-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0f172a; color: #fff; z-index: 9999;
-            flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;
-        }
-        #rotate-overlay h2 { font-size: 28px; margin-bottom: 20px; color: #4ecca3; }
-        #rotate-overlay p { font-size: 18px; color: #94a3b8; }
-        .rotate-icon { font-size: 60px; margin-bottom: 20px; animation: spin 2s infinite linear; }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(90deg); } }
-
-        #game-container.forced-landscape {
-            display: flex !important;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform-origin: center center;
-        }
-
-        /* --- CONTENEDOR DEL JUEGO (ESCENARIO COMPLETO) --- */
         #game-container {
             display: flex;
             width: 100vw; height: 100dvh;
@@ -53,7 +32,7 @@
             background-color: #16213e; 
         }
 
-        /* --- CONTROLES TÁCTILES (FLOTANDO SOBRE EL CANVAS) --- */
+        /* --- CONTROLES TÁCTILES --- */
         #controls {
             position: absolute;
             bottom: max(15px, env(safe-area-inset-bottom, 15px));
@@ -89,25 +68,36 @@
         }
         .btn:active, .btn.active { background: rgba(78, 204, 163, 0.6); border-color: rgba(78, 204, 163, 1); transform: scale(0.9); }
 
-        .attack-group { display: flex; gap: 10px; align-items: flex-end; }
+        .attack-group { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; justify-content: flex-end; max-width: 240px; }
+
         #btn-punch, #btn-kick {
             background: rgba(30, 80, 200, 0.4); border-color: rgba(80, 160, 255, 0.6);
-            font-weight: bold; font-size: 14px;
+            font-weight: bold; font-size: 12px;
         }
         #btn-punch:active, #btn-punch.active, #btn-kick:active, #btn-kick.active {
             background: rgba(80, 160, 255, 0.8);
         }
 
-        #btn-jump { width: 90px; height: 90px; background: rgba(200, 30, 30, 0.4); border-color: rgba(255, 50, 50, 0.6); font-weight: bold; font-size: 18px; }
+        #btn-punch2 {
+            background: rgba(0, 180, 220, 0.5); border-color: rgba(0, 220, 255, 0.7);
+            font-weight: bold; font-size: 11px; color: #aef;
+        }
+        #btn-punch2:active, #btn-punch2.active {
+            background: rgba(0, 220, 255, 0.8); color: #fff;
+        }
+
+        #btn-jump { width: 80px; height: 80px; background: rgba(200, 30, 30, 0.4); border-color: rgba(255, 50, 50, 0.6); font-weight: bold; font-size: 16px; }
         #btn-jump:active, #btn-jump.active { background: rgba(255, 50, 50, 0.8); }
 
         @media (max-width: 500px) {
-            .btn { width: 60px; height: 60px; font-size: 22px; }
-            #btn-jump { width: 75px; height: 75px; }
+            .btn { width: 60px; height: 60px; font-size: 20px; }
+            #btn-jump { width: 70px; height: 70px; }
+            .attack-group { max-width: 200px; gap: 6px; }
         }
         @media (max-width: 400px) {
-            .btn { width: 55px; height: 55px; font-size: 20px; }
-            #btn-jump { width: 70px; height: 70px; }
+            .btn { width: 55px; height: 55px; font-size: 18px; }
+            #btn-jump { width: 65px; height: 65px; }
+            .attack-group { max-width: 180px; gap: 5px; }
         }
     </style>
 </head>
@@ -128,6 +118,7 @@
                 </div>
                 <div class="control-group attack-group">
                     <button class="btn" id="btn-punch">GOLPE</button>
+                    <button class="btn" id="btn-punch2">HIELO</button>
                     <button class="btn" id="btn-kick">PATADA</button>
                     <button class="btn" id="btn-jump">SALTO</button>
                 </div>
@@ -138,12 +129,15 @@
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
 
+        // --- Sprites ---
         const idleSprite = new Image(); idleSprite.src = 'idle_subzero.png';
         const walkSprite = new Image(); walkSprite.src = 'walk_subzero.png';
         const jumpSprite = new Image(); jumpSprite.src = 'jump_subzero.png';
-        const punchSprite = new Image(); punchSprite.src = 'punch_subzero.png';
         const kickSprite = new Image(); kickSprite.src = 'kick_subzero.png';
+        const punchSprite = new Image(); punchSprite.src = 'punch_subzero.png';
+        const punch2Sprite = new Image(); punch2Sprite.src = 'punch_subzero2.png';
 
         let currentSprite = idleSprite; 
         let currentFrame = 0;
@@ -157,38 +151,84 @@
         const speed = 2.2; const gravity = 0.22; const jumpStrength = -7.5;
         let facingRight = true; let scale = 1;
 
-        // --- CARRIL DE PELEA (estilo Final Fight): el personaje se mueve arriba/abajo dentro de esta franja ---
+        let baseDrawWidth = 0;
+        let baseDrawHeight = 0;
+
+        // --- CARRIL DE PELEA ---
         let laneTop = 0; let laneBottom = 0; let playerLaneY = 0;
         const depthSpeed = 1.6;
         let positionInitialized = false;
 
+        // Offsets de ajuste generales
         const idleFrameOffset = [0, 0, 0, 0];
         const walkFrameOffset = [0, 0, 0, 0];
         const jumpFrameOffset = [0, 0, 0, 0];
-        const punchFrameOffset = [0, 0, 0, 0];
         const kickFrameOffset = [0, 0, 0, 0];
+        const punchFrameOffset = [0, 3, 16, 22];
+        const punch2FrameOffset = [0, 0, 0, -20]; // Frame 4 del hielo necesita ajuste
 
         let jumpTimer = 0;
         let isJumping = false;
         let isLanding = false;
         let landingTimer = 0;
-        // --- TIEMPOS DE SALTO: frame3 se mantiene mientras esté en el aire; el 4to valor es cuánto dura el frame de aterrizaje ---
         const jumpFrameTimes = [150, 120, 260, 180]; 
 
-        // --- ATAQUES (golpe y patada) ---
-        const punchFrameTimes = [90, 90, 100, 140];
+        // --- ATAQUES ---
+        const punchFrameTimes = [100, 100, 120, 160];
+        const punch2FrameTimes = [120, 140, 100, 200]; // Hielo es más lento al cargar
         const kickFrameTimes = [100, 110, 100, 160];
         let isAttacking = false;
-        let attackKind = null; // 'punch' | 'kick'
+        let attackKind = null;
         let attackTimer = 0;
         let lastAttackFrameTime = 0;
         let attackRequested = null;
+        let damageDealt = false; // Para evitar daño múltiple en un solo ataque
 
         const keys = { right: false, left: false, up: false, forward: false, backward: false };
 
+        // --- 🛠️ AJUSTES DE ESCALA Y POSICIÓN ---
+        const punchCustomScale = 1.0; 
+        const punch2CustomScale = 1.0;
+        const punchVerticalOffset = 0; 
+        const punch2VerticalOffset = 0;
+
+        // Recortes para punch normal
+        const punchCropAdjustX = [0, 0, 0, 0]; 
+        const punchCropAdjustW = [0, -5, -5, -5]; 
+
+        // Recortes para punch hielo (frame 4 tiene el personaje más a la izquierda)
+        const punch2CropAdjustX = [0, 0, 6, 0]; 
+        const punch2CropAdjustW = [0, 0, -28, -35]; 
+
+        // --- SISTEMA DE DAÑO ---
+        const enemy = {
+            x: 0, y: 0, width: 60, height: 100,
+            health: 100, maxHealth: 100,
+            laneY: 0,
+            flashTimer: 0,
+            dead: false
+        };
+
+        const damageValues = {
+            punch: 10,
+            kick: 15,
+            punch2: 25
+        };
+
+        const floatingTexts = []; // { x, y, text, color, timer, life }
+
+        function spawnFloatingText(x, y, text, color) {
+            floatingTexts.push({ x, y, text, color, timer: 0, life: 800 });
+        }
+
+        function resetEnemy() {
+            enemy.health = enemy.maxHealth;
+            enemy.dead = false;
+            enemy.flashTimer = 0;
+        }
 
         function requestAttack(kind) {
-            if (!isAttacking) attackRequested = kind;
+            if (!isAttacking && !enemy.dead) attackRequested = kind;
         }
 
         // --- CONTROLES ---
@@ -199,6 +239,7 @@
             if(e.code === 'ArrowDown' || e.code === 'KeyS') { keys.backward = true; e.preventDefault(); }
             if(e.code === 'Space') { keys.up = true; e.preventDefault(); }
             if(e.code === 'KeyJ' && !e.repeat) requestAttack('punch');
+            if(e.code === 'KeyL' && !e.repeat) requestAttack('punch2');
             if(e.code === 'KeyK' && !e.repeat) requestAttack('kick');
         });
         document.addEventListener('keyup', (e) => {
@@ -228,6 +269,7 @@
             el.addEventListener('click', trigger);
         }
         setupAttackButton('btn-punch', 'punch');
+        setupAttackButton('btn-punch2', 'punch2');
         setupAttackButton('btn-kick', 'kick');
 
         // --- CONFIGURACIÓN DEL CANVAS ---
@@ -239,8 +281,11 @@
             canvas.width = w;
             canvas.height = h;
 
-            const frameHeight = idleSprite.height;
+            const frameHeight = idleSprite.height || 369;
             scale = (h * 0.65) / frameHeight;
+
+            baseDrawWidth = ((idleSprite.width || 677) / totalFrames) * scale;
+            baseDrawHeight = (idleSprite.height || 369) * scale;
 
             laneBottom = canvas.height - (frameHeight * scale) - 20;
             const laneHeight = Math.min(canvas.height * 0.35, 160);
@@ -254,36 +299,22 @@
                 positionInitialized = true;
             }
             if (playerY > playerLaneY) playerY = playerLaneY;
+
+            // Posicionar enemigo
+            enemy.laneY = playerLaneY;
+            enemy.x = Math.min(canvas.width - 100, canvas.width * 0.75);
+            enemy.y = playerLaneY;
         }
 
-        // --- FORZAR HORIZONTAL SIN DEPENDER DE ROTACIÓN DEL DISPOSITIVO ---
-        const gameContainer = document.getElementById('game-container');
-        function applyForcedOrientation() {
-            const iw = window.innerWidth;
-            const ih = window.innerHeight;
-            const isPortrait = ih > iw;
-
-            if (isPortrait) {
-                gameContainer.classList.add('forced-landscape');
-                gameContainer.style.width = ih + 'px';
-                gameContainer.style.height = iw + 'px';
-                gameContainer.style.transform = 'translate(-50%, -50%) rotate(90deg)';
-            } else {
-                gameContainer.classList.remove('forced-landscape');
-                gameContainer.style.width = '';
-                gameContainer.style.height = '';
-                gameContainer.style.transform = '';
-            }
-            setupCanvas();
-        }
-
+        // --- Carga de imágenes ---
         let imagesLoaded = 0;
+        const totalImages = 6;
         function checkImagesLoaded() {
             imagesLoaded++;
-            if (imagesLoaded === 5) {
-                applyForcedOrientation();
-                window.addEventListener('resize', applyForcedOrientation);
-                window.addEventListener('orientationchange', () => setTimeout(applyForcedOrientation, 100));
+            if (imagesLoaded === totalImages) {
+                setupCanvas();
+                window.addEventListener('resize', setupCanvas);
+                window.addEventListener('orientationchange', () => setTimeout(setupCanvas, 100));
                 requestAnimationFrame(animate);
             }
         }
@@ -291,8 +322,9 @@
         idleSprite.onload = checkImagesLoaded;
         walkSprite.onload = checkImagesLoaded;
         jumpSprite.onload = checkImagesLoaded;
-        punchSprite.onload = checkImagesLoaded;
         kickSprite.onload = checkImagesLoaded;
+        punchSprite.onload = checkImagesLoaded;
+        punch2Sprite.onload = checkImagesLoaded;
 
         const showError = (name) => {
             document.querySelector('#canvas-wrapper').innerHTML = `<h2 style='color:red; text-align:center; padding:20px;'>❌ ERROR: No se encontró '${name}'.</h2>`;
@@ -300,8 +332,43 @@
         idleSprite.onerror = () => showError('idle_subzero.png');
         walkSprite.onerror = () => showError('walk_subzero.png');
         jumpSprite.onerror = () => showError('jump_subzero.png');
-        punchSprite.onerror = () => showError('punch_subzero.png');
         kickSprite.onerror = () => showError('kick_subzero.png');
+        punchSprite.onerror = () => showError('punch_subzero.png');
+        punch2Sprite.onerror = () => showError('punch_subzero2.png');
+
+        // --- DETECCIÓN DE DAÑO ---
+        function checkHit() {
+            if (damageDealt || enemy.dead) return;
+
+            // El hit ocurre en el frame de impacto (frame 2, índice 2) para todos los ataques
+            if (currentFrame !== 2) return;
+
+            // Calcular distancia en X y en profundidad (laneY)
+            const playerWidth = baseDrawWidth * 0.8;
+            const enemyWidth = enemy.width;
+            const distX = Math.abs((playerX + playerWidth/2) - (enemy.x + enemyWidth/2));
+            const distLane = Math.abs(playerLaneY - enemy.laneY);
+
+            // Rango de golpe: 80px en X, 30px en profundidad
+            if (distX < 90 && distLane < 40) {
+                const dmg = damageValues[attackKind] || 10;
+                enemy.health = Math.max(0, enemy.health - dmg);
+                enemy.flashTimer = 200;
+                damageDealt = true;
+
+                // Texto flotante de daño
+                const textX = enemy.x + enemy.width / 2;
+                const textY = enemy.y - 20;
+                const color = attackKind === 'punch2' ? '#0ff' : '#ff4444';
+                spawnFloatingText(textX, textY, `-${dmg}`, color);
+
+                if (enemy.health <= 0) {
+                    enemy.dead = true;
+                    spawnFloatingText(textX, textY - 30, '¡K.O.!', '#ffd700');
+                    setTimeout(resetEnemy, 2000);
+                }
+            }
+        }
 
         // --- BUCLE PRINCIPAL ---
         function animate(time) {
@@ -313,20 +380,22 @@
             lastJumpFrameTime = time;
 
             const isMoving = !isAttacking && (keys.left || keys.right || keys.forward || keys.backward);
-            const frameHeight = currentSprite.height;
 
-            // Iniciar ataque (golpe o patada) si se solicitó y no hay uno en curso ni está saltando
+            // Iniciar ataque
             if (attackRequested && !isAttacking && !isJumping) {
                 isAttacking = true;
                 attackKind = attackRequested;
                 attackTimer = 0;
                 lastAttackFrameTime = time;
-                currentSprite = attackKind === 'punch' ? punchSprite : kickSprite;
+                damageDealt = false;
+                if (attackKind === 'punch') currentSprite = punchSprite;
+                else if (attackKind === 'punch2') currentSprite = punch2Sprite;
+                else currentSprite = kickSprite;
                 currentFrame = 0;
             }
             attackRequested = null;
 
-            // Movimiento de carril arriba/abajo (estilo Final Fight) - congelado durante el ataque
+            // Movimiento de carril
             if (!isAttacking) {
                 if (keys.forward) playerLaneY -= depthSpeed;
                 if (keys.backward) playerLaneY += depthSpeed;
@@ -369,8 +438,13 @@
 
             const isInAir = isJumping;
 
+            // --- Lógica de Ataque ---
             if (isAttacking) {
-                const times = attackKind === 'punch' ? punchFrameTimes : kickFrameTimes;
+                let times;
+                if (attackKind === 'punch') times = punchFrameTimes;
+                else if (attackKind === 'punch2') times = punch2FrameTimes;
+                else times = kickFrameTimes;
+
                 attackTimer += (time - lastAttackFrameTime);
                 lastAttackFrameTime = time;
 
@@ -380,6 +454,9 @@
                     if (attackTimer < cum) { frame = i; break; }
                 }
                 currentFrame = frame;
+
+                // Verificar golpe en frame de impacto
+                checkHit();
 
                 const totalAttackTime = times.reduce((a, b) => a + b, 0);
                 if (attackTimer >= totalAttackTime) {
@@ -400,14 +477,12 @@
                     jumpTimer += jumpDeltaTime;
                 }
 
-                // Usamos los nuevos tiempos sugeridos
                 if (jumpTimer < jumpFrameTimes[0]) currentFrame = 0;
                 else if (jumpTimer < jumpFrameTimes[0] + jumpFrameTimes[1]) currentFrame = 1;
                 else currentFrame = 2;
 
             } else {
                 if (currentSprite === jumpSprite && !isLanding) {
-                    // Momento exacto de tocar el suelo: mostrar el frame 4 (aterrizaje)
                     isLanding = true;
                     currentFrame = 3;
                     landingTimer = 0;
@@ -441,56 +516,199 @@
             if (playerX < 0) playerX = 0;
             if (playerX > maxX) playerX = maxX;
 
+            // Actualizar enemigo (sigue al jugador en profundidad lentamente)
+            if (!enemy.dead) {
+                const targetLaneY = playerLaneY;
+                enemy.laneY += (targetLaneY - enemy.laneY) * 0.02;
+                enemy.y = enemy.laneY;
+            }
+            if (enemy.flashTimer > 0) enemy.flashTimer -= deltaTime;
+
+            // Actualizar textos flotantes
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                floatingTexts[i].timer += deltaTime;
+                floatingTexts[i].y -= 0.8; // subir
+                if (floatingTexts[i].timer >= floatingTexts[i].life) {
+                    floatingTexts.splice(i, 1);
+                }
+            }
+
+            // --- RENDERIZADO ---
             if (currentSprite.complete) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Franja del carril transitable (arriba/abajo)
+                // Fondo del carril
                 ctx.fillStyle = 'rgba(78, 204, 163, 0.08)';
-                ctx.fillRect(0, laneTop, canvas.width, (laneBottom - laneTop) + (frameHeight * scale) + 24);
+                ctx.fillRect(0, laneTop, canvas.width, (laneBottom - laneTop) + ((idleSprite.height || 369) * scale) + 24);
 
                 ctx.fillStyle = '#4ecca3';
-                ctx.fillRect(0, floorY + (frameHeight * scale), canvas.width, 4);
+                ctx.fillRect(0, floorY + ((idleSprite.height || 369) * scale), canvas.width, 4);
 
-                const frameWidth = currentSprite.width / totalFrames;
-
-                // Perspectiva: más lejos en el carril (arriba) = más pequeño
                 const laneRange = Math.max(1, laneBottom - laneTop);
-                const depthRatio = (laneBottom - playerLaneY) / laneRange; // 0 = adelante, 1 = atrás
+                const depthRatio = (laneBottom - playerLaneY) / laneRange; 
                 const perspectiveScale = 1 - depthRatio * 0.15;
 
-                const baseDrawWidth = frameWidth * scale;
-                const baseDrawHeight = frameHeight * scale;
                 const drawWidth = Math.round(baseDrawWidth * perspectiveScale);
                 const drawHeight = Math.round(baseDrawHeight * perspectiveScale);
                 const drawX = Math.round(playerX);
                 const drawY = Math.round(playerY + baseDrawHeight - drawHeight);
 
-                let currentOffset = [0,0,0,0];
-                if (currentSprite === idleSprite) currentOffset = idleFrameOffset;
-                else if (currentSprite === walkSprite) currentOffset = walkFrameOffset;
-                else if (currentSprite === jumpSprite) currentOffset = jumpFrameOffset;
-                else if (currentSprite === punchSprite) currentOffset = punchFrameOffset;
-                else if (currentSprite === kickSprite) currentOffset = kickFrameOffset;
+                let offset = 0;
+                let sourceImg = null;
+                let sourceX = 0, sourceY = 0, sourceW = 0, sourceH = 0;
+                let targetDrawWidth = drawWidth;
+                let targetDrawHeight = drawHeight;
+                let finalDrawY = drawY;
 
-                const offset = Math.round(currentOffset[currentFrame] * scale);
+                // --- Renderizado de sprites ---
+                if (isAttacking && attackKind === 'punch') {
+                    sourceImg = punchSprite;
+                    const sfw = sourceImg.width / totalFrames;
+                    const sfh = sourceImg.height;
+                    sourceX = Math.floor((currentFrame * sfw) + punchCropAdjustX[currentFrame]); 
+                    sourceY = 0; 
+                    sourceW = Math.floor(sfw + punchCropAdjustW[currentFrame]);
+                    sourceH = Math.floor(sfh);
+                    offset = Math.round(punchFrameOffset[currentFrame] * scale);
+                    const punchAspectScale = (baseDrawHeight / sourceH) * punchCustomScale;
+                    targetDrawWidth = Math.round(sourceW * punchAspectScale * perspectiveScale);
+                    targetDrawHeight = Math.round(sourceH * punchAspectScale * perspectiveScale);
+                    finalDrawY = Math.round(drawY + punchVerticalOffset);
 
+                } else if (isAttacking && attackKind === 'punch2') {
+                    sourceImg = punch2Sprite;
+                    const sfw = sourceImg.width / totalFrames;
+                    const sfh = sourceImg.height;
+                    sourceX = Math.floor((currentFrame * sfw) + punch2CropAdjustX[currentFrame]); 
+                    sourceY = 0; 
+                    sourceW = Math.floor(sfw + punch2CropAdjustW[currentFrame]);
+                    sourceH = Math.floor(sfh);
+                    offset = Math.round(punch2FrameOffset[currentFrame] * scale);
+                    const punch2AspectScale = (baseDrawHeight / sourceH) * punch2CustomScale;
+                    targetDrawWidth = Math.round(sourceW * punch2AspectScale * perspectiveScale);
+                    targetDrawHeight = Math.round(sourceH * punch2AspectScale * perspectiveScale);
+                    finalDrawY = Math.round(drawY + punch2VerticalOffset);
+
+                } else {
+                    sourceImg = currentSprite;
+                    const sfw = sourceImg.width / totalFrames;
+                    const sfh = sourceImg.height;
+                    sourceX = Math.floor(currentFrame * sfw); sourceY = 0; sourceW = Math.floor(sfw); sourceH = Math.floor(sfh);
+
+                    let currentOffset = [0,0,0,0];
+                    if (currentSprite === idleSprite) currentOffset = idleFrameOffset;
+                    else if (currentSprite === walkSprite) currentOffset = walkFrameOffset;
+                    else if (currentSprite === jumpSprite) currentOffset = jumpFrameOffset;
+                    else if (currentSprite === kickSprite) currentOffset = kickFrameOffset;
+                    offset = Math.round(currentOffset[currentFrame] * scale);
+                    finalDrawY = drawY;
+                }
+
+                // --- DIBUJAR JUGADOR ---
                 ctx.save(); 
                 if (!facingRight) {
-                    ctx.translate(drawX + drawWidth, drawY);
+                    ctx.translate(drawX + targetDrawWidth, finalDrawY);
                     ctx.scale(-1, 1);
                     ctx.drawImage(
-                        currentSprite,
-                        currentFrame * frameWidth, 0, frameWidth, frameHeight,
-                        -offset, 0, drawWidth, drawHeight
+                        sourceImg,
+                        sourceX, sourceY, sourceW, sourceH,
+                        -offset, 0, targetDrawWidth, targetDrawHeight
                     );
                 } else {
                     ctx.drawImage(
-                        currentSprite,
-                        currentFrame * frameWidth, 0, frameWidth, frameHeight,
-                        drawX + offset, drawY, drawWidth, drawHeight
+                        sourceImg,
+                        sourceX, sourceY, sourceW, sourceH,
+                        drawX + offset, finalDrawY, targetDrawWidth, targetDrawHeight
                     );
                 }
                 ctx.restore();
+
+                // --- DIBUJAR ENEMIGO (DUMMY) ---
+                if (!enemy.dead || enemy.flashTimer > 0) {
+                    const enemyDepthRatio = (laneBottom - enemy.laneY) / laneRange;
+                    const enemyScale = 1 - enemyDepthRatio * 0.15;
+                    const eW = enemy.width * enemyScale;
+                    const eH = enemy.height * enemyScale;
+                    const eX = enemy.x;
+                    const eY = enemy.y + baseDrawHeight - eH;
+
+                    ctx.save();
+                    if (enemy.flashTimer > 0) {
+                        ctx.globalAlpha = 0.6 + Math.sin(time / 30) * 0.4;
+                    }
+
+                    // Cuerpo del enemigo
+                    ctx.fillStyle = enemy.flashTimer > 0 ? '#fff' : '#c0392b';
+                    ctx.fillRect(eX, eY, eW, eH);
+
+                    // Cabeza
+                    ctx.fillStyle = enemy.flashTimer > 0 ? '#fff' : '#e74c3c';
+                    ctx.fillRect(eX + eW * 0.2, eY, eW * 0.6, eH * 0.25);
+
+                    // Ojos
+                    ctx.fillStyle = '#2c3e50';
+                    ctx.fillRect(eX + eW * 0.3, eY + eH * 0.08, eW * 0.15, eH * 0.06);
+                    ctx.fillRect(eX + eW * 0.55, eY + eH * 0.08, eW * 0.15, eH * 0.06);
+
+                    ctx.restore();
+
+                    // Barra de vida del enemigo
+                    const barW = eW * 1.2;
+                    const barH = 6;
+                    const barX = eX + eW / 2 - barW / 2;
+                    const barY = eY - 12;
+
+                    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                    ctx.fillRect(barX - 1, barY - 1, barW + 2, barH + 2);
+
+                    const healthPct = enemy.health / enemy.maxHealth;
+                    let healthColor = '#2ecc71';
+                    if (healthPct < 0.5) healthColor = '#f1c40f';
+                    if (healthPct < 0.25) healthColor = '#e74c3c';
+
+                    ctx.fillStyle = healthColor;
+                    ctx.fillRect(barX, barY, barW * healthPct, barH);
+                }
+
+                // --- DIBUJAR TEXTOS FLOTANTES ---
+                for (const ft of floatingTexts) {
+                    const alpha = 1 - (ft.timer / ft.life);
+                    ctx.save();
+                    ctx.globalAlpha = alpha;
+                    ctx.font = 'bold 22px sans-serif';
+                    ctx.fillStyle = ft.color;
+                    ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+                    ctx.lineWidth = 3;
+                    ctx.textAlign = 'center';
+                    ctx.strokeText(ft.text, ft.x, ft.y);
+                    ctx.fillText(ft.text, ft.x, ft.y);
+                    ctx.restore();
+                }
+
+                // --- HUD: Vida del enemigo arriba ---
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.fillRect(10, 10, 200, 30);
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 14px sans-serif';
+                ctx.fillText('ENEMIGO', 20, 30);
+
+                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.fillRect(90, 14, 110, 22);
+                const hudHealthPct = enemy.health / enemy.maxHealth;
+                let hudColor = '#2ecc71';
+                if (hudHealthPct < 0.5) hudColor = '#f1c40f';
+                if (hudHealthPct < 0.25) hudColor = '#e74c3c';
+                ctx.fillStyle = hudColor;
+                ctx.fillRect(92, 16, 106 * hudHealthPct, 18);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = '12px sans-serif';
+                ctx.fillText(`${Math.ceil(enemy.health)}/100`, 145, 30);
+
+                // Instrucciones
+                ctx.fillStyle = 'rgba(255,255,255,0.5)';
+                ctx.font = '11px sans-serif';
+                ctx.fillText('J=Golpe  L=Hielo(+daño)  K=Patada', canvas.width / 2, 20);
             }
 
             requestAnimationFrame(animate);
