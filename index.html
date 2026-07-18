@@ -204,6 +204,8 @@
         const kick2Sprite = new Image(); kick2Sprite.src = 'kick_subzero2.png';
         const punchSprite = new Image(); punchSprite.src = 'punch_subzero.png';
         const punch2Sprite = new Image(); punch2Sprite.src = 'punch_subzero2.png';
+        const punchAirSprite = new Image(); punchAirSprite.src = 'punch_air.png';
+        const kickAirSprite = new Image(); kickAirSprite.src = 'kick_air.png';
 
         let currentSprite = idleSprite; 
         let currentFrame = 0;
@@ -235,6 +237,12 @@
         const kickVerticalOffset = 0;
         const punchFrameOffset = [0, 3, 16, 22];
         const punch2FrameOffset = [0, 0, 0, -20]; // Frame 4 del hielo necesita ajuste
+        const punchAirFrameOffset = [0, 0, 0, 0];
+        const kickAirFrameOffset = [0, 0, 0, 0];
+        // Estos sprites vienen en un lienzo de 4 frames (como el resto), pero el
+        // personaje solo está dibujado en un frame específico dentro de ese lienzo.
+        const punchAirSourceFrame = 0;
+        const kickAirSourceFrame = 1;
 
         let jumpTimer = 0;
         let isJumping = false;
@@ -247,6 +255,8 @@
         const punch2FrameTimes = [120, 140, 100, 350]; // Hielo es más lento al cargar
         const kickFrameTimes = [160, 180, 140, 240];
         const kick2FrameTimes = [180, 200, 160, 300]; // Patada fuerte más lenta y pesada
+        const punchAirFrameTimes = [260];
+        const kickAirFrameTimes = [260];
         let isAttacking = false;
         let attackKind = null;
         let attackTimer = 0;
@@ -269,6 +279,10 @@
         const punch2CustomScale = 1.0;
         const punchVerticalOffset = 0; 
         const punch2VerticalOffset = 0;
+        const punchAirCustomScale = 1.0;
+        const kickAirCustomScale = 1.0;
+        const punchAirVerticalOffset = 0;
+        const kickAirVerticalOffset = 0;
 
         // Recortes para punch normal
         const punchCropAdjustX = [0, 0, 0, 0]; 
@@ -277,6 +291,12 @@
         // Recortes para punch hielo (frame 4 tiene el personaje más a la izquierda)
         const punch2CropAdjustX = [0, 0, 6, 0]; 
         const punch2CropAdjustW = [0, 0, -28, -35]; 
+
+        // Recortes para ataques aéreos (sin ajuste por defecto)
+        const punchAirCropAdjustX = [0, 0, 0, 0];
+        const punchAirCropAdjustW = [14, 0, 0, 0];
+        const kickAirCropAdjustX = [-4, 0, 0, 0];
+        const kickAirCropAdjustW = [28, 0, 0, 0];
 
         // --- SISTEMA DE DAÑO ---
         const enemy = {
@@ -291,7 +311,9 @@
             punch: 10,
             kick: 15,
             kick2: 30,
-            punch2: 25
+            punch2: 25,
+            punch_air: 10,
+            kick_air: 15
         };
 
         const floatingTexts = []; // { x, y, text, color, timer, life }
@@ -308,6 +330,20 @@
 
         function requestAttack(kind) {
             if (enemy.dead) return;
+
+            // Ataques aéreos: si el jugador está en el aire (saltando), el mismo botón
+            // de golpe/patada activa la variante aérea en vez del combo de doble-tap.
+            if (isJumping && !isAttacking) {
+                if (kind === 'punch') {
+                    attackRequested = 'punch_air';
+                    punchTapCount = 0;
+                    return;
+                } else if (kind === 'kick') {
+                    attackRequested = 'kick_air';
+                    kickTapCount = 0;
+                    return;
+                }
+            }
 
             const now = performance.now();
 
@@ -422,7 +458,7 @@
 
         // --- Carga de imágenes ---
         let imagesLoaded = 0;
-        const totalImages = 7;
+        const totalImages = 9;
 
         // --- BLOQUEO DE ORIENTACIÓN HORIZONTAL ---
         // La rotación visual ya la resuelve el CSS (@media orientation: portrait)
@@ -464,6 +500,8 @@
         kick2Sprite.onload = checkImagesLoaded;
         punchSprite.onload = checkImagesLoaded;
         punch2Sprite.onload = checkImagesLoaded;
+        punchAirSprite.onload = checkImagesLoaded;
+        kickAirSprite.onload = checkImagesLoaded;
 
         const showError = (name) => {
             document.querySelector('#canvas-wrapper').innerHTML = `<h2 style='color:red; text-align:center; padding:20px;'>❌ ERROR: No se encontró '${name}'.</h2>`;
@@ -475,13 +513,24 @@
         kick2Sprite.onerror = () => showError('kick_subzero2.png');
         punchSprite.onerror = () => showError('punch_subzero.png');
         punch2Sprite.onerror = () => showError('punch_subzero2.png');
+        punchAirSprite.onerror = () => showError('punch_air.png');
+        kickAirSprite.onerror = () => showError('kick_air.png');
 
         // --- DETECCIÓN DE DAÑO ---
+        // Retraso (ms) tras iniciar el ataque aéreo antes de aplicar daño,
+        // ya que estos sprites son de un solo frame y no tienen "frame de impacto".
+        const airHitDelay = { punch_air: 100, kick_air: 110 };
+
         function checkHit() {
             if (damageDealt || enemy.dead) return;
 
-            // El hit ocurre en el frame de impacto (frame 2, índice 2) para todos los ataques
-            if (currentFrame !== 2) return;
+            // El hit ocurre en el frame de impacto (frame 2, índice 2) para ataques de suelo.
+            // Los ataques aéreos (un solo frame) usan un pequeño retraso de tiempo en su lugar.
+            if (attackKind === 'punch_air' || attackKind === 'kick_air') {
+                if (attackTimer < (airHitDelay[attackKind] || 100)) return;
+            } else if (currentFrame !== 2) {
+                return;
+            }
 
             // Calcular distancia en X y en profundidad (laneY)
             const playerWidth = baseDrawWidth * 0.8;
@@ -521,8 +570,9 @@
 
             const isMoving = !isAttacking && (keys.left || keys.right || keys.forward || keys.backward);
 
-            // Iniciar ataque
-            if (attackRequested && !isAttacking && !isJumping) {
+            // Iniciar ataque (los ataques aéreos solo se solicitan estando en el aire,
+            // ver requestAttack; los ataques de suelo solo se solicitan sin saltar)
+            if (attackRequested && !isAttacking) {
                 isAttacking = true;
                 attackKind = attackRequested;
                 attackTimer = 0;
@@ -531,6 +581,8 @@
                 if (attackKind === 'punch') currentSprite = punchSprite;
                 else if (attackKind === 'punch2') currentSprite = punch2Sprite;
                 else if (attackKind === 'kick2') currentSprite = kick2Sprite;
+                else if (attackKind === 'punch_air') currentSprite = punchAirSprite;
+                else if (attackKind === 'kick_air') currentSprite = kickAirSprite;
                 else currentSprite = kickSprite;
                 currentFrame = 0;
             }
@@ -585,6 +637,8 @@
                 if (attackKind === 'punch') times = punchFrameTimes;
                 else if (attackKind === 'punch2') times = punch2FrameTimes;
                 else if (attackKind === 'kick2') times = kick2FrameTimes;
+                else if (attackKind === 'punch_air') times = punchAirFrameTimes;
+                else if (attackKind === 'kick_air') times = kickAirFrameTimes;
                 else times = kickFrameTimes;
 
                 attackTimer += (time - lastAttackFrameTime);
@@ -604,8 +658,14 @@
                 if (attackTimer >= totalAttackTime) {
                     isAttacking = false;
                     attackKind = null;
-                    currentSprite = (keys.left || keys.right || keys.forward || keys.backward) ? walkSprite : idleSprite;
-                    currentFrame = 0;
+                    if (isJumping) {
+                        // Sigue cayendo: retoma la animación de salto/caída
+                        currentSprite = jumpSprite;
+                        currentFrame = 2;
+                    } else {
+                        currentSprite = (keys.left || keys.right || keys.forward || keys.backward) ? walkSprite : idleSprite;
+                        currentFrame = 0;
+                    }
                     lastTime = time;
                 }
 
@@ -758,6 +818,36 @@
                     targetDrawWidth = Math.round(sourceW * kickAspectScale * perspectiveScale);
                     targetDrawHeight = Math.round(sourceH * kickAspectScale * perspectiveScale);
                     finalDrawY = Math.round(drawY + kickVerticalOffset);
+
+                } else if (isAttacking && attackKind === 'punch_air') {
+                    sourceImg = punchAirSprite;
+                    // Spritesheet de 4 frames; el personaje solo está en el frame fijo punchAirSourceFrame
+                    const sfw = sourceImg.width / totalFrames;
+                    const sfh = sourceImg.height;
+                    sourceX = Math.floor((punchAirSourceFrame * sfw) + punchAirCropAdjustX[0]);
+                    sourceY = 0;
+                    sourceW = Math.floor(sfw + punchAirCropAdjustW[0]);
+                    sourceH = Math.floor(sfh);
+                    offset = Math.round(punchAirFrameOffset[0] * scale);
+                    const punchAirAspectScale = (baseDrawHeight / sourceH) * punchAirCustomScale;
+                    targetDrawWidth = Math.round(sourceW * punchAirAspectScale * perspectiveScale);
+                    targetDrawHeight = Math.round(sourceH * punchAirAspectScale * perspectiveScale);
+                    finalDrawY = Math.round(drawY + punchAirVerticalOffset);
+
+                } else if (isAttacking && attackKind === 'kick_air') {
+                    sourceImg = kickAirSprite;
+                    // Spritesheet de 4 frames; el personaje solo está en el frame fijo kickAirSourceFrame
+                    const sfw = sourceImg.width / totalFrames;
+                    const sfh = sourceImg.height;
+                    sourceX = Math.floor((kickAirSourceFrame * sfw) + kickAirCropAdjustX[0]);
+                    sourceY = 0;
+                    sourceW = Math.floor(sfw + kickAirCropAdjustW[0]);
+                    sourceH = Math.floor(sfh);
+                    offset = Math.round(kickAirFrameOffset[0] * scale);
+                    const kickAirAspectScale = (baseDrawHeight / sourceH) * kickAirCustomScale;
+                    targetDrawWidth = Math.round(sourceW * kickAirAspectScale * perspectiveScale);
+                    targetDrawHeight = Math.round(sourceH * kickAirAspectScale * perspectiveScale);
+                    finalDrawY = Math.round(drawY + kickAirVerticalOffset);
 
                 } else {
                     sourceImg = currentSprite;
