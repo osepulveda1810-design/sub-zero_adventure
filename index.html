@@ -258,35 +258,35 @@ const LEVELS = [
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro",
       story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.",
       bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug','thug_gun','ninja_renegade'],
-      enemyCount: 8, spawnRate: 3000, bossHealth: 150, bossDamage: 8, bossSpeed: 1.2 },
+      enemyCount: 5, spawnRate: 4000, bossHealth: 150, bossDamage: 8, bossSpeed: 1.2 },
     { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei",
       story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor, el primer ciborg, te espera.",
       bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic','technician','sektor_miniboss'],
-      enemyCount: 10, spawnRate: 2800, bossHealth: 200, bossDamage: 10, bossSpeed: 1.0 },
+      enemyCount: 6, spawnRate: 3800, bossHealth: 200, bossDamage: 10, bossSpeed: 1.0 },
     { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano",
       story: "Los monjes shaolin son masacrados por un grupo que busca un mapa sagrado. Los Tarkatanos de Outworld han invadido el templo.",
       bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade','tarkatan','priest_quan'],
-      enemyCount: 12, spawnRate: 2500, bossHealth: 250, bossDamage: 12, bossSpeed: 1.5 },
+      enemyCount: 6, spawnRate: 3500, bossHealth: 250, bossDamage: 12, bossSpeed: 1.5 },
     { id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio",
       story: "Sigues el rastro del mapa robado hasta un pantano tenebroso. Un hechicero usa nigromancia para crear un ejercito de muertos.",
       bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie','reptile_mutant','shadow_ghost'],
-      enemyCount: 14, spawnRate: 2400, bossHealth: 220, bossDamage: 10, bossSpeed: 1.8 },
+      enemyCount: 7, spawnRate: 3400, bossHealth: 220, bossDamage: 10, bossSpeed: 1.8 },
     { id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico",
       story: "Descubres que Kano no actuaba solo. El Dragon Negro es solo una pieza del plan de un hechicero mucho mas poderoso.",
       bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite','cyborg_upgrade','assassin_lk'],
-      enemyCount: 12, spawnRate: 2200, bossHealth: 280, bossDamage: 14, bossSpeed: 1.3 },
+      enemyCount: 6, spawnRate: 3200, bossHealth: 280, bossDamage: 14, bossSpeed: 1.3 },
     { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan",
       story: "Cruzas a Outworld para enfrentar al verdadero villano. El camino esta custodiado por el ejercito de Shao Kahn.",
       bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan','sindel_priest','shadow_knight'],
-      enemyCount: 10, spawnRate: 2000, bossHealth: 400, bossDamage: 18, bossSpeed: 0.8 },
+      enemyCount: 5, spawnRate: 3000, bossHealth: 400, bossDamage: 18, bossSpeed: 0.8 },
     { id: 7, name: "Palacio de Shang Tsung", subtitle: "La Isla Maldita", boss: "Shang Tsung", bossTitle: "Hechicero Manipulador",
       story: "Llegas al corazon del complot. Shang Tsung te espera. Pero primero... debes enfrentar al asesino de tu hermano.",
       bgColor: [20, 15, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre','demon_quan','statue'],
-      enemyCount: 12, spawnRate: 1800, bossHealth: 350, bossDamage: 15, bossSpeed: 1.0, hasMidBoss: true, midBoss: "Scorpion", midBossHealth: 300 },
+      enemyCount: 6, spawnRate: 2800, bossHealth: 350, bossDamage: 15, bossSpeed: 1.0, hasMidBoss: true, midBoss: "Scorpion", midBossHealth: 300 },
     { id: 8, name: "El Netherrealm", subtitle: "El Origen del Frio", boss: "Noob Saibot", bossTitle: "Bi-Han Resucitado",
       story: "Tu hermano Bi-Han no descanso en paz. Ha sido resucitado como una sombra del mal en el infierno mismo. Debes liberarlo.",
       bgColor: [25, 5, 5], groundColor: [50, 15, 10], enemyTypes: ['demon_lord','shadow_clone','hell_beast'],
-      enemyCount: 15, spawnRate: 1500, bossHealth: 500, bossDamage: 20, bossSpeed: 1.4 }
+      enemyCount: 7, spawnRate: 2500, bossHealth: 500, bossDamage: 20, bossSpeed: 1.4 }
 ];
 
 const ENEMY_CONFIGS = {
@@ -384,9 +384,12 @@ const keys = { right: false, left: false, up: false, forward: false, backward: f
 
 const frameOffsets = { idle: [0,0,0,0], walk: [0,0,0,0], jump: [0,0,0,0], kick: [0,0,0,0], kick2: [0,0,0,0], punch: [0,3,16,22], punch2: [0,0,0,-20], punchAir: [0,0,0,0], kickAir: [0,0,0,0] };
 const cropAdjusts = { punch: {x:[0,0,0,0], w:[0,-5,-5,-5]}, punch2: {x:[0,0,6,0], w:[0,0,-28,-35]}, punchAir: {x:[0,0,0,0], w:[14,0,0,0]}, kickAir: {x:[-4,0,0,0], w:[28,0,0,0]} };
-const customScales = { punch: 1.0, punch2: 1.0, punchAir: 1.0, kickAir: 1.0 };
-const verticalOffsets = { punch: 0, punch2: 0, punchAir: 0, kickAir: 0 };
+const customScales = { punch: 1.0, punch2: 1.0, kick: 1.0, kick2: 1.0, punchAir: 1.0, kickAir: 1.0 };
+const verticalOffsets = { punch: 0, punch2: 0, kick: 0, kick2: 0, punchAir: 0, kickAir: 0 };
 const airSourceFrames = { punchAir: 0, kickAir: 1 };
+
+// Limite maximo de enemigos activos para evitar sobrecarga
+const MAX_ACTIVE_ENEMIES = 4;
 
 function setupCanvas() {
     const wrapper = document.getElementById('canvas-wrapper');
@@ -410,18 +413,24 @@ function randInt(min, max) { return Math.floor(rand(min, max + 1)); }
 function lerp(a, b, t) { return a + (b - a) * t; }
 function dist(x1, y1, x2, y2) { return Math.sqrt((x2-x1)**2 + (y2-y1)**2); }
 
+// Limite maximo de particulas activas para evitar caidas de FPS en rachas de golpes
+const MAX_PARTICLES = 50;
+
 function spawnParticle(x, y, type, color, count) {
-    for (let i = 0; i < count; i++) {
+    const allowed = Math.max(0, Math.min(count, MAX_PARTICLES - particles.length));
+    for (let i = 0; i < allowed; i++) {
         particles.push({ x, y, vx: rand(-3,3), vy: rand(-5,-1), life: rand(300,800), maxLife: 800, size: rand(2,6), color, type, gravity: 0.15 });
     }
 }
 function spawnIceEffect(x, y) {
-    for (let i = 0; i < 12; i++) {
+    const allowed = Math.max(0, Math.min(8, MAX_PARTICLES - particles.length));
+    for (let i = 0; i < allowed; i++) {
         particles.push({ x, y: y + rand(-20,20), vx: rand(-2,2), vy: rand(-4,-1), life: 600, maxLife: 600, size: rand(3,8), color: '#a0e6ff', type: 'ice', gravity: 0.05, rotation: rand(0, Math.PI*2), rotSpeed: rand(-0.1,0.1) });
     }
 }
 function spawnBloodEffect(x, y, color) {
-    for (let i = 0; i < 8; i++) {
+    const allowed = Math.max(0, Math.min(6, MAX_PARTICLES - particles.length));
+    for (let i = 0; i < allowed; i++) {
         particles.push({ x, y, vx: rand(-4,4), vy: rand(-3,1), life: 500, maxLife: 500, size: rand(2,5), color: color || '#c0392b', type: 'blood', gravity: 0.2 });
     }
 }
@@ -436,7 +445,7 @@ function spawnProjectile(x, y, tx, ty, damage, speed, color, owner, type) {
 function createEnemy(type, x, laneY) {
     const cfg = ENEMY_CONFIGS[type]; if (!cfg) return null;
     return { type, x, y: 0, laneY, width: cfg.width, height: cfg.height, health: cfg.health, maxHealth: cfg.health,
-        damage: cfg.damage, speed: cfg.speed, color: cfg.color, attackRange: cfg.attackRange, attackCooldown: cfg.attackCooldown,
+        damage: cfg.damage, speed: cfg.speed, color: cfg.color, lightColor: lightenColor(cfg.color, 20), attackRange: cfg.attackRange, attackCooldown: cfg.attackCooldown,
         lastAttack: 0, flashTimer: 0, dead: false, frozen: 0, facingRight: false, state: 'idle', stateTimer: 0,
         ranged: cfg.ranged || false, projectile: cfg.projectile || null, ethereal: cfg.ethereal || false, animFrame: 0, animTimer: 0 };
 }
@@ -444,7 +453,7 @@ function createEnemy(type, x, laneY) {
 function createBoss(bossName, x, laneY) {
     const cfg = BOSS_CONFIGS[bossName]; if (!cfg) return null;
     return { name: bossName, x, y: 0, laneY, width: cfg.width, height: cfg.height, health: cfg.health, maxHealth: cfg.health,
-        damage: cfg.damage, speed: cfg.speed, color: cfg.color, attackRange: cfg.attackRange, attackCooldown: cfg.attackCooldown,
+        damage: cfg.damage, speed: cfg.speed, color: cfg.color, lightColor: lightenColor(cfg.color, 30), attackRange: cfg.attackRange, attackCooldown: cfg.attackCooldown,
         lastAttack: 0, flashTimer: 0, dead: false, frozen: 0, facingRight: false, state: 'idle', stateTimer: 0,
         special: cfg.special, specialCooldown: cfg.specialCooldown, lastSpecial: 0, specialDamage: cfg.specialDamage,
         ranged: cfg.ranged || false, pattern: cfg.pattern, ethereal: cfg.ethereal || false, phase: 1, animFrame: 0, animTimer: 0, introTimer: 2000 };
@@ -464,10 +473,16 @@ function startLevel(levelIndex) {
 }
 
 function spawnEnemy() {
-    const lvl = LEVELS[currentLevel]; if (!lvl || enemiesDefeated >= lvl.enemyCount) return;
-    const types = lvl.enemyTypes; const type = types[randInt(0, types.length - 1)];
-    const laneY = rand(laneTop + 20, laneBottom - 20); const x = canvas.width + rand(50, 200);
-    const enemy = createEnemy(type, x, laneY); if (enemy) enemies.push(enemy);
+    const lvl = LEVELS[currentLevel]; 
+    if (!lvl || enemiesDefeated >= lvl.enemyCount) return;
+    // EVITAR SOBRECARGA: maximo 4 enemigos activos simultaneos
+    if (enemies.length >= MAX_ACTIVE_ENEMIES) return;
+    const types = lvl.enemyTypes; 
+    const type = types[randInt(0, types.length - 1)];
+    const laneY = rand(laneTop + 20, laneBottom - 20); 
+    const x = canvas.width + rand(50, 200);
+    const enemy = createEnemy(type, x, laneY); 
+    if (enemy) enemies.push(enemy);
 }
 
 function spawnBoss() {
@@ -519,7 +534,7 @@ function checkHit() {
             if (atk === 'punch2') { e.frozen = 2000; spawnIceEffect(eCenterX, e.y); }
             if (e.health <= 0) {
                 e.dead = true; spawnFloatingText(eCenterX, e.y - 40, 'K.O.!', '#ffd700');
-                score += 100; enemiesDefeated++; spawnParticle(eCenterX, e.y + e.height/2, 'explosion', e.color, 10);
+                score += 100; enemiesDefeated++; spawnParticle(eCenterX, e.y + e.height/2, 'explosion', e.color, 8);
             }
             return;
         }
@@ -537,7 +552,7 @@ function checkHit() {
             if (hpPct < 0.5 && boss.phase === 1) { boss.phase = 2; boss.speed *= 1.3; spawnFloatingText(bCenterX, boss.y - 60, 'FURIA!', '#ff0000'); }
             if (boss.health <= 0) {
                 boss.dead = true; spawnFloatingText(bCenterX, boss.y - 50, 'VICTORIA!', '#ffd700');
-                score += 1000; spawnParticle(bCenterX, boss.y + boss.height/2, 'explosion', boss.color, 20);
+                score += 1000; spawnParticle(bCenterX, boss.y + boss.height/2, 'explosion', boss.color, 15);
                 setTimeout(() => showVictory(), 2000);
             }
         }
@@ -552,7 +567,7 @@ function checkHit() {
             spawnBloodEffect(mCenterX, midBoss.y + midBoss.height/2, '#ff4500');
             if (midBoss.health <= 0) {
                 midBoss.dead = true; spawnFloatingText(mCenterX, midBoss.y - 50, 'SCORPION CAIDO!', '#ffd700');
-                score += 500; spawnParticle(mCenterX, midBoss.y + midBoss.height/2, 'explosion', '#ff4500', 15);
+                score += 500; spawnParticle(mCenterX, midBoss.y + midBoss.height/2, 'explosion', '#ff4500', 12);
                 setTimeout(() => {
                     const lvl = LEVELS[6];
                     boss = createBoss(lvl.boss, canvas.width - 150, (laneTop + laneBottom)/2);
@@ -567,7 +582,7 @@ function damagePlayer(amount) {
     if (player.invulnerable > 0) return;
     player.health -= amount; player.invulnerable = 1000; player.flashTimer = 500;
     spawnFloatingText(player.x + baseDrawWidth/2, player.y - 20, '-' + amount, '#ff0000');
-    spawnParticle(player.x + baseDrawWidth/2, player.y + baseDrawHeight/2, 'blood', '#ff0000', 5);
+    spawnParticle(player.x + baseDrawWidth/2, player.y + baseDrawHeight/2, 'blood', '#ff0000', 4);
     if (player.health <= 0) { player.health = 0; showDefeat(); }
 }
 
@@ -641,9 +656,10 @@ function updateBoss(dt, time) {
         if (boss.special === 'ground_pound') {
             const distToPlayer = Math.abs((boss.x + boss.width/2) - (player.x + baseDrawWidth/2));
             if (distToPlayer < 200) damagePlayer(boss.specialDamage);
-            spawnParticle(boss.x + boss.width/2, boss.y + boss.height, 'explosion', '#8B4513', 15);
+            spawnParticle(boss.x + boss.width/2, boss.y + boss.height, 'explosion', '#8B4513', 12);
         } else if (boss.special === 'shadow_clone' && boss.name === 'Noob Saibot') {
             for (let j = 0; j < 2; j++) {
+                if (enemies.length >= MAX_ACTIVE_ENEMIES) break;
                 const clone = createEnemy('shadow_clone', boss.x + rand(-100,100), boss.laneY + rand(-30,30));
                 if (clone) enemies.push(clone);
             }
@@ -698,10 +714,11 @@ function drawEnemy(ctx, e, time) {
     const x = e.x, y = e.laneY + baseDrawHeight - h;
     ctx.save();
     if (e.flashTimer > 0) ctx.globalAlpha = 0.6 + Math.sin(time / 30) * 0.4;
-    if (e.frozen > 0) ctx.filter = 'hue-rotate(180deg) brightness(1.5)';
+    // Nota: se quitó ctx.filter (hue-rotate/brightness) por ser muy costoso en móvil;
+    // el efecto de congelado ahora se pinta como una superposición semitransparente al final.
     ctx.fillStyle = e.color; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x + w*0.1, y + h*0.15, w*0.8, h*0.25);
-    ctx.fillStyle = e.flashTimer > 0 ? '#fff' : lightenColor(e.color, 20);
+    ctx.fillStyle = e.flashTimer > 0 ? '#fff' : e.lightColor;
     ctx.fillRect(x + w*0.25, y, w*0.5, h*0.2);
     ctx.fillStyle = '#fff'; const eyeGlow = Math.sin(time / 200) * 0.3 + 0.7; ctx.globalAlpha = eyeGlow;
     ctx.fillRect(x + w*0.32, y + h*0.06, w*0.12, h*0.06); ctx.fillRect(x + w*0.56, y + h*0.06, w*0.12, h*0.06); ctx.globalAlpha = 1;
@@ -714,6 +731,7 @@ function drawEnemy(ctx, e, time) {
     }
     if (e.type.includes('reptile')) { ctx.fillStyle = '#7CFC00'; ctx.globalAlpha = 0.6; ctx.fillRect(x + (e.facingRight ? w : -10), y + h*0.15, 10, 4); ctx.globalAlpha = 1; }
     if (e.ethereal) ctx.globalAlpha = 0.5 + Math.sin(time / 300) * 0.3;
+    if (e.frozen > 0) { ctx.globalAlpha = 0.35; ctx.fillStyle = '#a0e6ff'; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
     ctx.restore();
     if (!e.dead) {
         const barW = w * 1.2, barH = 5, barX = x + w/2 - barW/2, barY = y - 10;
@@ -731,17 +749,22 @@ function drawBoss(ctx, boss, time) {
     const x = boss.x, y = boss.laneY + baseDrawHeight - h;
     ctx.save();
     if (boss.flashTimer > 0) ctx.globalAlpha = 0.6 + Math.sin(time / 30) * 0.4;
-    if (boss.frozen > 0) ctx.filter = 'hue-rotate(180deg) brightness(1.5)';
+    // Nota: se quitaron ctx.shadowBlur y ctx.filter (muy costosos en móvil).
+    // El halo se simula con un rectángulo semitransparente detrás, mucho más barato.
     if (boss.pattern === 'stealth' && time % 5000 < 2000) ctx.globalAlpha = 0.2;
-    ctx.shadowColor = boss.color; ctx.shadowBlur = 20;
-    ctx.fillStyle = boss.color; ctx.fillRect(x, y, w, h); ctx.shadowBlur = 0;
+    const haloAlpha = ctx.globalAlpha;
+    ctx.globalAlpha = haloAlpha * 0.3; ctx.fillStyle = boss.color;
+    ctx.fillRect(x - 6, y - 6, w + 12, h + 12);
+    ctx.globalAlpha = haloAlpha;
+    ctx.fillStyle = boss.color; ctx.fillRect(x, y, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(x + w*0.05, y + h*0.1, w*0.9, h*0.3); ctx.fillRect(x + w*0.15, y + h*0.5, w*0.7, h*0.2);
-    ctx.fillStyle = lightenColor(boss.color, 30); ctx.fillRect(x + w*0.2, y, w*0.6, h*0.18);
+    ctx.fillStyle = boss.lightColor; ctx.fillRect(x + w*0.2, y, w*0.6, h*0.18);
     ctx.fillStyle = '#fff'; const glow = Math.sin(time / 150) * 0.2 + 0.8; ctx.globalAlpha = glow;
     ctx.fillRect(x + w*0.28, y + h*0.05, w*0.15, h*0.06); ctx.fillRect(x + w*0.57, y + h*0.05, w*0.15, h*0.06); ctx.globalAlpha = 1;
     if (boss.name === 'Goro') { ctx.fillStyle = boss.color; ctx.fillRect(x - w*0.15, y + h*0.25, w*0.2, h*0.4); ctx.fillRect(x + w*0.95, y + h*0.25, w*0.2, h*0.4); }
     if (boss.name === 'Scorpion') { ctx.fillStyle = '#FFD700'; ctx.fillRect(x + w*0.25, y + h*0.02, w*0.5, h*0.12); }
     if (boss.name === 'Noob Saibot') { ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(x + w*0.1, y + h*0.6, w*0.8, h*0.3); }
+    if (boss.frozen > 0) { ctx.globalAlpha = 0.35; ctx.fillStyle = '#a0e6ff'; ctx.fillRect(x, y, w, h); ctx.globalAlpha = 1; }
     ctx.restore();
     const barW = Math.min(w * 1.5, 200), barH = 8, barX = x + w/2 - barW/2, barY = y - 18;
     ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(barX - 2, barY - 2, barW + 4, barH + 4);
@@ -755,7 +778,12 @@ function drawBoss(ctx, boss, time) {
 
 function drawProjectiles(ctx) {
     for (const p of projectiles) {
-        ctx.save(); ctx.fillStyle = p.color; ctx.shadowColor = p.color; ctx.shadowBlur = 10;
+        ctx.save(); ctx.fillStyle = p.color;
+        // Halo barato con un círculo semitransparente en vez de ctx.shadowBlur
+        // (shadowBlur es muy costoso repetido por cada proyectil en móvil).
+        ctx.globalAlpha = 0.3;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.size + 4, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = 1;
         if (p.type === 'fireball' || p.type === 'hellfire') {
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size + 2, 0, Math.PI * 2); ctx.fill();
             ctx.fillStyle = '#ff6600'; ctx.beginPath(); ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2); ctx.fill();
@@ -801,7 +829,7 @@ function drawPlayerPlaceholder(ctx, drawX, drawY, width, height, facingRight, ti
     // Capucha
     ctx.fillStyle = '#a0e6ff';
     ctx.beginPath(); ctx.arc(0, -35, 18, 0, Math.PI*2); ctx.fill();
-    // Máscara
+    // Mascara
     ctx.fillStyle = '#0a5c5c';
     ctx.fillRect(-16, -42, 32, 14);
     // Ojos
@@ -810,7 +838,7 @@ function drawPlayerPlaceholder(ctx, drawX, drawY, width, height, facingRight, ti
     // Torso
     ctx.fillStyle = '#4ecca3';
     ctx.fillRect(-18, -20, 36, 45);
-    // Cinturón
+    // Cinturon
     ctx.fillStyle = '#ffd700';
     ctx.fillRect(-20, 15, 40, 6);
     // Brazos
@@ -830,13 +858,37 @@ function drawPlayer(ctx, time) {
     const drawHeight = Math.round(baseDrawHeight * perspectiveScale);
     const drawX = Math.round(player.x);
     const drawY = Math.round(player.y + baseDrawHeight - drawHeight);
-    let sourceImg = currentSprite, sourceX = 0, sourceY = 0, sourceW = 0, sourceH = 0;
+    
+    // Determinar que sprite se va a usar ANTES de cualquier calculo
+    let sourceImg = currentSprite;
+    if (player.isAttacking) {
+        const atk = player.attackKind;
+        if (atk === 'punch') sourceImg = playerSprites.punch;
+        else if (atk === 'punch2') sourceImg = playerSprites.punch2;
+        else if (atk === 'kick2') sourceImg = playerSprites.kick2;
+        else if (atk === 'punchAir') sourceImg = playerSprites.punchAir;
+        else if (atk === 'kickAir') sourceImg = playerSprites.kickAir;
+        else sourceImg = playerSprites.kick;
+    }
+    
+    // CRITICO: Si el sprite no esta cargado, dibujar placeholder inmediatamente
+    // usando las dimensiones base (drawWidth/drawHeight) que SIEMPRE son validas
+    if (!sourceImg.complete || !sourceImg.width) {
+        ctx.save();
+        if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
+        drawPlayerPlaceholder(ctx, drawX, drawY, drawWidth, drawHeight, player.facingRight, time);
+        ctx.restore();
+        return;
+    }
+    
+    // Solo si el sprite esta cargado, proceder con los calculos de recorte
+    let sourceX = 0, sourceY = 0, sourceW = 0, sourceH = 0;
     let targetDrawWidth = drawWidth, targetDrawHeight = drawHeight, finalDrawY = drawY, offset = 0;
 
     if (player.isAttacking) {
         const atk = player.attackKind;
         if (atk === 'punch') {
-            sourceImg = playerSprites.punch; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor((currentFrame * sfw) + cropAdjusts.punch.x[currentFrame]);
             sourceW = Math.floor(sfw + cropAdjusts.punch.w[currentFrame]); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.punch[currentFrame] * player.scale);
@@ -845,7 +897,7 @@ function drawPlayer(ctx, time) {
             targetDrawHeight = Math.round(sourceH * aspectScale * perspectiveScale);
             finalDrawY = Math.round(drawY + verticalOffsets.punch);
         } else if (atk === 'punch2') {
-            sourceImg = playerSprites.punch2; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor((currentFrame * sfw) + cropAdjusts.punch2.x[currentFrame]);
             sourceW = Math.floor(sfw + cropAdjusts.punch2.w[currentFrame]); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.punch2[currentFrame] * player.scale);
@@ -854,7 +906,7 @@ function drawPlayer(ctx, time) {
             targetDrawHeight = Math.round(sourceH * aspectScale * perspectiveScale);
             finalDrawY = Math.round(drawY + verticalOffsets.punch2);
         } else if (atk === 'kick2') {
-            sourceImg = playerSprites.kick2; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor(currentFrame * sfw); sourceW = Math.floor(sfw); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.kick2[currentFrame] * player.scale);
             const aspectScale = (baseDrawHeight / sourceH) * customScales.kick2;
@@ -862,7 +914,7 @@ function drawPlayer(ctx, time) {
             targetDrawHeight = Math.round(sourceH * aspectScale * perspectiveScale);
             finalDrawY = Math.round(drawY + verticalOffsets.kick2);
         } else if (atk === 'kick') {
-            sourceImg = playerSprites.kick; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor(currentFrame * sfw); sourceW = Math.floor(sfw); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.kick[currentFrame] * player.scale);
             const aspectScale = (baseDrawHeight / sourceH) * customScales.kick;
@@ -870,7 +922,7 @@ function drawPlayer(ctx, time) {
             targetDrawHeight = Math.round(sourceH * aspectScale * perspectiveScale);
             finalDrawY = Math.round(drawY + verticalOffsets.kick);
         } else if (atk === 'punchAir') {
-            sourceImg = playerSprites.punchAir; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor((airSourceFrames.punchAir * sfw) + cropAdjusts.punchAir.x[0]);
             sourceW = Math.floor(sfw + cropAdjusts.punchAir.w[0]); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.punchAir[0] * player.scale);
@@ -879,7 +931,7 @@ function drawPlayer(ctx, time) {
             targetDrawHeight = Math.round(sourceH * aspectScale * perspectiveScale);
             finalDrawY = Math.round(drawY + verticalOffsets.punchAir);
         } else if (atk === 'kickAir') {
-            sourceImg = playerSprites.kickAir; const sfw = sourceImg.width / totalFrames;
+            const sfw = sourceImg.width / totalFrames;
             sourceX = Math.floor((airSourceFrames.kickAir * sfw) + cropAdjusts.kickAir.x[0]);
             sourceW = Math.floor(sfw + cropAdjusts.kickAir.w[0]); sourceH = sourceImg.height;
             offset = Math.round(frameOffsets.kickAir[0] * player.scale);
@@ -889,7 +941,8 @@ function drawPlayer(ctx, time) {
             finalDrawY = Math.round(drawY + verticalOffsets.kickAir);
         }
     } else {
-        sourceImg = currentSprite; const sfw = sourceImg.width / totalFrames; const sfh = sourceImg.height;
+        const sfw = sourceImg.width / totalFrames; 
+        const sfh = sourceImg.height;
         sourceX = Math.floor(currentFrame * sfw); sourceY = 0; sourceW = Math.floor(sfw); sourceH = Math.floor(sfh);
         let currentOffset = [0,0,0,0];
         if (currentSprite === playerSprites.idle) currentOffset = frameOffsets.idle;
@@ -902,14 +955,6 @@ function drawPlayer(ctx, time) {
 
     ctx.save();
     if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
-    
-    // Si el sprite no esta cargado, dibujar placeholder
-    if (!sourceImg.complete || !sourceImg.width) {
-        drawPlayerPlaceholder(ctx, drawX, finalDrawY, targetDrawWidth, targetDrawHeight, player.facingRight, time);
-        ctx.restore();
-        return;
-    }
-    
     if (!player.facingRight) {
         ctx.translate(drawX + targetDrawWidth, finalDrawY); ctx.scale(-1, 1);
         ctx.drawImage(sourceImg, sourceX, sourceY, sourceW, sourceH, -offset, 0, targetDrawWidth, targetDrawHeight);
@@ -1089,6 +1134,7 @@ document.getElementById('btn-menu').onclick = () => {
 
 // ─── BUCLE PRINCIPAL ───
 function animate(time) {
+    try {
     if (!lastTime) lastTime = time;
     const deltaTime = time - lastTime;
     if (!lastJumpFrameTime) lastJumpFrameTime = time;
@@ -1192,10 +1238,11 @@ function animate(time) {
         if (player.invulnerable > 0) player.invulnerable -= deltaTime;
         if (player.flashTimer > 0) player.flashTimer -= deltaTime;
 
-        // Spawn enemigos
+        // Spawn enemigos con control de oleadas
         spawnTimer += deltaTime;
         if (!bossSpawned && spawnTimer > lvl.spawnRate && enemiesDefeated < lvl.enemyCount) {
-            spawnEnemy(); spawnTimer = 0;
+            spawnEnemy(); 
+            spawnTimer = 0;
         }
         // Spawn jefe cuando todos los enemigos estan derrotados
         if (!bossSpawned && enemiesDefeated >= lvl.enemyCount && enemies.length === 0) {
@@ -1231,7 +1278,13 @@ function animate(time) {
         drawFloatingTexts(ctx);
     }
 
-    requestAnimationFrame(animate);
+    } catch (err) {
+        // Un error puntual (ej. un sprite mal configurado) ya no congela el juego entero;
+        // se registra en consola para poder depurarlo y el loop continúa.
+        console.error('Error en el bucle de animación:', err);
+    } finally {
+        requestAnimationFrame(animate);
+    }
 }
 
 // ─── INICIALIZACIÓN ───
