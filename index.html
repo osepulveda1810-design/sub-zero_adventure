@@ -863,16 +863,16 @@ function drawEnemy(ctx, e, time) {
     if (e.ethereal) ctx.globalAlpha = 0.5 + Math.sin(time / 300) * 0.3;
     ctx.restore();
 
-    // EFECTO DE CONGELACIÓN ALINEADO PERFECTAMENTE
+    // EFECTO DE CONGELACIÓN (subzero_ice2) MÁS PEQUEÑO Y ALINEADO AL SUELO
     if (e.frozen > 0) {
         if (iceSprites.hit && iceSprites.hit.complete) {
             ctx.save(); ctx.globalAlpha = 0.85;
             let srcW = iceSprites.hit.width, srcH = iceSprites.hit.height;
-            let scale = h / srcH; // Escalar para igualar la altura del enemigo
+            let scale = (h / srcH) * 0.85; // 15% más pequeño que la altura del enemigo
             let finalW = srcW * scale;
-            let finalH = h;
-            let dx = x + (w - finalW) / 2; // Centrado horizontalmente
-            let dy = y; // Arriba, porque finalH == h, la base coincide
+            let finalH = srcH * scale;
+            let dx = x + (w - finalW) / 2; // Centrado horizontal
+            let dy = y + (h - finalH);     // Alineado al suelo
             ctx.drawImage(iceSprites.hit, dx, dy, finalW, finalH);
             ctx.restore();
         } else {
@@ -914,11 +914,11 @@ function drawBoss(ctx, boss, time) {
         if (iceSprites.hit && iceSprites.hit.complete) {
             ctx.save(); ctx.globalAlpha = 0.5;
             let srcW = iceSprites.hit.width, srcH = iceSprites.hit.height;
-            let scale = h / srcH;
+            let scale = (h / srcH) * 0.85;
             let finalW = srcW * scale;
-            let finalH = h;
+            let finalH = srcH * scale;
             let dx = x + (w - finalW) / 2;
-            let dy = y;
+            let dy = y + (h - finalH);
             ctx.drawImage(iceSprites.hit, dx, dy, finalW, finalH);
             ctx.restore();
         } else {
@@ -943,9 +943,12 @@ function drawProjectiles(ctx) {
             ctx.globalAlpha = 0.9;
             const scale = 0.8 + Math.sin(performance.now()/100)*0.1;
             if (p.sprite && p.sprite.complete) {
-                ctx.drawImage(p.sprite, p.x - (p.sprite.width * scale)/2, p.y - (p.sprite.height * scale)/2, p.sprite.width * scale, p.sprite.height * scale);
+                ctx.translate(p.x, p.y);
+                // Voltear el sprite si va hacia la izquierda
+                if (p.vx < 0) ctx.scale(-1, 1);
+                ctx.drawImage(p.sprite, -(p.sprite.width * scale)/2, -(p.sprite.height * scale)/2, p.sprite.width * scale, p.sprite.height * scale);
             } else {
-                ctx.fillStyle = '#a0e6ff'; ctx.beginPath(); ctx.arc(p.x, p.y, 20, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = '#a0e6ff'; ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI*2); ctx.fill();
             }
             ctx.restore(); continue;
         }
@@ -1009,7 +1012,7 @@ function drawPlayer(ctx, time) {
     const drawX = Math.round(player.x);
     const drawY = Math.round(player.y + baseDrawHeight - drawHeight);
     
-    // SPRITES DE HIELO CON ALINEACIÓN DE SUELO PERFECTA
+    // SPRITES DE HIELO MÁS PEQUEÑOS Y ALINEADOS AL SUELO
     if (player.isAttacking) {
         const atk = player.attackKind;
         if (atk === 'ice_charge' || atk === 'ice_throw') {
@@ -1019,13 +1022,13 @@ function drawPlayer(ctx, time) {
             }
             
             let srcW = iceImg.width, srcH = iceImg.height;
-            // Escalar para que la altura sea EXACTAMENTE igual a la del personaje
-            let scale = drawHeight / srcH;
+            // Escala un 15% menor que la altura del personaje
+            let scale = (drawHeight / srcH) * 0.85;
             let finalW = srcW * scale;
-            let finalH = drawHeight; // exactamente igual
-            // Centrar horizontalmente sobre el ancho del personaje
+            let finalH = srcH * scale;
+            // Centrado horizontal y alineado al suelo (base de los pies)
             let dx = drawX + (drawWidth - finalW) / 2;
-            let dy = drawY; // Alineado arriba, como finalH == drawHeight, la base de los pies coincidirá
+            let dy = drawY + (drawHeight - finalH);
 
             ctx.save();
             if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
@@ -1424,8 +1427,8 @@ function animate(time) {
                     player.attackKind = 'ice_throw';
                     player.attackTimer = 0;
                     const projX = player.x + baseDrawWidth/2 + (player.facingRight ? 20 : -20);
-                    // CORRECCIÓN: El proyectil sale de la cintura (0.4 de altura)
-                    const projY = playerLaneY + baseDrawHeight * 0.4;
+                    // CORRECCIÓN: Proyectil sale desde las piernas/cintura (0.65 de altura)
+                    const projY = playerLaneY + baseDrawHeight * 0.65;
                     spawnProjectileIce(projX, projY);
                 }
             } else if (player.attackKind === 'ice_throw') {
