@@ -506,6 +506,119 @@ function spawnProjectile(x, y, tx, ty, damage, speed, color, owner, type) {
     projectiles.push({ x, y, vx: (dx/mag)*speed, vy: (dy/mag)*speed, damage, color, owner, type, life: 3000, size: 6 });
 }
 
+// Variable para el proyectil de hielo "attached" durante la animación de lanzamiento
+let attachedIceProjectile = null;
+
+function spawnAttachedIceProjectile(x, y) {
+    attachedIceProjectile = {
+        x: x, y: y,
+        offsetX: x - player.x,
+        offsetY: y - playerLaneY,
+        life: 5000,
+        sprite: iceSprites.proj,
+        attached: true,
+        released: false,
+        scale: 0.6
+    };
+}
+
+function releaseAttachedProjectile() {
+    if (attachedIceProjectile && attachedIceProjectile.attached && !attachedIceProjectile.released) {
+        attachedIceProjectile.released = true;
+        attachedIceProjectile.attached = false;
+        const facingDir = player.facingRight ? 1 : -1;
+        const speed = 5.5;
+
+        let target = null;
+        let minDist = Infinity;
+        for (let e of enemies) {
+            if (e.dead) continue;
+            const ex = e.x + e.width/2;
+            if ((facingDir === 1 && ex > attachedIceProjectile.x) || (facingDir === -1 && ex < attachedIceProjectile.x)) {
+                const d = dist(attachedIceProjectile.x, attachedIceProjectile.y, ex, e.laneY + e.height/2);
+                if (d < minDist) { minDist = d; target = e; }
+            }
+        }
+        if (boss && !boss.dead) {
+            const bx = boss.x + boss.width/2;
+            if ((facingDir === 1 && bx > attachedIceProjectile.x) || (facingDir === -1 && bx < attachedIceProjectile.x)) {
+                const d = dist(attachedIceProjectile.x, attachedIceProjectile.y, bx, boss.laneY + boss.height/2);
+                if (d < minDist) { minDist = d; target = boss; }
+            }
+        }
+        if (midBoss && !midBoss.dead) {
+            const mx = midBoss.x + midBoss.width/2;
+            if ((facingDir === 1 && mx > attachedIceProjectile.x) || (facingDir === -1 && mx < attachedIceProjectile.x)) {
+                const d = dist(attachedIceProjectile.x, attachedIceProjectile.y, mx, midBoss.laneY + midBoss.height/2);
+                if (d < minDist) { minDist = d; target = midBoss; }
+            }
+        }
+
+        let vx = facingDir * speed;
+        let vy = 0;
+        if (target) {
+            const tx = target.x + target.width/2;
+            const ty = target.laneY + target.height/2;
+            const dx = tx - attachedIceProjectile.x;
+            const dy = ty - attachedIceProjectile.y;
+            const mag = Math.sqrt(dx*dx + dy*dy);
+            vx = (Math.abs(dx) / mag) * speed * facingDir;
+            vy = (dy / mag) * speed;
+        }
+
+        projectiles.push({
+            x: attachedIceProjectile.x,
+            y: attachedIceProjectile.y,
+            vx: vx, vy: vy,
+            damage: 0, color: '#a0e6ff', owner: 'player',
+            type: 'ice_projectile', life: 3000, size: 20,
+            sprite: iceSprites.proj
+        });
+
+        attachedIceProjectile = null;
+    }
+}
+
+function updateAttachedProjectile(dt) {
+    if (!attachedIceProjectile) return;
+    attachedIceProjectile.life -= dt;
+    if (attachedIceProjectile.life <= 0) {
+        attachedIceProjectile = null;
+        return;
+    }
+    if (attachedIceProjectile.attached && !attachedIceProjectile.released) {
+        const handOffset = player.facingRight ? baseDrawWidth * 0.85 : baseDrawWidth * 0.15;
+        attachedIceProjectile.x = player.x + handOffset;
+        attachedIceProjectile.y = playerLaneY + baseDrawHeight * 0.42;
+        if (player.attackKind === 'ice_follow') {
+            const progress = Math.min(1, player.attackTimer / 150);
+            attachedIceProjectile.scale = 0.6 + progress * 0.5;
+            const pushOut = progress * 40;
+            attachedIceProjectile.x += (player.facingRight ? pushOut : -pushOut);
+        }
+    }
+}
+
+function drawAttachedProjectile(ctx, time) {
+    if (!attachedIceProjectile) return;
+    const p = attachedIceProjectile;
+    ctx.save();
+    ctx.globalAlpha = 0.9;
+    const pulse = 0.9 + Math.sin(time/80)*0.1;
+    if (p.sprite && p.sprite.complete) {
+        ctx.translate(p.x, p.y);
+        if (!player.facingRight) ctx.scale(-1, 1);
+        const w = p.sprite.width * p.scale * pulse;
+        const h = p.sprite.height * p.scale * pulse;
+        ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
+        ctx.globalCompositeOperation = 'screen';
+        ctx.globalAlpha = 0.3 + Math.sin(time/60)*0.2;
+        ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
+        ctx.globalCompositeOperation = 'source-over';
+    }
+    ctx.restore();
+}
+
 function createEnemy(type, x, laneY) {
     const cfg = ENEMY_CONFIGS[type]; if (!cfg) return null;
     return { type, x, y: 0, laneY, width: cfg.width, height: cfg.height, health: cfg.health, maxHealth: cfg.health,
@@ -1038,21 +1151,23 @@ function drawPlayer(ctx, time) {
     const drawX = Math.round(player.x);
     const drawY = Math.round(player.y + baseDrawHeight - drawHeight);
     
-    // SPRITES DE HIELO MÁS PEQUEÑOS Y ALINEADOS AL SUELO
+    // SPRITES DE HIELO
     if (player.isAttacking) {
         const atk = player.attackKind;
-        if (atk === 'ice_charge' || atk === 'ice_throw') {
-            let iceImg = (atk === 'ice_charge') ? iceSprites.charge : iceSprites.throw;
+        if (atk === 'ice_charge' || atk === 'ice_throw' || atk === 'ice_follow') {
+            let iceImg;
+            if (atk === 'ice_charge') iceImg = iceSprites.charge;
+            else if (atk === 'ice_throw') iceImg = iceSprites.throw;
+            else iceImg = iceSprites.hit;
+
             if (!iceImg.complete || !iceImg.width) {
                 ctx.save(); if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5; drawPlayerPlaceholder(ctx, drawX, drawY, drawWidth, drawHeight, player.facingRight, time); ctx.restore(); return;
             }
-            
+
             let srcW = iceImg.width, srcH = iceImg.height;
-            // Escala un 15% menor que la altura del personaje
             let scale = (drawHeight / srcH) * 0.85;
             let finalW = srcW * scale;
             let finalH = srcH * scale;
-            // Centrado horizontal y alineado al suelo (base de los pies)
             let dx = drawX + (drawWidth - finalW) / 2;
             let dy = drawY + (drawHeight - finalH);
 
@@ -1069,7 +1184,7 @@ function drawPlayer(ctx, time) {
             return;
         }
     }
-    
+
     let sourceImg = currentSprite;
     if (player.isAttacking) {
         const atk = player.attackKind;
@@ -1408,6 +1523,12 @@ function animate(time) {
             if (player.attackKind === 'ice_charge') {
                 currentSprite = iceSprites.charge;
                 currentFrame = 0;
+            } else if (player.attackKind === 'ice_throw') {
+                currentSprite = iceSprites.throw;
+                currentFrame = 0;
+            } else if (player.attackKind === 'ice_follow') {
+                currentSprite = iceSprites.hit;
+                currentFrame = 0;
             } else {
                 if (player.attackKind === 'punch') currentSprite = playerSprites.punch;
                 else if (player.attackKind === 'punch2') currentSprite = playerSprites.punch2;
@@ -1455,21 +1576,29 @@ function animate(time) {
                     player.attackTimer = 0;
                 }
             } else if (player.attackKind === 'ice_throw') {
-                // Disparar el proyectil a los 80ms de la animación de lanzamiento
-                // cuando la mano está completamente extendida
-                if (player.attackTimer > 80 && !player.iceProjectileSpawned) {
+                // Fase 1: subzero_ice1.png - la mano se extiende
+                // El proyectil aparece cerca de la mano a los 60ms
+                if (player.attackTimer > 60 && !player.iceProjectileSpawned) {
                     player.iceProjectileSpawned = true;
-                    // Posición de la mano en el sprite subzero_ice1.png
-                    const handOffset = player.facingRight ? baseDrawWidth * 0.85 : baseDrawWidth * 0.15;
+                    // Posición de la mano en subzero_ice1.png (cerca del personaje)
+                    const handOffset = player.facingRight ? baseDrawWidth * 0.82 : baseDrawWidth * 0.18;
                     const projX = player.x + handOffset;
-                    // Altura del pecho/mano (~0.42 de la altura del sprite)
                     const projY = playerLaneY + baseDrawHeight * 0.42;
-                    spawnProjectileIce(projX, projY);
+                    spawnAttachedIceProjectile(projX, projY);
                 }
-                if (player.attackTimer > 350) {
+                if (player.attackTimer > 200) {
+                    // Convertir a proyectil libre y pasar a follow-through
+                    releaseAttachedProjectile();
+                    player.attackKind = 'ice_follow';
+                    player.attackTimer = 0;
+                }
+            } else if (player.attackKind === 'ice_follow') {
+                // Fase 2: subzero_ice2.png - follow-through, proyectil se aleja más
+                if (player.attackTimer > 150) {
                     player.isAttacking = false;
                     player.attackKind = null;
                     player.iceProjectileSpawned = false;
+                    if (attachedIceProjectile) { releaseAttachedProjectile(); }
                     currentSprite = (keys.left || keys.right || keys.forward || keys.backward) ? playerSprites.walk : playerSprites.idle;
                     currentFrame = 0;
                 }
@@ -1546,6 +1675,7 @@ function animate(time) {
 
         updateEnemies(deltaTime);
         updateBoss(deltaTime, time);
+        updateAttachedProjectile(deltaTime);
         updateProjectiles(deltaTime);
         updateParticles(deltaTime);
         updateFloatingTexts(deltaTime);
@@ -1564,6 +1694,7 @@ function animate(time) {
         drawProjectiles(ctx);
         drawParticles(ctx);
         drawPlayer(ctx, time);
+        drawAttachedProjectile(ctx, time);
         drawFloatingTexts(ctx);
     }
 
