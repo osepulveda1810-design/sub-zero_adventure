@@ -1427,8 +1427,8 @@ function animate(time) {
                     player.attackKind = 'ice_throw';
                     player.attackTimer = 0;
                     const projX = player.x + baseDrawWidth/2 + (player.facingRight ? 20 : -20);
-                    // CORRECCIÓN: Proyectil sale desde las piernas/cintura (0.65 de altura)
-                    const projY = playerLaneY + baseDrawHeight * 0.65;
+                    // Proyectil sale desde el pecho/mano (0.45 de altura)
+                    const projY = playerLaneY + baseDrawHeight * 0.45;
                     spawnProjectileIce(projX, projY);
                 }
             } else if (player.attackKind === 'ice_throw') {
