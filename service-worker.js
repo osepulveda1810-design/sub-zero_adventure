@@ -1,7 +1,7 @@
 // Service Worker - Sub-Zero Adventure
 // Sube este archivo a la RAÍZ del repo (mismo nivel que index.html) como "service-worker.js"
 
-const CACHE_VERSION = 'subzero-v1';
+const CACHE_VERSION = 'subzero-v1.11';
 const CACHE_NAME = `subzero-adventure-${CACHE_VERSION}`;
 
 // Todo lo necesario para que el juego cargue y funcione sin conexión.
@@ -56,13 +56,32 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ─── FETCH: cache-first, con fallback a la red y actualización en segundo plano ───
+// ─── FETCH: network-first para index.html, cache-first para el resto ───
 self.addEventListener('fetch', (event) => {
-  // Solo manejamos peticiones GET del mismo origen (evita romper llamadas externas/analytics)
+  // Solo manejamos peticiones GET del mismo origen
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
 
+  const url = new URL(event.request.url);
+  
+  // Para index.html: network-first (siempre trae la última versión)
+  if (url.pathname.endsWith('/index.html') || url.pathname === '/' || url.pathname === '') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
+          }
+          return networkResponse;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Para el resto de assets: stale-while-revalidate (rápido, actualiza en segundo plano)
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const networkFetch = fetch(event.request)
@@ -73,10 +92,8 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         })
-        .catch(() => cachedResponse); // sin conexión: usa lo que haya en caché
+        .catch(() => cachedResponse);
 
-      // Si ya está en caché, respondemos al instante y actualizamos en segundo plano (stale-while-revalidate).
-      // Si no está en caché, esperamos a la red.
       return cachedResponse || networkFetch;
     })
   );
