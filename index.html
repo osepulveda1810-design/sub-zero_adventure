@@ -556,6 +556,7 @@ function spawnBoss() {
     spawnFloatingText(canvas.width/2, canvas.height/3, '!' + lvl.boss + ' APARECE!', '#ffd700');
 }
 
+// Lógica para crear el proyectil de hielo y apuntar al enemigo
 function spawnProjectileIce(x, y) {
     let target = null;
     let minDist = Infinity;
@@ -862,15 +863,16 @@ function drawEnemy(ctx, e, time) {
     if (e.ethereal) ctx.globalAlpha = 0.5 + Math.sin(time / 300) * 0.3;
     ctx.restore();
 
+    // EFECTO DE CONGELACIÓN ALINEADO PERFECTAMENTE
     if (e.frozen > 0) {
         if (iceSprites.hit && iceSprites.hit.complete) {
             ctx.save(); ctx.globalAlpha = 0.85;
             let srcW = iceSprites.hit.width, srcH = iceSprites.hit.height;
-            let scaleX = w / srcW, scaleY = h / srcH;
-            let scale = Math.max(scaleX, scaleY);
-            let finalW = srcW * scale, finalH = srcH * scale;
-            let dx = x - (finalW - w) / 2;
-            let dy = y - (finalH - h) / 2;
+            let scale = h / srcH; // Escalar para igualar la altura del enemigo
+            let finalW = srcW * scale;
+            let finalH = h;
+            let dx = x + (w - finalW) / 2; // Centrado horizontalmente
+            let dy = y; // Arriba, porque finalH == h, la base coincide
             ctx.drawImage(iceSprites.hit, dx, dy, finalW, finalH);
             ctx.restore();
         } else {
@@ -912,11 +914,11 @@ function drawBoss(ctx, boss, time) {
         if (iceSprites.hit && iceSprites.hit.complete) {
             ctx.save(); ctx.globalAlpha = 0.5;
             let srcW = iceSprites.hit.width, srcH = iceSprites.hit.height;
-            let scaleX = w / srcW, scaleY = h / srcH;
-            let scale = Math.max(scaleX, scaleY);
-            let finalW = srcW * scale, finalH = srcH * scale;
-            let dx = x - (finalW - w) / 2;
-            let dy = y - (finalH - h) / 2;
+            let scale = h / srcH;
+            let finalW = srcW * scale;
+            let finalH = h;
+            let dx = x + (w - finalW) / 2;
+            let dy = y;
             ctx.drawImage(iceSprites.hit, dx, dy, finalW, finalH);
             ctx.restore();
         } else {
@@ -1007,6 +1009,7 @@ function drawPlayer(ctx, time) {
     const drawX = Math.round(player.x);
     const drawY = Math.round(player.y + baseDrawHeight - drawHeight);
     
+    // SPRITES DE HIELO CON ALINEACIÓN DE SUELO PERFECTA
     if (player.isAttacking) {
         const atk = player.attackKind;
         if (atk === 'ice_charge' || atk === 'ice_throw') {
@@ -1016,11 +1019,13 @@ function drawPlayer(ctx, time) {
             }
             
             let srcW = iceImg.width, srcH = iceImg.height;
-            let scaleX = drawWidth / srcW, scaleY = drawHeight / srcH;
-            let scale = Math.max(scaleX, scaleY);
-            let finalW = srcW * scale, finalH = srcH * scale;
-            let dx = drawX - (finalW - drawWidth) / 2;
-            let dy = drawY - (finalH - drawHeight) / 2;
+            // Escalar para que la altura sea EXACTAMENTE igual a la del personaje
+            let scale = drawHeight / srcH;
+            let finalW = srcW * scale;
+            let finalH = drawHeight; // exactamente igual
+            // Centrar horizontalmente sobre el ancho del personaje
+            let dx = drawX + (drawWidth - finalW) / 2;
+            let dy = drawY; // Alineado arriba, como finalH == drawHeight, la base de los pies coincidirá
 
             ctx.save();
             if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
@@ -1419,7 +1424,8 @@ function animate(time) {
                     player.attackKind = 'ice_throw';
                     player.attackTimer = 0;
                     const projX = player.x + baseDrawWidth/2 + (player.facingRight ? 20 : -20);
-                    const projY = playerLaneY + baseDrawHeight/4;
+                    // CORRECCIÓN: El proyectil sale de la cintura (0.4 de altura)
+                    const projY = playerLaneY + baseDrawHeight * 0.4;
                     spawnProjectileIce(projX, projY);
                 }
             } else if (player.attackKind === 'ice_throw') {
