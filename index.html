@@ -1393,7 +1393,10 @@ function updateHUD() {
 
 function showMenu(menuId) {
     document.querySelectorAll('.menu-overlay').forEach(el => el.classList.add('hidden'));
-    if (menuId !== 'none') document.getElementById(menuId).classList.remove('hidden');
+    if (menuId !== 'none') {
+        const target = document.getElementById(menuId);
+        if (target) target.classList.remove('hidden');
+    }
     // Mostrar/ocultar botones de esquina solo en el menú principal
     const helpBtn = document.getElementById('btn-help-corner');
     const updateBtn = document.getElementById('btn-update-corner');
@@ -1541,16 +1544,12 @@ document.getElementById('btn-save').onclick = () => {
     spawnFloatingText(canvas.width/2, canvas.height/2, 'PROGRESO GUARDADO!', '#4ecca3');
     togglePause();
 };
-document.getElementById('btn-quit').onclick = () => {
+document.getElementById('btn-quit').onclick = (e) => {
+    e.preventDefault();
     document.getElementById('hud').style.display = 'none';
     document.getElementById('controls').style.display = 'none';
     showMenu('main-menu');
     currentState = GameState.MENU;
-    // Mostrar botones de esquina al volver al menú
-    const helpBtn = document.getElementById('btn-help-corner');
-    const updateBtn = document.getElementById('btn-update-corner');
-    if (helpBtn) helpBtn.style.display = 'block';
-    if (updateBtn) updateBtn.style.display = 'block';
 };
 
 // Botón de actualización en menú de pausa
@@ -1617,8 +1616,16 @@ document.getElementById('btn-select-level').onclick = () => {
     buildLevelSelect(); showMenu('level-select-menu');
 };
 document.getElementById('btn-how-to-play').onclick = () => showMenu('how-to-play');
-document.getElementById('btn-back-main').onclick = () => showMenu('main-menu');
-document.getElementById('btn-back-how').onclick = () => showMenu('main-menu');
+document.getElementById('btn-back-main').onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showMenu('main-menu');
+};
+document.getElementById('btn-back-how').onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    showMenu('main-menu');
+};
 document.getElementById('btn-start-level').onclick = () => {
     showMenu('none');
     startLevel(currentLevel);
@@ -1632,16 +1639,12 @@ document.getElementById('btn-next-level').onclick = () => {
         showStory(currentLevel + 1);
     }
 };
-document.getElementById('btn-menu').onclick = () => {
+document.getElementById('btn-menu').onclick = (e) => {
+    e.preventDefault();
     document.getElementById('hud').style.display = 'none';
     document.getElementById('controls').style.display = 'none';
     showMenu('main-menu');
     currentState = GameState.MENU;
-    // Mostrar botones de esquina al volver al menú
-    const helpBtn = document.getElementById('btn-help-corner');
-    const updateBtn = document.getElementById('btn-update-corner');
-    if (helpBtn) helpBtn.style.display = 'block';
-    if (updateBtn) updateBtn.style.display = 'block';
 };
 
 // ─── BUCLE PRINCIPAL ───
