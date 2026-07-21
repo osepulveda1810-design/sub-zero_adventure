@@ -143,7 +143,9 @@
             display: flex; justify-content: space-between; align-items: flex-end;
             z-index: 10; pointer-events: none;
         }
-        #controls .control-group, #controls .btn { pointer-events: auto; }
+        #controls .control-group, #controls .btn, #controls .action-cross * { pointer-events: auto; }
+        
+        /* D-Pad de Movimiento (Izquierda) */
         .control-group.dpad { display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .dpad-row { display: flex; gap: 10px; }
         .btn-small {
@@ -154,17 +156,21 @@
             touch-action: none; cursor: pointer;
         }
         .btn-small:active, .btn-small.active { background: rgba(78,204,163,0.6); border-color: rgba(78,204,163,1); transform: scale(0.9); }
-        .btn {
-            width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.3);
-            background: rgba(20,30,50,0.6); backdrop-filter: blur(2px);
-            color: #fff; font-size: 24px; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.8); transition: all 0.1s;
-            touch-action: none; cursor: pointer;
+
+        /* Botones de Acción (Cruz a la derecha) */
+        .action-cross {
+            display: grid;
+            grid-template-columns: 65px 70px 65px;
+            grid-template-rows: 65px 70px 65px;
+            gap: 4px;
+            justify-content: center;
+            align-items: center;
+            margin-right: 5px;
         }
-        .btn:active, .btn.active { background: rgba(78,204,163,0.6); border-color: rgba(78,204,163,1); transform: scale(0.9); }
-        .attack-group { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; justify-content: flex-end; max-width: 280px; }
-        #btn-punch, #btn-kick {
-            width: 66px; height: 66px; border-radius: 50%; padding: 0;
+        #btn-punch {
+            grid-column: 1; grid-row: 2;
+            width: 65px; height: 65px;
+            border-radius: 50%; padding: 0;
             background: radial-gradient(circle, rgba(160,230,255,0.05) 0%, rgba(160,230,255,0.15) 100%);
             border: 2px solid rgba(160,230,255,0.4);
             box-shadow: 0 0 20px rgba(160,230,255,0.2), inset 0 0 25px rgba(160,230,255,0.2), inset 0 0 5px rgba(255,255,255,0.4);
@@ -172,22 +178,27 @@
             transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
             user-select: none; -webkit-user-select: none;
             touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-size: 24px;
         }
-        #btn-punch:active, #btn-punch.active, #btn-kick:active, #btn-kick.active {
-            transform: scale(0.88);
-            background: radial-gradient(circle, rgba(160,230,255,0.15) 0%, rgba(160,230,255,0.3) 100%);
-            box-shadow: 0 0 30px rgba(160,230,255,0.5), inset 0 0 30px rgba(160,230,255,0.5);
-            border-color: rgba(160,230,255,0.8);
+        #btn-kick {
+            grid-column: 3; grid-row: 2;
+            width: 65px; height: 65px;
+            border-radius: 50%; padding: 0;
+            background: radial-gradient(circle, rgba(160,230,255,0.05) 0%, rgba(160,230,255,0.15) 100%);
+            border: 2px solid rgba(160,230,255,0.4);
+            box-shadow: 0 0 20px rgba(160,230,255,0.2), inset 0 0 25px rgba(160,230,255,0.2), inset 0 0 5px rgba(255,255,255,0.4);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+            transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+            user-select: none; -webkit-user-select: none;
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-size: 24px;
         }
-        .punch-icon, .boot-icon { width: 60%; height: 60%; pointer-events: none;
-            filter: drop-shadow(0 0 6px rgba(160,230,255,0.8)) drop-shadow(0 0 2px #fff); transition: transform 0.1s ease; }
-        #btn-punch:active .punch-icon, #btn-punch.active .punch-icon { transform: scale(0.95) translateY(-5px);
-            filter: drop-shadow(0 0 10px rgba(160,230,255,1)) drop-shadow(0 0 4px #fff); }
-        #btn-kick:active .boot-icon, #btn-kick.active .boot-icon { transform: scale(0.95) rotate(-3deg);
-            filter: drop-shadow(0 0 10px rgba(160,230,255,1)) drop-shadow(0 0 4px #fff); }
-
         #btn-ice {
-            width: 60px; height: 60px; border-radius: 50%; padding: 0;
+            grid-column: 2; grid-row: 1;
+            width: 65px; height: 65px;
+            border-radius: 50%; padding: 0;
             background: radial-gradient(circle, rgba(0, 150, 255, 0.1) 0%, rgba(0, 100, 200, 0.2) 100%);
             border: 2px solid rgba(0, 200, 255, 0.6);
             box-shadow: 0 0 25px rgba(0, 150, 255, 0.2), inset 0 0 25px rgba(0, 150, 255, 0.1);
@@ -195,52 +206,52 @@
             transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
             user-select: none; -webkit-user-select: none;
             touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            display: flex; justify-content: center; align-items: center;
             color: #a0e6ff; font-size: 26px; font-weight: bold;
         }
-        #btn-ice:active, #btn-ice.active {
-            transform: scale(0.88);
-            background: radial-gradient(circle, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 255, 0.6) 100%);
-            box-shadow: 0 0 40px rgba(0, 150, 255, 0.6), inset 0 0 30px rgba(0, 150, 255, 0.5);
-            border-color: #00ffff;
+        #btn-jump {
+            grid-column: 2; grid-row: 3;
+            width: 65px; height: 65px;
+            border-radius: 50%; padding: 0;
+            background: rgba(200,30,30,0.4); border: 2px solid rgba(255,50,50,0.6);
+            transition: all 0.15s cubic-bezier(0.4,0,0.2,1);
+            user-select: none; -webkit-user-select: none;
+            touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-weight: bold; font-size: 14px;
         }
 
-        #btn-jump { width: 80px; height: 80px; background: rgba(200,30,30,0.4); border-color: rgba(255,50,50,0.6); font-weight: bold; font-size: 16px; }
-        #btn-jump:active, #btn-jump.active { background: rgba(255,50,50,0.8); }
+        /* Animaciones y efectos de los botones de acción */
+        #btn-punch:active, #btn-punch.active { transform: scale(0.88); background: radial-gradient(circle, rgba(160,230,255,0.15) 0%, rgba(160,230,255,0.3) 100%); box-shadow: 0 0 30px rgba(160,230,255,0.5), inset 0 0 30px rgba(160,230,255,0.5); border-color: rgba(160,230,255,0.8); }
+        #btn-kick:active, #btn-kick.active { transform: scale(0.88); background: radial-gradient(circle, rgba(160,230,255,0.15) 0%, rgba(160,230,255,0.3) 100%); box-shadow: 0 0 30px rgba(160,230,255,0.5), inset 0 0 30px rgba(160,230,255,0.5); border-color: rgba(160,230,255,0.8); }
+        #btn-ice:active, #btn-ice.active { transform: scale(0.88); background: radial-gradient(circle, rgba(0, 200, 255, 0.4) 0%, rgba(0, 150, 255, 0.6) 100%); box-shadow: 0 0 40px rgba(0, 150, 255, 0.6), inset 0 0 30px rgba(0, 150, 255, 0.5); border-color: #00ffff; }
+        #btn-jump:active, #btn-jump.active { transform: scale(0.88); background: rgba(255,50,50,0.8); border-color: rgba(255,255,255,0.8); }
+
+        .punch-icon, .boot-icon { width: 60%; height: 60%; pointer-events: none; filter: drop-shadow(0 0 6px rgba(160,230,255,0.8)) drop-shadow(0 0 2px #fff); transition: transform 0.1s ease; }
+        #btn-punch:active .punch-icon, #btn-punch.active .punch-icon { transform: scale(0.95) translateY(-5px); filter: drop-shadow(0 0 10px rgba(160,230,255,1)) drop-shadow(0 0 4px #fff); }
+        #btn-kick:active .boot-icon, #btn-kick.active .boot-icon { transform: scale(0.95) rotate(-3deg); filter: drop-shadow(0 0 10px rgba(160,230,255,1)) drop-shadow(0 0 4px #fff); }
 
         @media (max-width: 500px) {
-            .btn { width: 60px; height: 60px; font-size: 20px; }
-            #btn-punch, #btn-kick { width: 58px; height: 58px; }
-            #btn-ice { width: 58px; height: 58px; font-size: 22px; }
-            #btn-jump { width: 70px; height: 70px; }
-            .attack-group { max-width: 220px; gap: 6px; }
+            .btn-small { width: 40px; height: 40px; font-size: 16px; }
+            #btn-punch, #btn-kick, #btn-ice, #btn-jump { width: 55px; height: 55px; }
+            .action-cross { grid-template-columns: 55px 60px 55px; grid-template-rows: 55px 60px 55px; gap: 2px; }
         }
         @media (max-width: 400px) {
-            .btn { width: 55px; height: 55px; font-size: 18px; }
-            #btn-punch, #btn-kick { width: 52px; height: 52px; }
-            #btn-ice { width: 50px; height: 50px; font-size: 20px; }
-            #btn-jump { width: 65px; height: 65px; }
-            .attack-group { max-width: 190px; gap: 5px; }
+            .btn-small { width: 35px; height: 35px; font-size: 14px; }
+            #btn-punch, #btn-kick, #btn-ice, #btn-jump { width: 48px; height: 48px; font-size: 18px; }
+            .action-cross { grid-template-columns: 48px 52px 48px; grid-template-rows: 48px 52px 48px; gap: 2px; }
+            #btn-ice { font-size: 20px; }
+            #btn-jump { font-size: 12px; }
         }
 
-        #main-menu .menu-btn, #pause-screen .menu-btn {
-            box-sizing: border-box;
-            flex-shrink: 0;
-        }
-
-        #btn-help-corner:hover, #btn-help-corner:active {
-            background: rgba(160,230,255,0.25) !important;
-            border-color: rgba(160,230,255,0.8) !important;
-            transform: scale(1.05);
-        }
-        #btn-update-corner:hover, #btn-update-corner:active {
-            background: rgba(241,196,15,0.25) !important;
-            border-color: rgba(241,196,15,0.8) !important;
-            transform: scale(1.05);
-        }
+        #main-menu .menu-btn, #pause-screen .menu-btn { box-sizing: border-box; flex-shrink: 0; }
+        #btn-help-corner:hover, #btn-help-corner:active { background: rgba(160,230,255,0.25) !important; border-color: rgba(160,230,255,0.8) !important; transform: scale(1.05); }
+        #btn-update-corner:hover, #btn-update-corner:active { background: rgba(241,196,15,0.25) !important; border-color: rgba(241,196,15,0.8) !important; transform: scale(1.05); }
     </style>
 </head>
 <body>
-    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.25</div>
+    <!-- Etiqueta de versión actualizada a 1.26 -->
+    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.26</div>
 
     <div id="game-container">
         <div id="canvas-wrapper">
@@ -272,7 +283,7 @@
                 <div class="menu-title" style="font-size:clamp(24px,5vw,44px);margin-bottom:12px;">PAUSA</div>
                 <div class="story-box" style="max-width:340px;padding:14px;margin-bottom:12px;font-size:clamp(12px,2vw,15px);">
                     <p style="margin:0;">El destino de Lin Kuei descansa en tus manos...</p>
-                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.25</p>
+                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.26</p>
                 </div>
                 <button class="menu-btn" id="btn-resume" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Continuar</button>
                 <button class="menu-btn" id="btn-save" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Guardar Progreso</button>
@@ -280,7 +291,7 @@
                 <button class="menu-btn" id="btn-quit" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Salir al Menú</button>
             </div>
 
-            <!-- Menú Principal (ahora oculto inicialmente) -->
+            <!-- Menú Principal -->
             <div class="menu-overlay hidden" id="main-menu" style="justify-content:flex-start;padding-top:5vh;overflow-y:auto;align-items:center;">
                 <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-bottom:20px;flex-shrink:0;width:100%;max-width:400px;">
                     <div class="menu-title" style="margin-bottom:0;">SUB-ZERO</div>
@@ -290,7 +301,7 @@
                     <button class="menu-btn" id="btn-select-level">Seleccionar Nivel</button>
                 </div>
             </div>
-            <!-- Botones auxiliares fijos en esquinas del viewport -->
+            <!-- Botones auxiliares fijos en esquinas -->
             <button id="btn-help-corner" style="position:fixed;bottom:16px;left:16px;padding:6px 12px;font-size:clamp(11px,2vw,13px);background:rgba(160,230,255,0.1);border:2px solid rgba(160,230,255,0.5);color:#a0e6ff;border-radius:6px;cursor:pointer;letter-spacing:1px;font-weight:700;transition:all 0.3s;z-index:200;display:none;">❓ Ayuda</button>
             <button id="btn-update-corner" style="position:fixed;bottom:16px;right:16px;padding:6px 12px;font-size:clamp(11px,2vw,13px);background:rgba(241,196,15,0.1);border:2px solid rgba(241,196,15,0.4);color:#f1c40f;border-radius:6px;cursor:pointer;letter-spacing:1px;font-weight:700;transition:all 0.3s;z-index:200;display:none;">🔄 Actualizar</button>
 
@@ -307,7 +318,7 @@
                 <button class="menu-btn" id="btn-start-level">INICIAR</button>
             </div>
 
-            <!-- Resultados (Victoria/Derrota) -->
+            <!-- Resultados -->
             <div class="menu-overlay hidden" id="result-screen">
                 <div class="menu-title" id="result-title" style="font-size:clamp(28px,6vw,56px);"></div>
                 <div class="story-box" id="result-text"></div>
@@ -324,11 +335,11 @@
                     <div class="menu-title" style="font-size:clamp(22px,5vw,36px);margin-bottom:4px;">COMO JUGAR</div>
                     <div class="story-box" style="text-align:left;max-width:560px;padding:14px 18px;font-size:clamp(12px,2.2vw,15px);line-height:1.5;">
                         <p style="margin:4px 0;"><strong style="color:#4ecca3;">Movimiento:</strong> &#9664; &#9654; para moverte, &#9650; &#9660; para cambiar de carril</p>
-                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Salto:</strong> Boton SALTO o Espacio</p>
-                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Puño:</strong> 1 tap = golpe rapido | 2 taps rapidos = proyectil de hielo</p>
-                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Patada:</strong> 1 tap = patada normal | 2 taps rapidos = patada fuerte</p>
+                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Salto:</strong> Boton de accion "Abajo" o tecla Espacio</p>
+                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Puño (Izquierda):</strong> 1 tap = golpe rapido | 2 taps rapidos = proyectil de hielo</p>
+                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">Patada (Derecha):</strong> 1 tap = patada normal | 2 taps rapidos = patada fuerte</p>
                         <p style="margin:4px 0;"><strong style="color:#4ecca3;">Aereo:</strong> Salta y ataca para combos aereos</p>
-                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">❄️ Hielo:</strong> Congela a los enemigos y al jefe por unos segundos.</p>
+                        <p style="margin:4px 0;"><strong style="color:#4ecca3;">❄️ Hielo (Arriba):</strong> Congela a los enemigos y al jefe por unos segundos.</p>
                         <p style="margin:4px 0;"><strong style="color:#ffd700;">⏸ Pausa:</strong> Presiona el botón de pausa o la tecla <strong>P/Escape</strong> para guardar o salir.</p>
                         <p style="margin-top:10px;color:#f1c40f;">Derrota a todos los enemigos y al jefe de cada nivel para avanzar.</p>
                     </div>
@@ -338,16 +349,21 @@
 
             <!-- Controles Táctiles -->
             <div id="controls" style="display:none;">
+                <!-- D-Pad de Movimiento (Izquierda) -->
                 <div class="control-group dpad">
                     <button class="btn-small" id="btn-forward">&#9650;</button>
                     <div class="dpad-row">
-                        <button class="btn" id="btn-left">&#9664;</button>
-                        <button class="btn" id="btn-right">&#9654;</button>
+                        <button class="btn-small" id="btn-left">&#9664;</button>
+                        <button class="btn-small" id="btn-right">&#9654;</button>
                     </div>
                     <button class="btn-small" id="btn-backward">&#9660;</button>
                 </div>
-                <div class="control-group attack-group">
-                    <button class="btn" id="btn-punch" aria-label="Ataque de Puño">
+
+                <!-- Cruz de Acciones (Derecha) -->
+                <div class="action-cross">
+                    <button class="btn" id="btn-ice" aria-label="Ataque de Hielo">❄️</button>
+                    
+                    <button class="btn" id="btn-punch" aria-label="Ataque de Puño / Combo">
                         <svg class="punch-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                             <g fill="none" stroke="#a0e6ff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M 32 75 L 68 75 L 65 92 L 35 92 Z" />
@@ -358,7 +374,8 @@
                             </g>
                         </svg>
                     </button>
-                    <button class="btn" id="btn-kick" aria-label="Patada Alta">
+                    
+                    <button class="btn" id="btn-kick" aria-label="Patada Alta / Combo">
                         <svg class="boot-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
                             <g fill="none" stroke="#a0e6ff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M 65 20 L 65 55 C 65 65 72 75 70 85 C 69 88 64 90 55 90 L 25 90 C 12 90 12 78 22 72 C 32 66 38 58 38 45 L 38 20 Z" />
@@ -370,7 +387,7 @@
                             </g>
                         </svg>
                     </button>
-                    <button class="btn" id="btn-ice" aria-label="Ataque de Hielo">❄️</button>
+                    
                     <button class="btn" id="btn-jump">SALTO</button>
                 </div>
             </div>
@@ -382,6 +399,35 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
+
+// ==========================================
+// 🛠️ AJUSTES PARA ALINEAR LOS SPRITES DE HIELO
+// ==========================================
+// Modifica estos valores para que los sprites de hielo encajen perfectamente
+// con idle_subzero.png. scale = 0.8 suele ser el tamaño más proporcionado.
+const iceAdjustments = {
+    ice_charge: {
+        scale: 0.8,        // Escala del sprite de carga (bajada para evitar que sea enorme)
+        offsetX: 0,        // Desplazamiento horizontal (positivo = derecha)
+        offsetY: 0,        // Desplazamiento vertical (positivo = abajo)
+        anchorX: 0.5,      // Punto de anclaje X del sprite de hielo
+        anchorY: 0.5       // Punto de anclaje Y del sprite de hielo
+    },
+    ice_throw: {
+        scale: 0.8,
+        offsetX: 0,
+        offsetY: 0,
+        // El proyectil sale de la mano. Estos valores definen dónde está la mano en el sprite de hielo.
+        handAnchorX: 0.93, // Posición horizontal de la mano en el sprite del personaje (0=izq, 1=der)
+        handAnchorY: 0.42  // Posición vertical de la mano en el sprite del personaje
+    },
+    ice_follow: {
+        scale: 0.8,
+        offsetX: 0,
+        offsetY: 0
+    }
+};
+// ==========================================
 
 const LEVELS = [
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro",
@@ -563,10 +609,7 @@ const frameOffsets = { idle: [0,0,0,0], walk: [0,0,0,0], jump: [0,0,0,0], kick: 
 const cropAdjusts = { punch: {x:[0,0,0,0], w:[0,-5,-5,-5]}, punch2: {x:[0,0,6,0], w:[0,0,-28,-35]}, punchAir: {x:[0,0,0,0], w:[14,0,0,0]}, kickAir: {x:[-4,0,0,0], w:[28,0,0,0]} };
 const customScales = { punch: 1.0, punch2: 1.0, kick: 1.0, kick2: 1.0, punchAir: 1.0, kickAir: 1.0 };
 const verticalOffsets = { punch: 0, punch2: 0, kick: 0, kick2: 0, punchAir: 0, kickAir: 0 };
-// Ajustes de alineación para sprites de hielo
-const iceCustomScales = { ice_charge: 1.0, ice_throw: 1.0, ice_follow: 1.0 };
-const iceOffsets = { ice_charge: 0, ice_throw: 0, ice_follow: 0 };
-const iceVerticalOffsets = { ice_charge: 0, ice_throw: 0, ice_follow: 0 };
+// Ajustes de alineación para sprites de hielo (los hemos reemplazado arriba con iceAdjustments)
 const airSourceFrames = { punchAir: 0, kickAir: 1 };
 
 const MAX_ACTIVE_ENEMIES = 4;
@@ -726,16 +769,28 @@ function updateAttachedProjectile(dt) {
     }
     if (attachedIceProjectile.attached && !attachedIceProjectile.released) {
         if (player.attackKind === 'ice_throw') {
+            // Usar las dimensiones REALES del sprite de hielo para calcular la posición exacta de la mano
             const depthRatio = (laneBottom - playerLaneY) / Math.max(1, laneBottom - laneTop);
             const perspectiveScale = 1 - depthRatio * 0.15;
-            const iceScale = player.scale * perspectiveScale;
-            const spriteW = 536 * iceScale;
-            const offsetX = iceOffsets['ice_throw'] * player.scale;
-            const handRelX = player.facingRight ? 0.93 : 0.07;
-            attachedIceProjectile.x = player.x + offsetX + (spriteW * handRelX);
-            const spriteH = 369 * iceScale;
-            const handRelY = 0.42;
-            attachedIceProjectile.y = playerLaneY + baseDrawHeight - spriteH + (spriteH * handRelY);
+            
+            const srcW = iceSprites.throw.naturalWidth;
+            const srcH = iceSprites.throw.naturalHeight;
+            const cfg = iceAdjustments.ice_throw;
+            
+            const aspectScale = (baseDrawHeight / srcH) * cfg.scale;
+            const spriteW = Math.round(srcW * aspectScale * perspectiveScale);
+            const spriteH = Math.round(srcH * aspectScale * perspectiveScale);
+            
+            const offsetX = Math.round(cfg.offsetX * player.scale);
+            const baseY = playerLaneY + baseDrawHeight - spriteH + Math.round(cfg.offsetY * player.scale);
+            
+            // Calcular posición de la mano usando los anclajes relativos
+            const handRelX = player.facingRight ? cfg.handAnchorX : (1 - cfg.handAnchorX);
+            const projX = player.x + offsetX + (spriteW * handRelX);
+            const projY = baseY + (spriteH * cfg.handAnchorY);
+            
+            attachedIceProjectile.x = projX;
+            attachedIceProjectile.y = projY;
         } else if (player.attackKind === 'ice_follow' && attachedIceProjectile.dirX !== undefined) {
             const progress = Math.min(1, player.attackTimer / 150);
             const pushOut = progress * 55;
@@ -1340,32 +1395,40 @@ function drawPlayer(ctx, time) {
         const atk = player.attackKind;
         if (atk === 'ice_charge' || atk === 'ice_throw' || atk === 'ice_follow') {
             let iceImg;
+            const configKey = atk === 'ice_charge' ? 'ice_charge' : (atk === 'ice_throw' ? 'ice_throw' : 'ice_follow');
             if (atk === 'ice_charge') iceImg = iceSprites.charge;
             else if (atk === 'ice_throw') iceImg = iceSprites.throw;
             else iceImg = iceSprites.hit;
 
-            if (!iceImg.complete || !iceImg.width) {
-                ctx.save(); if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5; drawPlayerPlaceholder(ctx, drawX, drawY, drawWidth, drawHeight, player.facingRight, time); ctx.restore(); return;
+            if (!iceImg.complete || !iceImg.naturalWidth) {
+                ctx.save();
+                if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
+                drawPlayerPlaceholder(ctx, drawX, drawY, drawWidth, drawHeight, player.facingRight, time);
+                ctx.restore();
+                return;
             }
 
-            let srcW = iceImg.width, srcH = iceImg.height;
-            // Escalamos para que la altura coincida con la del personaje (baseDrawHeight)
-            const aspectScale = (baseDrawHeight / srcH) * iceCustomScales[atk];
+            const srcW = iceImg.naturalWidth;
+            const srcH = iceImg.naturalHeight;
+            const cfg = iceAdjustments[configKey];
+            
+            const aspectScale = (baseDrawHeight / srcH) * cfg.scale;
             const finalW = Math.round(srcW * aspectScale * perspectiveScale);
             const finalH = Math.round(srcH * aspectScale * perspectiveScale);
-            // Desplazamiento horizontal (0 para alinear el centro)
-            const offsetX = Math.round(iceOffsets[atk] * player.scale);
-            // Desplazamiento vertical: alineamos la base del sprite con la base del personaje
-            const dy = Math.round(drawY + drawHeight - finalH + iceVerticalOffsets[atk]);
+            
+            const offsetX = Math.round(cfg.offsetX * player.scale);
+            const offsetY = Math.round(cfg.offsetY * player.scale);
+            
+            const baseY = drawY + drawHeight - finalH + offsetY;
 
             ctx.save();
             if (player.flashTimer > 0) ctx.globalAlpha = 0.5 + Math.sin(time / 50) * 0.5;
             if (!player.facingRight) {
-                ctx.translate(drawX + finalW, dy);
+                ctx.translate(drawX + finalW, baseY);
                 ctx.scale(-1, 1);
                 ctx.drawImage(iceImg, 0, 0, srcW, srcH, -offsetX, 0, finalW, finalH);
             } else {
-                ctx.drawImage(iceImg, 0, 0, srcW, srcH, drawX + offsetX, dy, finalW, finalH);
+                ctx.drawImage(iceImg, 0, 0, srcW, srcH, drawX + offsetX, baseY, finalW, finalH);
             }
             ctx.restore();
             return;
@@ -1868,10 +1931,10 @@ function animate(time) {
                     const iceScale = player.scale * perspectiveScale;
                     const spriteW = 536 * iceScale;
                     const spriteH = 369 * iceScale;
-                    const offsetX = iceOffsets['ice_throw'] * player.scale;
-                    const handRelX = player.facingRight ? 0.93 : 0.07;
+                    const offsetX = iceAdjustments['ice_throw'].offsetX * player.scale;
+                    const handRelX = player.facingRight ? iceAdjustments['ice_throw'].handAnchorX : (1 - iceAdjustments['ice_throw'].handAnchorX);
                     const projX = player.x + offsetX + (spriteW * handRelX);
-                    const handRelY = 0.42;
+                    const handRelY = iceAdjustments['ice_throw'].handAnchorY;
                     const projY = playerLaneY + baseDrawHeight - spriteH + (spriteH * handRelY);
                     spawnAttachedIceProjectile(projX, projY);
                 }
@@ -2046,7 +2109,7 @@ if (clearedLevels.length > 0) document.getElementById('btn-continue').removeAttr
   // ─── Service Worker con detección de actualizaciones ───
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      const swUrl = './service-worker.js?v=1.25';
+      const swUrl = './service-worker.js?v=1.26';
 
       navigator.serviceWorker.register(swUrl)
         .then((registration) => {
