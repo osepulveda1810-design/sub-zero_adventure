@@ -249,8 +249,8 @@
     </style>
 </head>
 <body>
-    <!-- Etiqueta de versión actualizada a 1.28 -->
-    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.28</div>
+    <!-- Etiqueta de versión actualizada a 1.29 -->
+    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.29</div>
 
     <div id="game-container">
         <div id="canvas-wrapper">
@@ -282,7 +282,7 @@
                 <div class="menu-title" style="font-size:clamp(24px,5vw,44px);margin-bottom:12px;">PAUSA</div>
                 <div class="story-box" style="max-width:340px;padding:14px;margin-bottom:12px;font-size:clamp(12px,2vw,15px);">
                     <p style="margin:0;">El destino de Lin Kuei descansa en tus manos...</p>
-                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.28</p>
+                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.29</p>
                 </div>
                 <button class="menu-btn" id="btn-resume" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Continuar</button>
                 <button class="menu-btn" id="btn-save" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Guardar Progreso</button>
@@ -400,19 +400,19 @@ const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 
 // ==========================================
-// 🛠️ AJUSTES PARA ALINEAR LOS SPRITES DE HIELO (V1.28)
+// 🛠️ AJUSTES PARA ALINEAR LOS SPRITES DE HIELO (V1.29)
 // ==========================================
-// Ahora el motor escala los sprites de hielo basándose en el ancho de UN SOLO fotograma.
-// Si la bola de hielo no sale de la mano exactamente, ajusta solo handAnchorX (derecha) 
-// y handAnchorY (abajo). Si es muy grande, baja el "scale".
+// Ahora escala basado en la ALTURA real del sprite idle, no en el ancho.
+// Si el sprite de hielo se ve ligeramente grande o pequeño, cambia el "scale".
+// Si la bola de hielo no sale de la mano exactamente, ajusta handAnchorX y handAnchorY.
 const iceAdjustments = {
     ice_charge: {
-        scale: 0.95,       // Escala del sprite de carga
+        scale: 0.85,       // Escala del sprite de carga
         offsetX: 0,        // Desplazamiento horizontal (positivo = derecha)
         offsetY: 0         // Desplazamiento vertical (positivo = abajo)
     },
     ice_throw: {
-        scale: 0.95,
+        scale: 0.85,
         offsetX: 0,
         offsetY: 0,
         // El proyectil sale de la mano. Ajusta estos valores para que la bola salga de la palma.
@@ -420,7 +420,7 @@ const iceAdjustments = {
         handAnchorY: 0.45  // Posición vertical de la mano (0=arriba, 1=abajo)
     },
     ice_follow: {
-        scale: 0.95,
+        scale: 0.85,
         offsetX: 0,
         offsetY: 0
     }
@@ -767,18 +767,18 @@ function updateAttachedProjectile(dt) {
     }
     if (attachedIceProjectile.attached && !attachedIceProjectile.released) {
         if (player.attackKind === 'ice_throw') {
-            // NUEVA LÓGICA: Usar el ancho de UN fotograma idle para escalar el sprite de hielo
+            // NUEVA LÓGICA V1.29: Usar la ALTURA del fotograma idle para escalar el sprite de hielo
             const depthRatio = (laneBottom - playerLaneY) / Math.max(1, laneBottom - laneTop);
             const perspectiveScale = 1 - depthRatio * 0.15;
             
             const srcW = iceSprites.throw.naturalWidth;
             const srcH = iceSprites.throw.naturalHeight;
-            const idleFrameW = playerSprites.idle.naturalWidth / totalFrames;
+            const idleFrameH = playerSprites.idle.naturalHeight; // 369px original
             
             const cfg = iceAdjustments.ice_throw;
             
-            // La escala se calcula en base al fotograma idle, no al ancho total
-            const aspectScale = (idleFrameW / srcW) * cfg.scale;
+            // La escala se calcula en base a la altura del fotograma idle, no al ancho
+            const aspectScale = (idleFrameH / srcH) * cfg.scale;
             const spriteW = Math.round(srcW * aspectScale * perspectiveScale);
             const spriteH = Math.round(srcH * aspectScale * perspectiveScale);
             
@@ -1410,12 +1410,13 @@ function drawPlayer(ctx, time) {
 
             const srcW = iceImg.naturalWidth;
             const srcH = iceImg.naturalHeight;
-            const idleFrameW = playerSprites.idle.naturalWidth / totalFrames;
+            const idleFrameH = playerSprites.idle.naturalHeight; // 369px original
             
             const cfg = iceAdjustments[configKey];
             
-            // NUEVA LÓGICA V1.28: Escalar en base al ancho del fotograma idle, no al ancho total
-            const aspectScale = (idleFrameW / srcW) * cfg.scale;
+            // NUEVA LÓGICA V1.29: Escalar basándonos en la altura del fotograma original 
+            // para que el tamaño encaje perfectamente sin deformaciones.
+            const aspectScale = (idleFrameH / srcH) * cfg.scale;
             const finalW = Math.round(srcW * aspectScale * perspectiveScale);
             const finalH = Math.round(srcH * aspectScale * perspectiveScale);
             
@@ -2112,7 +2113,7 @@ if (clearedLevels.length > 0) document.getElementById('btn-continue').removeAttr
   // ─── Service Worker con detección de actualizaciones ───
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      const swUrl = './service-worker.js?v=1.28';
+      const swUrl = './service-worker.js?v=1.29';
 
       navigator.serviceWorker.register(swUrl)
         .then((registration) => {
