@@ -807,15 +807,21 @@ function startLevel(levelIndex) {
 }
 
 function spawnEnemy() {
-    const lvl = LEVELS[currentLevel]; 
+    const lvl = LEVELS[currentLevel];
     if (!lvl || enemiesDefeated >= lvl.enemyCount) return;
     if (enemies.length >= MAX_ACTIVE_ENEMIES) return;
-    const types = lvl.enemyTypes; 
+    const types = lvl.enemyTypes;
     const type = types[randInt(0, types.length - 1)];
-    const laneY = rand(laneTop + 20, laneBottom - 20); 
-    const x = canvas.width + rand(50, 200);
-    const enemy = createEnemy(type, x, laneY); 
-    if (enemy) enemies.push(enemy);
+    // Elegir lado: 0 = izquierda, 1 = derecha
+    const side = Math.random() < 0.5 ? 0 : 1;
+    const x = side === 0 ? -rand(50, 150) : canvas.width + rand(50, 150);
+    const laneY = rand(laneTop + 20, laneBottom - 20);
+    const enemy = createEnemy(type, x, laneY);
+    if (enemy) {
+        // Ajustar dirección inicial hacia el jugador
+        enemy.facingRight = x < canvas.width / 2;
+        enemies.push(enemy);
+    }
 }
 
 function spawnBoss() {
@@ -1027,8 +1033,7 @@ function updateProjectiles(dt) {
 
         if (p.owner === 'player' && p.type === 'ice_projectile') {
             let hit = false;
-            // Aumentamos el radio de detección a 55 para asegurar impacto
-            const detectionRadius = 55;
+            const detectionRadius = 65;
             for (let e of enemies) {
                 if (e.dead) continue;
                 const ex = e.x + e.width/2, ey = e.laneY + e.height/2;
@@ -1036,6 +1041,7 @@ function updateProjectiles(dt) {
                     e.frozen = 4000;
                     spawnIceEffect(ex, ey);
                     spawnFloatingText(ex, ey - 30, '¡CONGELADO!', '#a0e6ff');
+                    console.log('Enemigo congelado!');
                     hit = true;
                     break;
                 }
@@ -1046,6 +1052,7 @@ function updateProjectiles(dt) {
                     midBoss.frozen = 2500;
                     spawnIceEffect(mx, my);
                     spawnFloatingText(mx, my - 30, '¡CONGELADO!', '#a0e6ff');
+                    console.log('MidBoss congelado!');
                     hit = true;
                 }
             }
@@ -1055,6 +1062,7 @@ function updateProjectiles(dt) {
                     boss.frozen = 2000;
                     spawnIceEffect(bx, by);
                     spawnFloatingText(bx, by - 30, '¡CONGELADO!', '#a0e6ff');
+                    console.log('Boss congelado!');
                     hit = true;
                 }
             }
@@ -1117,7 +1125,13 @@ function drawEnemy(ctx, e, time) {
     const x = e.x, y = e.laneY + baseDrawHeight - h;
     ctx.save();
     if (e.flashTimer > 0) ctx.globalAlpha = 0.6 + Math.sin(time / 30) * 0.4;
-    ctx.fillStyle = e.color; ctx.fillRect(x, y, w, h);
+    // Cambiar color si está congelado
+    let baseColor = e.color;
+    if (e.frozen > 0) {
+        baseColor = '#4a9eff'; // Azul hielo
+    }
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(x, y, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x + w*0.1, y + h*0.15, w*0.8, h*0.25);
     ctx.fillStyle = e.flashTimer > 0 ? '#fff' : e.lightColor;
     ctx.fillRect(x + w*0.25, y, w*0.5, h*0.2);
@@ -1177,7 +1191,10 @@ function drawBoss(ctx, boss, time) {
     ctx.globalAlpha = haloAlpha * 0.3; ctx.fillStyle = boss.color;
     ctx.fillRect(x - 6, y - 6, w + 12, h + 12);
     ctx.globalAlpha = haloAlpha;
-    ctx.fillStyle = boss.color; ctx.fillRect(x, y, w, h);
+    let baseColor = boss.color;
+    if (boss.frozen > 0) baseColor = '#4a9eff';
+    ctx.fillStyle = baseColor;
+    ctx.fillRect(x, y, w, h);
     ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fillRect(x + w*0.05, y + h*0.1, w*0.9, h*0.3); ctx.fillRect(x + w*0.15, y + h*0.5, w*0.7, h*0.2);
     ctx.fillStyle = boss.lightColor; ctx.fillRect(x + w*0.2, y, w*0.6, h*0.18);
     ctx.fillStyle = '#fff'; const glow = Math.sin(time / 150) * 0.2 + 0.8; ctx.globalAlpha = glow;
