@@ -327,7 +327,7 @@
 
 <script>
 // ============================================================
-// MOTOR DE JUEGO COMPLETO - SUB-ZERO ADVENTURE
+// MOTOR DE JUEGO REPARADO - SUB-ZERO ADVENTURE
 // ============================================================
 
 // --- 1. Configuración del Canvas ---
@@ -343,7 +343,7 @@ function resizeCanvas() {
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-// --- 2. Carga de Assets (Sprites) ---
+// --- 2. Carga de Assets (Sprites) con protección contra fallos ---
 const assets = {
     idle_subzero: null,
     subzero_ice_charge: null,
@@ -360,12 +360,17 @@ function loadAssets(callback) {
         img.src = key + '.png';
         img.onload = () => {
             assets[key] = img;
+            console.log('Cargado:', key);
             assetsLoaded++;
             if (assetsLoaded === TOTAL_ASSETS) callback();
         };
         img.onerror = () => {
-            console.warn('Error cargando:', key + '.png');
-            assets[key] = document.createElement('canvas'); // fallback
+            console.warn('ERROR cargando:', key + '.png. Se usará rectángulo de respaldo.');
+            // Creamos un canvas de 1x1 para evitar que el motor dibuje rectángulos invisibles de 0px.
+            const fallback = document.createElement('canvas');
+            fallback.width = 1;
+            fallback.height = 1;
+            assets[key] = fallback;
             assetsLoaded++;
             if (assetsLoaded === TOTAL_ASSETS) callback();
         };
@@ -393,13 +398,16 @@ const game = {
     idleFrameH: 0
 };
 
-// --- 4. Funciones de Dibujo y Animación ---
+// --- 4. Funciones de Dibujo y Animación robustas ---
 function drawPlayer() {
     const cx = canvas.width / 2;
     const cy = canvas.height - 20;
     const w = game.width;
     
-    if (game.state === 'idle' && assets.idle_subzero) {
+    // Verificar si la imagen de inactividad es válida
+    const validIdle = assets.idle_subzero && assets.idle_subzero.width > 1; // >1 porque el fallback tiene 1x1
+    
+    if (game.state === 'idle' && validIdle) {
         if (game.idleFrameW === 0) {
             game.idleFrameW = assets.idle_subzero.width / game.idleFrames;
             game.idleFrameH = assets.idle_subzero.height;
@@ -408,23 +416,62 @@ function drawPlayer() {
         const h = w * (game.idleFrameH / game.idleFrameW);
         ctx.drawImage(assets.idle_subzero, frameX, 0, game.idleFrameW, game.idleFrameH, cx - w/2, cy - h, w, h);
     } 
-    else if (game.state === 'ice_charge' && assets.subzero_ice_charge) {
+    else if (game.state === 'ice_charge') {
         const img = assets.subzero_ice_charge;
-        const h = w * (img.height / img.width);
-        ctx.drawImage(img, cx - w/2, cy - h, w, h);
+        if (img && img.width > 1) {
+            const h = w * (img.height / img.width);
+            ctx.drawImage(img, cx - w/2, cy - h, w, h);
+        } else {
+            // Marcador de posición para carga de hielo
+            ctx.fillStyle = '#00bfff';
+            ctx.fillRect(cx - w/2, cy - w, w, w);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('❄️ CHARGE', cx, cy - w/2 + 6);
+        }
     }
-    else if (game.state === 'ice_attack' && assets.subzero_ice1 && assets.subzero_ice2) {
-        // Alternar entre ice1 e ice2 cada 200ms para animación de impacto
-        const img = Math.floor(Date.now() / 200) % 2 === 0 ? assets.subzero_ice1 : assets.subzero_ice2;
-        const h = w * (img.height / img.width);
-        ctx.drawImage(img, cx - w/2, cy - h, w, h);
+    else if (game.state === 'ice_attack') {
+        const img1 = assets.subzero_ice1;
+        const img2 = assets.subzero_ice2;
+        if (img1 && img1.width > 1 && img2 && img2.width > 1) {
+            const img = Math.floor(Date.now() / 200) % 2 === 0 ? img1 : img2;
+            const h = w * (img.height / img.width);
+            ctx.drawImage(img, cx - w/2, cy - h, w, h);
+        } else {
+            // Marcador de posición para ataque de hielo
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(cx - w/2, cy - w, w, w);
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('⚡ ICE', cx, cy - w/2 + 6);
+        }
+    }
+    else if (game.state === 'jump') {
+        // Animación de salto simple usando el idle si está disponible
+        const validJumpImg = assets.idle_subzero && assets.idle_subzero.width > 1;
+        if (validJumpImg) {
+            if (game.idleFrameW === 0) {
+                game.idleFrameW = assets.idle_subzero.width / game.idleFrames;
+                game.idleFrameH = assets.idle_subzero.height;
+            }
+            const h = w * (game.idleFrameH / game.idleFrameW);
+            ctx.drawImage(assets.idle_subzero, 0, 0, game.idleFrameW, game.idleFrameH, cx - w/2, cy - h - 20, w, h);
+        } else {
+            ctx.fillStyle = '#ff4500';
+            ctx.fillRect(cx - w/2, cy - w - 20, w, w);
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 18px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('⬆ JUMP', cx, cy - w/2 - 15);
+        }
     }
 }
 
 function updateGame() {
     if (game.isPaused || !game.isRunning) return;
 
-    // Lógica de animación
     game.timer++;
     if (game.timer >= game.animSpeed) {
         game.timer = 0;
@@ -449,7 +496,7 @@ function attackBoss(damage) {
         game.score += 10;
         updateHUD();
         if (game.bossHp === 0) {
-            // Victoria!
+            // Victoria
             setTimeout(() => {
                 game.isRunning = false;
                 document.getElementById('result-title').textContent = "¡VICTORIA!";
@@ -464,14 +511,10 @@ function attackBoss(damage) {
 
 // --- 6. Control de Eventos (Teclado y Táctil) ---
 function setupControls() {
-    // -- Movimiento --
-    const moveSpeed = 15;
-    const moveMap = {
-        'btn-left': -moveSpeed,
-        'btn-right': moveSpeed
-    };
+    // Mapa de teclas para movimiento fluido
+    let keys = { left: false, right: false };
 
-    // Función auxiliar para eventos táctiles y ratón
+    // Función auxiliar para eventos táctiles y ratón (robusta)
     function addButtonListener(id, action) {
         const el = document.getElementById(id);
         if (!el) return;
@@ -485,16 +528,19 @@ function setupControls() {
         el.addEventListener('touchcancel', end, {passive: false});
     }
 
-    // Movimiento lateral
-    let moveDir = 0;
-    addButtonListener('btn-left', (pressed) => { moveDir = pressed ? -1 : 0; });
-    addButtonListener('btn-right', (pressed) => { moveDir = pressed ? 1 : 0; });
+    // Movimiento lateral (Izquierda / Derecha)
+    addButtonListener('btn-left', (pressed) => { keys.left = pressed; });
+    addButtonListener('btn-right', (pressed) => { keys.right = pressed; });
 
     // Movimiento en bucle del juego (para mover al personaje)
     setInterval(() => {
         if (game.isRunning && !game.isPaused) {
+            let moveDir = 0;
+            if (keys.left) moveDir -= 1;
+            if (keys.right) moveDir += 1;
             game.x += moveDir * 10;
-            // Límites del canvas
+            
+            // Límites del canvas (evitar que se salga de la pantalla)
             const halfW = game.width / 2;
             if (game.x < -halfW) game.x = -halfW;
             if (game.x > canvas.width - halfW) game.x = canvas.width - halfW;
@@ -517,35 +563,36 @@ function setupControls() {
             game.state = 'ice_charge';
             setTimeout(() => {
                 if (game.state === 'ice_charge') game.state = 'idle';
-            }, 500);
+            }, 600);
         }
     });
 
-    // -- Salto --
-    addButtonListener('btn-jump', (pressed) => {
+    // -- Salto (btn-jump + botones de flecha arriba/abajo) --
+    const jumpAction = (pressed) => {
         if (pressed && game.isRunning && !game.isPaused) {
             game.state = 'jump';
             setTimeout(() => { if (game.state === 'jump') game.state = 'idle'; }, 400);
         }
-    });
+    };
+    addButtonListener('btn-jump', jumpAction);
+    addButtonListener('btn-forward', jumpAction);
+    addButtonListener('btn-backward', jumpAction);
 
     // -- Teclado (PC) --
     document.addEventListener('keydown', (e) => {
         if (e.key === 'p' || e.key === 'Escape') {
             togglePause();
         }
-        if (e.key === 'ArrowLeft') moveDir = -1;
-        if (e.key === 'ArrowRight') moveDir = 1;
+        if (e.key === 'ArrowLeft') keys.left = true;
+        if (e.key === 'ArrowRight') keys.right = true;
         if (e.key === ' ' || e.key === 'Space') {
             e.preventDefault();
-            if (game.isRunning && !game.isPaused) {
-                game.state = 'jump';
-                setTimeout(() => { if (game.state === 'jump') game.state = 'idle'; }, 400);
-            }
+            jumpAction(true);
         }
     });
     document.addEventListener('keyup', (e) => {
-        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') moveDir = 0;
+        if (e.key === 'ArrowLeft') keys.left = false;
+        if (e.key === 'ArrowRight') keys.right = false;
     });
 }
 
@@ -563,6 +610,8 @@ function startGame() {
     game.score = 0;
     game.state = 'idle';
     game.x = 0;
+    game.frame = 0;
+    game.timer = 0;
     
     document.getElementById('main-menu').classList.add('hidden');
     document.getElementById('pause-screen').classList.add('hidden');
@@ -577,13 +626,13 @@ function gameLoop() {
     updateGame();
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    // Dibujar fondo simple
+    // Dibujar fondo
     ctx.fillStyle = '#0a0e1a';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = '#1a2a3a';
     ctx.fillRect(0, canvas.height - 40, canvas.width, 40); // suelo
     
-    // Dibujar al jugador desplazado
+    // Dibujar al jugador con desplazamiento horizontal
     ctx.save();
     ctx.translate(game.x, 0);
     drawPlayer();
@@ -595,7 +644,7 @@ function gameLoop() {
 // --- 9. Inicialización y Eventos de la UI ---
 document.addEventListener('DOMContentLoaded', () => {
     loadAssets(() => {
-        console.log('Todos los assets cargados.');
+        console.log('Todos los assets cargados (o con fallbacks).');
         gameLoop();
         setupControls();
         
