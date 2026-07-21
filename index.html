@@ -240,7 +240,7 @@
     </style>
 </head>
 <body>
-    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.23</div>
+    <div id="test-version-label" style="position:fixed; top:4px; left:6px; z-index:9999; font-family:sans-serif; font-size:11px; color:#fff; background:rgba(0,0,0,0.5); padding:2px 6px; border-radius:4px; pointer-events:none;">Test v1.24</div>
 
     <div id="game-container">
         <div id="canvas-wrapper">
@@ -272,7 +272,7 @@
                 <div class="menu-title" style="font-size:clamp(24px,5vw,44px);margin-bottom:12px;">PAUSA</div>
                 <div class="story-box" style="max-width:340px;padding:14px;margin-bottom:12px;font-size:clamp(12px,2vw,15px);">
                     <p style="margin:0;">El destino de Lin Kuei descansa en tus manos...</p>
-                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.23</p>
+                    <p style="margin-top:6px;font-size:0.8em;color:#4ecca3;">Versión: Test v1.24</p>
                 </div>
                 <button class="menu-btn" id="btn-resume" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Continuar</button>
                 <button class="menu-btn" id="btn-save" style="max-width:260px;padding:8px 22px;font-size:clamp(11px,2vw,14px);">Guardar Progreso</button>
@@ -526,12 +526,12 @@ playerSprites.punch2.src = 'assets/sprites/player/punch_subzero2.png'; playerSpr
 playerSprites.kickAir.src = 'assets/sprites/player/kick_air.png';
 
 const iceSprites = {
-    charge: new Image(), throw: new Image(), proj: new Image(), hit: new Image()
+    charge: new Image(), throw: new Image(), hit: new Image()
 };
 iceSprites.charge.src = 'assets/sprites/player/subzero_ice_charge.png';
 iceSprites.throw.src = 'assets/sprites/player/subzero_ice1.png';
-iceSprites.proj.src = 'assets/sprites/player/ice.png';
 iceSprites.hit.src = 'assets/sprites/player/subzero_ice2.png';
+// Nota: ice.png (proj) ya no se usa; se dibuja con canvas.
 
 let currentSprite = playerSprites.idle, currentFrame = 0;
 const totalFrames = 4;
@@ -629,7 +629,6 @@ function spawnAttachedIceProjectile(x, y) {
         offsetX: x - player.x,
         offsetY: y - playerLaneY,
         life: 5000,
-        sprite: iceSprites.proj,
         attached: true,
         released: false,
         scale: 0.6
@@ -711,8 +710,7 @@ function releaseAttachedProjectile() {
             y: attachedIceProjectile.y,
             vx: safeDirX * speed, vy: dirY * speed,
             damage: 0, color: '#a0e6ff', owner: 'player',
-            type: 'ice_projectile', life: 3000, size: 20,
-            sprite: iceSprites.proj
+            type: 'ice_projectile', life: 3000, size: 20
         });
 
         attachedIceProjectile = null;
@@ -754,17 +752,25 @@ function drawAttachedProjectile(ctx, time) {
     ctx.save();
     ctx.globalAlpha = 0.9;
     const pulse = 0.9 + Math.sin(time/80)*0.1;
-    if (p.sprite && p.sprite.complete) {
-        ctx.translate(p.x, p.y);
-        if (!player.facingRight) ctx.scale(-1, 1);
-        const w = p.sprite.width * p.scale * pulse;
-        const h = p.sprite.height * p.scale * pulse;
-        ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
-        ctx.globalCompositeOperation = 'screen';
-        ctx.globalAlpha = 0.3 + Math.sin(time/60)*0.2;
-        ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
-        ctx.globalCompositeOperation = 'source-over';
-    }
+    // Dibujar una pequeña bola de hielo (seguirá la mano)
+    const size = 12 * p.scale * pulse;
+    const grad = ctx.createRadialGradient(p.x - 3, p.y - 3, 2, p.x, p.y, size);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.4, '#a0e6ff');
+    grad.addColorStop(0.8, '#4ecca3');
+    grad.addColorStop(1, '#0a5c5c');
+    ctx.shadowColor = '#a0e6ff';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    // destello
+    ctx.fillStyle = 'rgba(255,255,255,0.6)';
+    ctx.beginPath();
+    ctx.arc(p.x - 4, p.y - 4, 4, 0, Math.PI * 2);
+    ctx.fill();
     ctx.restore();
 }
 
@@ -845,8 +851,7 @@ function spawnProjectileIce(x, y) {
     projectiles.push({
         x, y, vx, vy,
         damage: 0, color: '#a0e6ff', owner: 'player',
-        type: 'ice_projectile', life: 3000, size: 20,
-        sprite: iceSprites.proj
+        type: 'ice_projectile', life: 3000, size: 20
     });
 }
 
@@ -1155,6 +1160,25 @@ function drawEnemy(ctx, e, time) {
 
     if (e.frozen > 0) {
         drawFrozenTint(ctx, x, y, w, h);
+        // Cristales alrededor
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2 + Date.now() / 800;
+            const dist = 20 + Math.sin(Date.now() / 500 + i) * 8;
+            const cx = x + w/2 + Math.cos(angle) * dist;
+            const cy = y + h/2 + Math.sin(angle) * dist;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle + Date.now() / 1000);
+            ctx.fillStyle = 'rgba(160, 230, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(0, -6);
+            ctx.lineTo(4, 0);
+            ctx.lineTo(0, 6);
+            ctx.lineTo(-4, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
     }
     if (!e.dead) {
         const barW = w * 1.2, barH = 5, barX = x + w/2 - barW/2, barY = y - 10;
@@ -1189,6 +1213,25 @@ function drawBoss(ctx, boss, time) {
 
     if (boss.frozen > 0) {
         drawFrozenTint(ctx, x, y, w, h);
+        // Cristales alrededor del boss
+        for (let i = 0; i < 10; i++) {
+            const angle = (i / 10) * Math.PI * 2 + Date.now() / 800;
+            const dist = 30 + Math.sin(Date.now() / 500 + i) * 10;
+            const cx = x + w/2 + Math.cos(angle) * dist;
+            const cy = y + h/2 + Math.sin(angle) * dist;
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(angle + Date.now() / 1000);
+            ctx.fillStyle = 'rgba(160, 230, 255, 0.6)';
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(6, 0);
+            ctx.lineTo(0, 8);
+            ctx.lineTo(-6, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
     }
 
     const barW = Math.min(w * 1.5, 200), barH = 8, barX = x + w/2 - barW/2, barY = y - 18;
@@ -1205,23 +1248,41 @@ function drawProjectiles(ctx) {
     for (const p of projectiles) {
         ctx.save(); 
         if (p.type === 'ice_projectile') {
-            ctx.globalAlpha = 0.95;
-            const pulse = 0.85 + Math.sin(performance.now()/80)*0.15;
-            if (p.sprite && p.sprite.complete) {
-                ctx.translate(p.x, p.y);
-                if (p.vx < 0) ctx.scale(-1, 1);
-                const w = p.sprite.width * pulse;
-                const h = p.sprite.height * pulse;
-                ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
-                ctx.globalCompositeOperation = 'screen';
-                ctx.globalAlpha = 0.3 + Math.sin(performance.now()/60)*0.2;
-                ctx.drawImage(p.sprite, -w/2, -h/2, w, h);
-                ctx.globalCompositeOperation = 'source-over';
-            } else {
-                ctx.fillStyle = '#a0e6ff'; ctx.beginPath(); ctx.arc(0, 0, 20, 0, Math.PI*2); ctx.fill();
+            // Dibujar bola de hielo con canvas
+            const grad = ctx.createRadialGradient(p.x - 4, p.y - 4, 2, p.x, p.y, p.size);
+            grad.addColorStop(0, '#ffffff');
+            grad.addColorStop(0.3, '#a0e6ff');
+            grad.addColorStop(0.7, '#4ecca3');
+            grad.addColorStop(1, '#0a5c5c');
+            ctx.shadowColor = '#a0e6ff';
+            ctx.shadowBlur = 25;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            // destello
+            ctx.fillStyle = 'rgba(255,255,255,0.8)';
+            ctx.beginPath();
+            ctx.arc(p.x - 5, p.y - 5, 6, 0, Math.PI * 2);
+            ctx.fill();
+            // pequeños cristales alrededor
+            for (let i = 0; i < 6; i++) {
+                const angle = (i / 6) * Math.PI * 2 + Date.now() / 1000;
+                const dx = Math.cos(angle) * (p.size + 4);
+                const dy = Math.sin(angle) * (p.size + 4);
+                ctx.fillStyle = 'rgba(160, 230, 255, 0.5)';
+                ctx.beginPath();
+                ctx.moveTo(p.x + dx, p.y + dy - 4);
+                ctx.lineTo(p.x + dx + 4, p.y + dy);
+                ctx.lineTo(p.x + dx, p.y + dy + 4);
+                ctx.closePath();
+                ctx.fill();
             }
-            ctx.restore(); continue;
+            ctx.restore();
+            continue;
         }
+        // otros proyectiles
         ctx.fillStyle = p.color;
         ctx.globalAlpha = 0.3;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size + 4, 0, Math.PI * 2); ctx.fill();
@@ -1937,7 +1998,7 @@ function animate(time) {
 
 // ─── INICIALIZACIÓN ───
 let imagesLoaded = 0;
-const totalImages = 13;
+const totalImages = 12; // ice.proj ya no se carga
 let initStarted = false;
 
 function startGameInit() {
@@ -1960,10 +2021,6 @@ function checkImagesLoaded() {
     }
 }
 
-// Si el splash ya terminó antes de que las imágenes estén listas, se inicia automáticamente.
-// También cubrimos el caso de que las imágenes se carguen primero.
-// La llamada a setTimeout ya inició el temporizador del splash.
-
 setTimeout(() => {
     if (!initStarted && imagesLoadedFlag && splashFinished) {
         startGameInit();
@@ -1974,16 +2031,17 @@ setTimeout(() => {
     }
 }, 100);
 
-playerSprites.idle.onload = checkImagesLoaded; playerSprites.walk.onload = checkImagesLoaded;
-playerSprites.jump.onload = checkImagesLoaded; playerSprites.kick.onload = checkImagesLoaded;
-playerSprites.kick2.onload = checkImagesLoaded; playerSprites.punch.onload = checkImagesLoaded;
-playerSprites.punch2.onload = checkImagesLoaded; playerSprites.punchAir.onload = checkImagesLoaded;
-playerSprites.kickAir.onload = checkImagesLoaded;
-iceSprites.charge.onload = checkImagesLoaded; iceSprites.throw.onload = checkImagesLoaded;
-iceSprites.proj.onload = checkImagesLoaded; iceSprites.hit.onload = checkImagesLoaded;
-
-const allSprites = [playerSprites.idle, playerSprites.walk, playerSprites.jump, playerSprites.kick, playerSprites.kick2, playerSprites.punch, playerSprites.punch2, playerSprites.punchAir, playerSprites.kickAir, iceSprites.charge, iceSprites.throw, iceSprites.proj, iceSprites.hit];
-allSprites.forEach(s => s.onerror = () => checkImagesLoaded());
+// Cargar solo los sprites necesarios (eliminamos ice.proj)
+const spritesToLoad = [
+    playerSprites.idle, playerSprites.walk, playerSprites.jump,
+    playerSprites.kick, playerSprites.kick2, playerSprites.punch,
+    playerSprites.punch2, playerSprites.punchAir, playerSprites.kickAir,
+    iceSprites.charge, iceSprites.throw, iceSprites.hit
+];
+spritesToLoad.forEach(s => {
+    s.onload = checkImagesLoaded;
+    s.onerror = checkImagesLoaded; // si falla, igual contamos
+});
 
 document.getElementById('btn-continue').disabled = clearedLevels.length === 0;
 if (clearedLevels.length > 0) document.getElementById('btn-continue').removeAttribute('disabled');
@@ -1992,7 +2050,7 @@ if (clearedLevels.length > 0) document.getElementById('btn-continue').removeAttr
   // ─── Service Worker con detección de actualizaciones ───
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      const swUrl = './service-worker.js?v=1.23';
+      const swUrl = './service-worker.js?v=1.24';
 
       navigator.serviceWorker.register(swUrl)
         .then((registration) => {
