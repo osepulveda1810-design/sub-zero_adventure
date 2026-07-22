@@ -407,12 +407,14 @@ ctx.imageSmoothingEnabled = false;
 // Si la bola de hielo no sale de la mano exactamente, ajusta handAnchorX y handAnchorY.
 const iceAdjustments = {
     ice_charge: {
-        scale: 0.85,       // Escala del sprite de carga
+        scale: 0.85,       // Escala base del sprite
+        widthMult: 3.5,    // v1.30: Multiplicador de ancho (el sprite de hielo es más ancho que idle)
         offsetX: 0,        // Desplazamiento horizontal (positivo = derecha)
         offsetY: 0         // Desplazamiento vertical (positivo = abajo)
     },
     ice_throw: {
         scale: 0.85,
+        widthMult: 3.5,    // v1.30: Pose de lanzamiento requiere más ancho
         offsetX: 0,
         offsetY: 0,
         // El proyectil sale de la mano. Ajusta estos valores para que la bola salga de la palma.
@@ -421,6 +423,7 @@ const iceAdjustments = {
     },
     ice_follow: {
         scale: 0.85,
+        widthMult: 3.5,    // v1.30: Mismo ancho que throw
         offsetX: 0,
         offsetY: 0
     }
@@ -777,10 +780,9 @@ function updateAttachedProjectile(dt) {
 
             const cfg = iceAdjustments.ice_throw;
 
-            // v1.30: Escalar para que el sprite de hielo coincida con el fotograma idle (169x369)
-            // Los sprites de hielo son imagenes individuales de 677x369 (mismo tamaño que el spritesheet idle)
-            // pero deben coincidir con un solo fotograma idle de 169x369
-            const scaleX = (baseDrawWidth * cfg.scale * perspectiveScale) / srcW;
+            // v1.30: Escalar sprite de hielo. Los sprites son 677x369 (mismo tamaño que spritesheet idle)
+            // pero deben verse proporcionales al fotograma idle (169x369). Usamos widthMult para ajustar ancho.
+            const scaleX = (baseDrawWidth * cfg.scale * (cfg.widthMult || 1.0) * perspectiveScale) / srcW;
             const scaleY = (baseDrawHeight * cfg.scale * perspectiveScale) / srcH;
             const spriteW = Math.round(srcW * scaleX);
             const spriteH = Math.round(srcH * scaleY);
@@ -1418,9 +1420,9 @@ function drawPlayer(ctx, time) {
             const cfg = iceAdjustments[configKey];
 
             // NUEVA LÓGICA V1.30: Escalar sprites de hielo usando las dimensiones del fotograma idle
-            // v1.30: Los sprites de hielo son 677x369 (mismo tamaño que el spritesheet completo)
-            // pero deben coincidir con un fotograma idle de 169x369
-            const scaleX = (baseDrawWidth * cfg.scale * perspectiveScale) / srcW;
+            // v1.30: Escalar sprites de hielo. widthMult ajusta el ancho para poses de acción.
+            // Los sprites de hielo son 677x369 pero deben verse proporcionales al fotograma idle (169x369).
+            const scaleX = (baseDrawWidth * cfg.scale * (cfg.widthMult || 1.0) * perspectiveScale) / srcW;
             const scaleY = (baseDrawHeight * cfg.scale * perspectiveScale) / srcH;
             const finalW = Math.round(srcW * scaleX);
             const finalH = Math.round(srcH * scaleY);
@@ -1937,9 +1939,10 @@ function animate(time) {
                     player.iceProjectileSpawned = true;
                     const depthRatio = (laneBottom - playerLaneY) / Math.max(1, laneBottom - laneTop);
                     const perspectiveScale = 1 - depthRatio * 0.15;
-                    // v1.30: Usar baseDrawWidth/baseDrawHeight para escalar correctamente el sprite de hielo
-                    const iceScaleX = (baseDrawWidth * iceAdjustments['ice_throw'].scale * perspectiveScale) / 677;
-                    const iceScaleY = (baseDrawHeight * iceAdjustments['ice_throw'].scale * perspectiveScale) / 369;
+                    // v1.30: Escalar sprite de hielo con widthMult para poses de acción
+                    const iceCfg = iceAdjustments['ice_throw'];
+                    const iceScaleX = (baseDrawWidth * iceCfg.scale * (iceCfg.widthMult || 1.0) * perspectiveScale) / 677;
+                    const iceScaleY = (baseDrawHeight * iceCfg.scale * perspectiveScale) / 369;
                     const spriteW = Math.round(677 * iceScaleX);
                     const spriteH = Math.round(369 * iceScaleY);
                     const offsetX = iceAdjustments['ice_throw'].offsetX * player.scale;
