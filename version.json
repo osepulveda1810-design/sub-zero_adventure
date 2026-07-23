@@ -1,6 +1,5 @@
 {
-  "version": "1.43",
-  "build": 43,
-  "name": "NO INTRO + BOTONES FIX",
-  "notes": "v1.42 entraba al menú pero botones sin función - fix: re-vinculación robusta de todos los botones con bindMenuButtons + timeouts"
+  "version": "1.45",
+  "build": 45,
+  "name": "BOTONES FIX FINAL - INLINE + SAFE"
 }
