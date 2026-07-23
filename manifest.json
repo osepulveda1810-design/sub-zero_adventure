@@ -1,8 +1,8 @@
 {
-  "name": "Sub-Zero v1.43 NO INTRO + BOTONES FIX",
+  "name": "Sub-Zero v1.45 BOTONES FIX",
   "short_name": "Sub-Zero",
-  "version": "1.43",
-  "start_url": "./index.html?v=1.43",
+  "version": "1.45",
+  "start_url": "./index.html?v=1.45",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
