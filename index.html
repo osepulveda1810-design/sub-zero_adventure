@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero v1.42 PREMIUM - Historia + Sprites Reales</title>
+<title>Sub-Zero v1.43 PREMIUM - Historia + Sprites Reales</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -50,7 +50,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #btn-kick{grid-column:3;grid-row:2}
 #btn-jump{grid-column:2;grid-row:3;border-radius:18px!important;width:72px!important;height:46px!important;font-size:10px;font-weight:900;letter-spacing:1.2px;color:#e0ffff;background:rgba(255,255,255,0.09)!important}
 .punch-icon,.boot-icon{filter:drop-shadow(0 0 5px #0ff)}
-.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.94);backdrop-filter:blur(22px);z-index:55;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:90px 24px 24px 24px;overflow-y:auto} #menu-main{display:flex !important} #menu-main .ice-demo{margin-top:20px; display:flex !important}
+.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.94);backdrop-filter:blur(22px);z-index:55;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 24px 24px;overflow-y:auto} #menu-main{display:flex !important; padding-top:90px} #menu-main .ice-demo{display:flex !important; margin-top:15px}
 .menu-title{font-size:clamp(34px,9vw,68px);font-weight:900;background:linear-gradient(180deg,#a0e6ff 0%,#4ecca3 55%,#0a5c5c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:7px;text-align:center}
 .ice-demo{width:124px;height:124px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0%,#e0f2fe 18%,#7dd3fc 38%,#0e7490 72%);box-shadow:0 0 34px #7dd3fc,0 0 70px rgba(78,204,163,0.45);animation:pulseIce 2.2s ease-in-out infinite;position:relative;margin:22px}
 .ice-demo::before{content:'';position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(160,230,255,0.32);animation:spin 5s linear infinite}
@@ -60,14 +60,14 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .btn-premium{background:rgba(78,204,163,0.13);border:1.5px solid rgba(78,204,163,0.42);color:#a0e6ff;padding:14px 34px;border-radius:16px;font-weight:800;letter-spacing:2px;cursor:pointer;transition:all 0.28s;margin-top:14px;min-width:260px;text-transform:uppercase;font-size:13px}
 .btn-premium:hover{background:rgba(78,204,163,0.26);box-shadow:0 0 28px rgba(78,204,163,0.34);transform:translateY(-1px)}
 .story-box{background:rgba(0,0,0,0.54);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;max-width:640px;width:100%;margin-top:18px}
-/* splash eliminado */
+/* splash eliminado v1.43 */
 /* splash title eliminado */
 #level-grid button{text-align:left}
 </style>
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.42 NO INTRO</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">42</span> • DIRECTO AL MENÚ</div></div></div>
+<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.43 NO INTRO</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">43</span> • BOTONES FIX</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -85,11 +85,11 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <button class="btn" id="btn-jump">SALTO</button>
 </div>
 </div>
-<!-- SPLASH ELIMINADO v1.42 - Directo al menú -->
+<!-- v1.43 NO INTRO - splash eliminado -->
 <div id="menu-main" class="menu-overlay">
 <div class="ice-demo"></div>
 <div class="menu-title">SUB-ZERO</div>
-<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.42 PREMIUM • HISTORIA COMPLETA • SPRITES REALES</div>
+<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.43 PREMIUM • HISTORIA COMPLETA • SPRITES REALES</div>
 <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:1px">assets/sprites/player/ • 12 sprites • SCROLLING 3500→5600px • ICE 28px VISIBLE</div>
 <button class="btn-premium" id="btn-play">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels">NIVELES (8)</button>
@@ -109,10 +109,10 @@ https://api.github.com/repos/TU_REPO/releases/latest</div><button class="btn-pre
 </div>
 </div>
 <script>
-// v1.42 PREMIUM - MOTOR RECREADO
-const GAME_VERSION="1.42";
-console.log("%c SUB-ZERO ADVENTURE v1.42 PREMIUM - HISTORIA + SPRITES REALES + SCROLLING + ICE FIX ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
-let buildNum=42; try{ const s=localStorage.getItem('sz_build_v142'); buildNum=(s?parseInt(s):41)+1; localStorage.setItem('sz_build_v142',buildNum); }catch(e){ buildNum=42; } try{ const el=document.getElementById('build-num'); if(el) el.textContent=buildNum; }catch(e){}
+// v1.43 PREMIUM - MOTOR RECREADO
+const GAME_VERSION="1.43";
+console.log("%c SUB-ZERO ADVENTURE v1.43 PREMIUM - HISTORIA + SPRITES REALES + SCROLLING + ICE FIX ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
+let buildNum=43; try{ const s=localStorage.getItem('sz_build_v143'); buildNum=(s?parseInt(s):42)+1; localStorage.setItem('sz_build_v143',buildNum); }catch(e){ buildNum=43; } try{ const el=document.getElementById('build-num'); if(el) el.textContent=buildNum; }catch(e){}
 
 const LEVELS = [
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro",
@@ -206,6 +206,8 @@ const playerSprites={};
 let imagesLoaded=0;
 const totalImages=12;
 let imagesLoadedFlag=false;
+let splashFinished=false;
+
 function onSpriteLoad(){ imagesLoaded++; if(imagesLoaded>=totalImages){ imagesLoadedFlag=true; if(splashFinished) startGameInitIfNeeded(); } }
 function onSpriteError(name){ console.warn("Sprite no encontrado, usando placeholder azul: "+basePath+name); imagesLoaded++; if(imagesLoaded>=totalImages){ imagesLoadedFlag=true; if(splashFinished) startGameInitIfNeeded(); } }
 
@@ -246,21 +248,6 @@ const ctx=canvas.getContext('2d');
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU';
 let gameLoopStarted=false;
-
-// v1.42 NO INTRO - Directo al menú, sin splash
-let splashFinished=true;
-function finishSplash(){ try{ showMenu('main'); }catch(e){} }
-function hideSplash(){ try{ showMenu('main'); }catch(e){} }
-// Mostrar menú inmediatamente al cargar
-document.addEventListener('DOMContentLoaded', ()=>{
-  try{
-    const splash=document.getElementById('splash-overlay');
-    if(splash) splash.style.display='none';
-    showMenu('main');
-    console.log('v1.42 NO INTRO - Menu mostrado directo');
-  }catch(e){ console.log('Error menu',e); }
-});
-
 
 function setupCanvas(){
   const wrapper=document.getElementById('canvas-wrapper');
@@ -332,7 +319,7 @@ function drawPlayerPlaceholder(x,y,w,h){
   ctx.fillStyle='#4ecca3'; ctx.fillRect(x+w*0.22,y,w*0.56,h*0.16);
   ctx.fillStyle='#e0ffff'; ctx.fillRect(x+w*0.3,y+h*0.04,w*0.13,h*0.06); ctx.fillRect(x+w*0.58,y+h*0.04,w*0.13,h*0.06);
   ctx.fillStyle='rgba(160,230,255,0.9)'; ctx.font='bold 8px monospace'; ctx.fillText('SUB-ZERO',x+5,y+14);
-  ctx.fillStyle='rgba(78,204,163,0.8)'; ctx.font='7px monospace'; ctx.fillText('v1.42 PREMIUM',x+5,y+h-6);
+  ctx.fillStyle='rgba(78,204,163,0.8)'; ctx.font='7px monospace'; ctx.fillText('v1.43 PREMIUM',x+5,y+h-6);
 }
 
 function drawPlayer(time){
@@ -418,15 +405,73 @@ function loop(time){
 function showMenu(id){ document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); const el=document.getElementById('menu-'+id); if(el) el.style.display='flex'; }
 function startGameInitIfNeeded(){ if(currentState==='PLAYING') return; }
 function startGameInit(){ setupCanvas(); currentState='PLAYING'; document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); if(!gameLoopStarted){ gameLoopStarted=true; lastAnimTime=performance.now(); requestAnimationFrame(loop); } }
+let splashFinished=true;
+function finishSplash(){ try{ const s=document.getElementById('splash-overlay'); if(s) s.style.display='none'; }catch(e){} splashFinished=true; try{ showMenu('main'); }catch(e){} }
+// v1.43 NO INTRO - mostrar menú inmediato
+setTimeout(()=>{ try{ showMenu('main'); }catch(e){} }, 100);
+
 
 function startLevel(idx){ currentLevel=idx; camera.worldWidth=getWorldWidthForLevel(idx); camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; playerLaneY=laneBottom; const lvl=LEVELS[idx]; document.getElementById('story-title').textContent=lvl.name; document.getElementById('story-sub').textContent=lvl.subtitle||''; document.getElementById('story-text').textContent=lvl.story||''; document.getElementById('story-boss').textContent='JEFE: '+(lvl.boss||'')+' — '+(lvl.bossTitle||''); document.getElementById('story-meta').textContent='worldWidth: '+camera.worldWidth+' • bg '+JSON.stringify(lvl.bgColor)+' • enemigos: '+lvl.enemyTypes.join(', ')+' • total '+lvl.enemyCount; showMenu('story'); }
 
-document.getElementById('btn-play').onclick=()=>startLevel(0);
-document.getElementById('btn-levels').onclick=()=>showMenu('levels');
-document.getElementById('btn-back-main').onclick=()=>showMenu('main');
-document.getElementById('btn-back-levels').onclick=()=>showMenu('levels');
-document.getElementById('btn-how').onclick=()=>alert('Controles:\nWASD / Flechas mover\nJ Puño / K Patada / I Hielo / SPACE Salto\nTáctil: dpad izquierda + cruz derecha\n\nSprites en assets/sprites/player/\n12 archivos PNG\n\nScrolling: cámara sigue a Sub-Zero\nHielo: I una vez carga, segunda vez lanza, congela 4s');
-document.getElementById('btn-start-level').onclick=()=>startGameInit();
+
+// v1.43 BOTONES FIX - Asegurar que todos los botones funcionen
+function bindMenuButtons(){
+  try{
+    const btnPlay=document.getElementById('btn-play');
+    if(btnPlay) btnPlay.onclick=()=>{ console.log('Play clicked'); startLevel(0); };
+    
+    const btnLevels=document.getElementById('btn-levels');
+    if(btnLevels) btnLevels.onclick=()=>{ console.log('Levels clicked'); showMenu('levels'); };
+    
+    const btnBackMain=document.getElementById('btn-back-main');
+    if(btnBackMain) btnBackMain.onclick=()=>{ showMenu('main'); };
+    
+    const btnBackLevels=document.getElementById('btn-back-levels');
+    if(btnBackLevels) btnBackLevels.onclick=()=>{ showMenu('levels'); };
+    
+    const btnHow=document.getElementById('btn-how');
+    if(btnHow) btnHow.onclick=()=>{ alert('Controles:
+WASD / Flechas mover
+J Puño / K Patada / I Hielo / SPACE Salto
+Táctil: dpad izquierda + cruz derecha
+
+Sprites en assets/sprites/player/
+Scrolling: cámara sigue a Sub-Zero'); };
+    
+    const btnStartLevel=document.getElementById('btn-start-level');
+    if(btnStartLevel) btnStartLevel.onclick=()=>{ startGameInit(); };
+    
+    const btnUpdate=document.getElementById('btn-update');
+    if(btnUpdate) btnUpdate.onclick=()=>{ showMenu('update'); };
+    
+    const btnBackUpdate=document.getElementById('btn-back-update');
+    if(btnBackUpdate) btnBackUpdate.onclick=()=>{ showMenu('main'); };
+    
+    const btnCheckUpdate=document.getElementById('btn-check-update');
+    if(btnCheckUpdate) btnCheckUpdate.onclick=()=>{ checkUpdate(); };
+    
+    const pauseBtn=document.getElementById('pause-btn');
+    if(pauseBtn) pauseBtn.onclick=()=>{ pauseGame(); };
+    
+    const btnResume=document.getElementById('btn-resume');
+    if(btnResume) btnResume.onclick=()=>{ resumeGame(); };
+    
+    const btnSave=document.getElementById('btn-save-ingame');
+    if(btnSave) btnSave.onclick=()=>{ saveGameState(); };
+    
+    const btnExit=document.getElementById('btn-exit-menu');
+    if(btnExit) btnExit.onclick=()=>{ exitToMenu(); };
+    
+    console.log('Botones vinculados OK v1.43');
+  }catch(e){ console.error('Error vinculando botones',e); }
+}
+
+// Vincular inmediatamente y también en DOMContentLoaded
+bindMenuButtons();
+document.addEventListener('DOMContentLoaded', bindMenuButtons);
+setTimeout(bindMenuButtons, 500);
+setTimeout(bindMenuButtons, 1500);
+
 
 const grid=document.getElementById('level-grid');
 LEVELS.forEach((lvl,i)=>{ const b=document.createElement('button'); b.className='btn-premium'; b.style.textAlign='left'; b.innerHTML='<div style="font-weight:900">'+(i+1)+'. '+lvl.name+'</div><div style="font-size:10px;opacity:0.6;margin-top:4px">'+lvl.subtitle+'</div>'; b.onclick=()=>startLevel(i); grid.appendChild(b); });
@@ -516,10 +561,12 @@ localStorage.setItem('subzero_github_repo', defaultRepo);
 if(savedRepo) repoInput.value=savedRepo;
 
 async function checkUpdate(){
-  const repo='osepulveda1810-design/sub-zero_adventure';
+  const repoInput=document.getElementById('github-repo');
+  const repo=repoInput?repoInput.value.trim():'osepulveda1810-design/sub-zero_adventure';
   const resultEl=document.getElementById('update-result');
   if(!resultEl) return;
-  resultEl.textContent='🔍 GitHub: '+repo+'
+  resultEl.textContent='🔍 Buscando en GitHub...
+📦 '+repo+'
 Este: v'+GAME_VERSION+' BUILD '+buildNum+'
 ';
   try{
@@ -527,7 +574,7 @@ Este: v'+GAME_VERSION+' BUILD '+buildNum+'
     if(rawRes.ok){
       const vData=await rawRes.json();
       resultEl.textContent+='
-✅ version.json:
+✅ version.json EN GITHUB:
 '+JSON.stringify(vData,null,2);
       const cur=parseFloat(GAME_VERSION.replace('v',''))||0;
       const lat=parseFloat((vData.version||'').replace('v',''))||0;
@@ -537,7 +584,8 @@ Este: v'+GAME_VERSION+' BUILD '+buildNum+'
       else resultEl.textContent+='
 
 🔵 AL DÍA - v'+GAME_VERSION;
-    }
+    }else{ resultEl.textContent+='
+⚠️ version.json HTTP '+rawRes.status; }
   }catch(e){ resultEl.textContent+='
 ⚠️ Error: '+e.message; }
 }
@@ -546,24 +594,13 @@ document.getElementById('btn-check-update').onclick=checkUpdate;
 document.getElementById('btn-update').onclick=()=>{ showMenu('update'); };
 document.getElementById('btn-back-update').onclick=()=>showMenu('main');
 
-function showMenu(id){ document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); const el=document.getElementById('menu-'+id); if(el) el.style.display='flex'; if(id==='main'){ document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; } }
+function showMenu(id){ try{ document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); const el=document.getElementById('menu-'+id); if(el) el.style.display='flex'; if(id==='main'){ const hud=document.getElementById('hud'); const controls=document.getElementById('controls'); if(hud) hud.style.display='none'; if(controls) controls.style.display='none'; } }catch(e){ console.log('showMenu error',e); } }
 
-
-
-// PWA v1.42 - Sin cache agresivo
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>{
-    navigator.serviceWorker.register('./service-worker.js?v=1.42', {updateViaCache:'none'}).then(()=>console.log('SW v1.42')).catch(()=>{});
-  });
-  navigator.serviceWorker.addEventListener('controllerchange', ()=>{ window.location.reload(); });
-}
-// Mostrar menú al inicio sin esperar nada
-window.addEventListener('load', ()=>{ try{ showMenu('main'); }catch(e){} });
 
 window.addEventListener('resize',setupCanvas);
-setupCanvas();
+try{ setupCanvas(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
-setupCanvas();
+
 </script>
 </body>
 </html>
