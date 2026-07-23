@@ -1,8 +1,8 @@
 {
-  "name": "Sub-Zero Adventure v1.37 PREMIUM",
+  "name": "Sub-Zero Adventure v1.38 PREMIUM",
   "short_name": "Sub-Zero",
-  "description": "Beat'em up 2D arcade Mortal Kombat - Historia 8 niveles, scrolling, hielo 28px, pausa con guardado, PWA standalone landscape - osepulveda1810-design",
-  "version": "1.37",
+  "description": "Beat'em up arcade MK - Historia 8 niveles, PWA standalone, update desde GitHub - osepulveda1810-design",
+  "version": "1.38",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -55,6 +55,7 @@
     {
       "name": "Buscar Actualización",
       "short_name": "Update",
+      "description": "Desde GitHub",
       "url": "./index.html?action=update",
       "icons": [
         {
@@ -63,9 +64,5 @@
         }
       ]
     }
-  ],
-  "categories": [
-    "games"
-  ],
-  "prefer_related_applications": false
+  ]
 }
