@@ -22,12 +22,12 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero v1.39 PREMIUM - Historia + Sprites Reales</title>
+<title>Sub-Zero v1.40 PREMIUM - Historia + Sprites Reales</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
 #game-container{width:100vw;height:100dvh;position:fixed;inset:0;display:flex;flex-direction:column;background:#050a14}
-#top-bar{height:62px;min-height:62px;background:rgba(5,10,20,0.96);border-bottom:1px solid rgba(78,204,163,0.22);display:flex;align-items:center;justify-content:space-between;padding:0 18px;padding-top:env(safe-area-inset-top,0px);backdrop-filter:blur(16px);z-index:70;position:relative}
+#top-bar{height:62px;min-height:62px;background:rgba(5,10,20,0.98);border-bottom:1px solid rgba(78,204,163,0.22);display:flex;align-items:center;justify-content:space-between;padding:0 18px;backdrop-filter:blur(16px);z-index:80;position:relative}
 .logo{font-weight:900;letter-spacing:5px;color:#7ef0ff;text-shadow:0 0 18px #0ff;font-size:22px}
 .badge{background:#facc15;color:#000;font-weight:900;font-size:11px;padding:6px 12px;border-radius:9999px;letter-spacing:1px;box-shadow:0 0 18px rgba(250,204,21,0.45)}
 #canvas-wrapper{flex:1;position:relative;overflow:hidden;background:#0a0e1a}
@@ -36,7 +36,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .hud-box{background:rgba(0,0,0,0.62);border:1px solid rgba(78,204,163,0.22);border-radius:14px;padding:8px 14px;backdrop-filter:blur(10px);min-width:80px}
 .hud-box .label{font-size:8px;color:rgba(255,255,255,0.42);letter-spacing:2px}
 .hud-box .value{font-weight:800;color:#e0ffff;font-size:13px;margin-top:2px}
-#controls{position:absolute;bottom:calc(18px + env(safe-area-inset-bottom,0px));left:14px;right:14px;display:flex;justify-content:space-between;align-items:flex-end;z-index:45;pointer-events:none} @media (orientation: portrait){ #controls{bottom:calc(90px + env(safe-area-inset-bottom,0px))} #canvas-wrapper::before{content:"GIRA TU CELULAR ↔️ PARA JUGAR EN HORIZONTAL";position:absolute;inset:0;background:rgba(5,10,20,0.92);z-index:100;display:flex;align-items:center;justify-content:center;color:#7ef0ff;font-weight:900;letter-spacing:2px;font-size:18px;text-align:center;padding:20px} }
+#controls{position:absolute;bottom:22px;left:16px;right:16px;display:flex;justify-content:space-between;align-items:flex-end;z-index:45;pointer-events:none}
 .dpad{display:grid;grid-template-columns:56px 56px 56px;grid-template-rows:56px 56px 56px;gap:8px;pointer-events:auto}
 .dpad button{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);border-radius:16px;color:#a0e6ff;font-size:15px;backdrop-filter:blur(12px);transition:all 0.08s;touch-action:manipulation}
 .dpad button:active{background:rgba(78,204,163,0.28);transform:scale(0.92)}
@@ -50,7 +50,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #btn-kick{grid-column:3;grid-row:2}
 #btn-jump{grid-column:2;grid-row:3;border-radius:18px!important;width:72px!important;height:46px!important;font-size:10px;font-weight:900;letter-spacing:1.2px;color:#e0ffff;background:rgba(255,255,255,0.09)!important}
 .punch-icon,.boot-icon{filter:drop-shadow(0 0 5px #0ff)}
-.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.93);backdrop-filter:blur(22px);z-index:55;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 24px 24px;overflow-y:auto} #menu-main{padding-top:110px} #menu-main .ice-demo{margin-top:20px} #menu-main .menu-title{margin-top:10px} #menu-main .ice-demo{margin-top:10px}
+.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.94);backdrop-filter:blur(22px);z-index:55;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:90px 24px 24px 24px;overflow-y:auto} #menu-main{padding-top:110px} #menu-main .ice-demo{margin-top:20px}
 .menu-title{font-size:clamp(34px,9vw,68px);font-weight:900;background:linear-gradient(180deg,#a0e6ff 0%,#4ecca3 55%,#0a5c5c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:7px;text-align:center}
 .ice-demo{width:124px;height:124px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0%,#e0f2fe 18%,#7dd3fc 38%,#0e7490 72%);box-shadow:0 0 34px #7dd3fc,0 0 70px rgba(78,204,163,0.45);animation:pulseIce 2.2s ease-in-out infinite;position:relative;margin:22px}
 .ice-demo::before{content:'';position:absolute;inset:-14px;border-radius:50%;border:2px solid rgba(160,230,255,0.32);animation:spin 5s linear infinite}
@@ -67,7 +67,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.39 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">0</span> • PAUSE VISIBLE + SNOW</div></div></div>
+<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:80">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.40 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">40</span> • FIX INTRO</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -85,11 +85,11 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <button class="btn" id="btn-jump">SALTO</button>
 </div>
 </div>
-<div id="splash-overlay"><div id="splash-title">SNAKEBYTE STUDIOS</div><div style="color:#666;letter-spacing:6px;font-size:11px;margin-top:14px">v1.39 PREMIUM • SCROLLING + SPRITES REALES</div><div style="margin-top:18px;width:42px;height:42px;border:3px solid rgba(0,255,255,0.18);border-top-color:#0ff;border-radius:50%;animation:spin 1s linear infinite"></div></div>
+<div id="splash-overlay"><div id="splash-title">SNAKEBYTE STUDIOS</div><div style="color:#666;letter-spacing:6px;font-size:11px;margin-top:14px">v1.40 PREMIUM • SCROLLING + SPRITES REALES</div><div style="margin-top:18px;width:42px;height:42px;border:3px solid rgba(0,255,255,0.18);border-top-color:#0ff;border-radius:50%;animation:spin 1s linear infinite"></div></div>
 <div id="menu-main" class="menu-overlay">
 <div class="ice-demo"></div>
 <div class="menu-title">SUB-ZERO</div>
-<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.39 PREMIUM • HISTORIA COMPLETA • SPRITES REALES</div>
+<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.40 PREMIUM • HISTORIA COMPLETA • SPRITES REALES</div>
 <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:1px">assets/sprites/player/ • 12 sprites • SCROLLING 3500→5600px • ICE 28px VISIBLE</div>
 <button class="btn-premium" id="btn-play">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels">NIVELES (8)</button>
@@ -98,8 +98,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </div>
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#e0ffff;letter-spacing:4px">SELECCIONA NIVEL</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;max-width:760px;width:100%"></div><button class="btn-premium" id="btn-back-main">VOLVER</button></div>
 
-<div id="menu-pause" class="menu-overlay" style="display:none;background:rgba(5,10,20,0.88)"><div style="text-align:center"><div style="font-size:32px;font-weight:900;letter-spacing:6px;color:#7ef0ff">PAUSA</div><div style="color:#4ecca3;font-size:11px;letter-spacing:3px;margin-top:6px">v1.37 • PWA FIX • STANDALONE • osepulveda1810-design</div><div style="margin-top:24px;display:flex;flex-direction:column;gap:12px"><button class="btn-premium" id="btn-resume">▶ CONTINUAR</button><button class="btn-premium" id="btn-save-ingame" style="border-color:#7dd3fc;color:#7dd3fc">💾 GUARDAR PARTIDA</button><div id="save-feedback" style="font-size:11px;color:#4ecca3;height:16px;opacity:0;transition:opacity 0.3s">✔ Partida guardada</div><button class="btn-premium" id="btn-exit-menu" style="border-color:rgba(255,100,100,0.4);color:#ff8a8a">⏏ SALIR AL MENÚ PRINCIPAL</button></div></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Busca actualización en GitHub - Fix caché - osepulveda1810-design/sub-zero_adventure (./version.json y ./manifest.json)</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" placeholder="osepulveda1810-design/sub-zero_adventure" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Modo GITHUB activado - osepulveda1810-design/sub-zero_adventure - Consultando releases/latest y version.json en GitHub\nPages: https://github.com/osepulveda1810-design/sub-zero_adventure\nPresiona Buscar para verificar última versión.
+<div id="menu-pause" class="menu-overlay" style="display:none;background:rgba(5,10,20,0.88)"><div style="text-align:center"><div style="font-size:32px;font-weight:900;letter-spacing:6px;color:#7ef0ff">PAUSA</div><div style="color:#4ecca3;font-size:11px;letter-spacing:3px;margin-top:6px">v1.35 • PARTIDA EN CURSO • osepulveda1810-design</div><div style="margin-top:24px;display:flex;flex-direction:column;gap:12px"><button class="btn-premium" id="btn-resume">▶ CONTINUAR</button><button class="btn-premium" id="btn-save-ingame" style="border-color:#7dd3fc;color:#7dd3fc">💾 GUARDAR PARTIDA</button><div id="save-feedback" style="font-size:11px;color:#4ecca3;height:16px;opacity:0;transition:opacity 0.3s">✔ Partida guardada</div><button class="btn-premium" id="btn-exit-menu" style="border-color:rgba(255,100,100,0.4);color:#ff8a8a">⏏ SALIR AL MENÚ PRINCIPAL</button></div></div></div>
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Consulta tu repositorio de GitHub para ver si hay una versión más nueva</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" placeholder="osepulveda1810-design/sub-zero_adventure" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Repo vinculado: osepulveda1810-design/sub-zero_adventure\nPages: https://osepulveda1810-design.github.io/sub-zero_adventure/\nPresiona Buscar para verificar última versión.
 Ejemplo: osepulveda89/subzero-adventure
 
 El sistema consultará:
@@ -109,17 +109,10 @@ https://api.github.com/repos/TU_REPO/releases/latest</div><button class="btn-pre
 </div>
 </div>
 <script>
-// v1.39 PREMIUM - MOTOR RECREADO
-const GAME_VERSION="1.39";
-console.log("%c SUB-ZERO ADVENTURE v1.39 PREMIUM - HISTORIA + SPRITES REALES + SCROLLING + ICE FIX ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
-let buildNum=0;
-try{
-  const stored=localStorage.getItem('sz_build_v133');
-  buildNum=(stored?parseInt(stored):0)+1;
-  localStorage.setItem('sz_build_v133',buildNum);
-}catch(e){ buildNum=Date.now()%1000; }
-try{ document.getElementById('build-num').textContent=buildNum; }catch{}
-
+// v1.40 PREMIUM - MOTOR RECREADO
+const GAME_VERSION="1.40";
+console.log("%c SUB-ZERO ADVENTURE v1.40 PREMIUM - HISTORIA + SPRITES REALES + SCROLLING + ICE FIX ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
+let buildNum=40; try{ const s=localStorage.getItem('sz_build_v140'); buildNum=(s?parseInt(s):39)+1; localStorage.setItem('sz_build_v140',buildNum); }catch(e){ buildNum=40; } try{ const el=document.getElementById('build-num'); if(el) el.textContent=buildNum; }catch(e){}
 
 const LEVELS = [
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro",
@@ -213,9 +206,7 @@ const playerSprites={};
 let imagesLoaded=0;
 const totalImages=12;
 let imagesLoadedFlag=false;
-let splashFinished=false;
-
-function onSpriteLoad(){ try{ imagesLoaded++; if(imagesLoaded>=totalImages){ imagesLoadedFlag=true; if(splashFinished) startGameInitIfNeeded(); } }catch(e){ console.log(e); } }
+function onSpriteLoad(){ imagesLoaded++; if(imagesLoaded>=totalImages){ imagesLoadedFlag=true; if(splashFinished) startGameInitIfNeeded(); } }
 function onSpriteError(name){ console.warn("Sprite no encontrado, usando placeholder azul: "+basePath+name); imagesLoaded++; if(imagesLoaded>=totalImages){ imagesLoadedFlag=true; if(splashFinished) startGameInitIfNeeded(); } }
 
 Object.keys(spriteMap).forEach(key=>{
@@ -256,18 +247,43 @@ const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU';
 let gameLoopStarted=false;
 
+
+// v1.40 FIX INTRO PEGADO - Safety net garantizado
+let splashFinished=false;
+let imagesLoadedFlag=false;
+function hideSplash(){
+  try{
+    const s=document.getElementById('splash-overlay');
+    if(s){
+      s.style.opacity='0';
+      setTimeout(()=>{ s.style.display='none'; splashFinished=true; showMenu('main'); }, 400);
+    }else{
+      splashFinished=true; showMenu('main');
+    }
+  }catch(e){ console.log('hideSplash error',e); splashFinished=true; try{ showMenu('main'); }catch{} }
+}
+// Forzar hide a los 2.5s pase lo que pase
+setTimeout(()=>{ console.log('Safety net hide splash'); hideSplash(); }, 2500);
+// Segundo safety a los 4s
+setTimeout(()=>{ const s=document.getElementById('splash-overlay'); if(s && s.style.display!=='none'){ s.style.display='none'; showMenu('main'); } }, 4000);
+
 function setupCanvas(){
+  try{
   const wrapper=document.getElementById('canvas-wrapper');
-  const w=wrapper.clientWidth, h=wrapper.clientHeight;
-  canvas.width=w; canvas.height=h;
-  camera.worldWidth=getWorldWidthForLevel(currentLevel);
+  if(!wrapper) return;
+  const w=wrapper.clientWidth||window.innerWidth, h=wrapper.clientHeight||window.innerHeight;
+  const canvasEl=document.getElementById('gameCanvas'); if(!canvasEl) return;
+  canvasEl.width=w; canvasEl.height=h;
+  
+    }catch(e){ console.log('setupCanvas error',e); }
+  try{ camera.worldWidth=getWorldWidthForLevel(currentLevel);
   const ih=playerSprites.idle?.naturalHeight||369;
   const iw=playerSprites.idle?.naturalWidth? (playerSprites.idle.naturalWidth/4):169;
-  player.scale=Math.min(0.85, (h*0.42)/ih);
+  player.scale=(h*0.62)/ih;
   baseDrawWidth=iw*player.scale;
   baseDrawHeight=ih*player.scale;
-  laneBottom=h-(ih*player.scale)-90;
-  laneTop=Math.max(22,laneBottom-Math.min(h*0.28,130));
+  laneBottom=h-(ih*player.scale)-22;
+  laneTop=Math.max(22,laneBottom-Math.min(h*0.36,168));
   if(playerLaneY==0) playerLaneY=laneBottom;
 }
 function rand(a,b){return Math.random()*(b-a)+a;}
@@ -326,7 +342,7 @@ function drawPlayerPlaceholder(x,y,w,h){
   ctx.fillStyle='#4ecca3'; ctx.fillRect(x+w*0.22,y,w*0.56,h*0.16);
   ctx.fillStyle='#e0ffff'; ctx.fillRect(x+w*0.3,y+h*0.04,w*0.13,h*0.06); ctx.fillRect(x+w*0.58,y+h*0.04,w*0.13,h*0.06);
   ctx.fillStyle='rgba(160,230,255,0.9)'; ctx.font='bold 8px monospace'; ctx.fillText('SUB-ZERO',x+5,y+14);
-  ctx.fillStyle='rgba(78,204,163,0.8)'; ctx.font='7px monospace'; ctx.fillText('v1.39 PREMIUM',x+5,y+h-6);
+  ctx.fillStyle='rgba(78,204,163,0.8)'; ctx.font='7px monospace'; ctx.fillText('v1.40 PREMIUM',x+5,y+h-6);
 }
 
 function drawPlayer(time){
@@ -412,13 +428,11 @@ function loop(time){
 function showMenu(id){ document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); const el=document.getElementById('menu-'+id); if(el) el.style.display='flex'; }
 function startGameInitIfNeeded(){ if(currentState==='PLAYING') return; }
 function startGameInit(){ setupCanvas(); currentState='PLAYING'; document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); if(!gameLoopStarted){ gameLoopStarted=true; lastAnimTime=performance.now(); requestAnimationFrame(loop); } }
-function finishfunction hideSplash(){ const s=document.getElementById("splash-overlay"); if(s){ s.style.opacity="0"; setTimeout(()=>{ s.style.display="none"; splashFinished=true; showMenu("main"); },520); } }
-function hideSplashDirect(){ try{ hideSplash(); }catch{} }
-function initSplash(){ const s=document.getElementById('splash-overlay'); if(s){ s.style.opacity='0'; setTimeout(()=>s.style.display='none',520); } splashFinished=true; showMenu('main'); if(imagesLoadedFlag){ /* already */ } }
-setTimeout(finishSplash,3600); // Fallback garantizado para no quedarse pegado
-setTimeout(()=>{ try{ hideSplash(); }catch(e){ console.log('Fallback hide splash',e); const s=document.getElementById('splash-overlay'); if(s) s.style.display='none'; } }, 4000);
+function finishSplash(){ const s=document.getElementById('splash-overlay'); if(s){ s.style.opacity='0'; setTimeout(()=>s.style.display='none',520); } splashFinished=true; showMenu('main'); if(imagesLoadedFlag){ /* already */ } }
+setTimeout(finishSplash,3600);
 
-function startLevel(idx){ currentLevel=idx; camera.worldWidth=getWorldWidthForLevel(idx); camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; playerLaneY=laneBottom; const lvl=LEVELS[idx]; document.getElementById('story-title').textContent=lvl.name; document.getElementById('story-sub').textContent=lvl.subtitle||''; document.getElementById('story-text').textContent=lvl.story||''; document.getElementById('story-boss').textContent='JEFE: '+(lvl.boss||'')+' — '+(lvl.bossTitle||''); document.getElementById('story-meta').textContent='worldWidth: '+camera.worldWidth+' • bg '+JSON.stringify(lvl.bgColor)+' • enemigos: '+lvl.enemyTypes.join(', ')+' • total '+lvl.enemyCount; showMenu('story'); }
+function startLevel(idx){ currentLevel=idx;   }catch(e){ console.log('setupCanvas error',e); }
+  try{ camera.worldWidth=getWorldWidthForLevel(idx); camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; playerLaneY=laneBottom; const lvl=LEVELS[idx]; document.getElementById('story-title').textContent=lvl.name; document.getElementById('story-sub').textContent=lvl.subtitle||''; document.getElementById('story-text').textContent=lvl.story||''; document.getElementById('story-boss').textContent='JEFE: '+(lvl.boss||'')+' — '+(lvl.bossTitle||''); document.getElementById('story-meta').textContent='worldWidth: '+camera.worldWidth+' • bg '+JSON.stringify(lvl.bgColor)+' • enemigos: '+lvl.enemyTypes.join(', ')+' • total '+lvl.enemyCount; showMenu('story'); }
 
 document.getElementById('btn-play').onclick=()=>startLevel(0);
 document.getElementById('btn-levels').onclick=()=>showMenu('levels');
@@ -517,108 +531,53 @@ if(savedRepo) repoInput.value=savedRepo;
 async function checkUpdate(){
   const repo='osepulveda1810-design/sub-zero_adventure';
   const resultEl=document.getElementById('update-result');
+  if(!resultEl) return;
   resultEl.textContent='🔍 Buscando en GitHub...
-📦 Repo: '+repo+'
-
-• Este index: v'+GAME_VERSION+' (BUILD '+buildNum+')
-• Consultando version.json...';
-  let foundVersionJson=false;
-  let latestVersion=null;
-  let notes='';
+📦 '+repo+'
+Este index: v'+GAME_VERSION+' (BUILD '+buildNum+')
+';
   try{
-    // MÉTODO 1: version.json RAW - TU MÉTODO PRINCIPAL (siempre funciona si tienes el archivo)
-    const rawRes=await fetch('https://raw.githubusercontent.com/'+repo+'/main/version.json?v='+Date.now());
+    const rawRes=await fetch('https://raw.githubusercontent.com/'+repo+'/main/version.json?v='+Date.now(), {cache:'no-store'});
     if(rawRes.ok){
       const vData=await rawRes.json();
-      foundVersionJson=true;
-      latestVersion=vData.version||'';
-      notes=vData.notes||'';
-      resultEl.textContent='✅ version.json EN GITHUB ENCONTRADO:
-'+JSON.stringify(vData,null,2);
-      
-      const curNum=parseFloat(GAME_VERSION.replace('v',''))||0;
-      const latestNum=parseFloat(latestVersion.replace('v',''))||0;
-      
-      if(latestNum > curNum){
-        resultEl.textContent+='
-
-🟢 ¡HAY ACTUALIZACIÓN DISPONIBLE!
-• Tu index: v'+GAME_VERSION+'
-• GitHub: v'+latestVersion+'
-• '+notes+'
-
-Recarga con Ctrl+F5 para obtener la nueva versión.';
-      } else if(latestNum === curNum){
-        resultEl.textContent+='
-
-🔵 ESTÁS AL DÍA
-• Tu index: v'+GAME_VERSION+'
-• GitHub version.json: v'+latestVersion+'
-• '+notes;
-      } else {
-        resultEl.textContent+='
-
-🔵 Version local más nueva que GitHub (estás en desarrollo)';
-      }
-    } else {
+      const latest=vData.version||'';
       resultEl.textContent+='
+✅ version.json EN GITHUB:
+'+JSON.stringify(vData,null,2);
+      const cur=parseFloat(GAME_VERSION.replace('v',''))||0;
+      const lat=parseFloat(latest.replace('v',''))||0;
+      if(lat>cur){ resultEl.textContent+='
 
-⚠️ version.json no encontrado (HTTP '+rawRes.status+')';
+🟢 ¡HAY ACTUALIZACIÓN! Tu v'+GAME_VERSION+' -> GitHub v'+latest; }
+      else if(lat===cur){ resultEl.textContent+='
+
+🔵 ESTÁS AL DÍA - v'+GAME_VERSION; }
+      else { resultEl.textContent+='
+
+🔵 Estás en versión de desarrollo'; }
+    }else{
+      resultEl.textContent+='
+⚠️ version.json HTTP '+rawRes.status;
     }
-  }catch(e){
-    resultEl.textContent+='
+  }catch(e){ resultEl.textContent+='
+⚠️ Error version.json: '+e.message; }
 
-⚠️ Error leyendo version.json: '+e.message;
-  }
-
-  // MÉTODO 2: Releases API - OPCIONAL, solo si creas Releases
   try{
-    const apiRes=await fetch('https://api.github.com/repos/'+repo+'/releases/latest');
+    const apiRes=await fetch('https://api.github.com/repos/'+repo+'/releases/latest', {cache:'no-store'});
     if(apiRes.ok){
       const apiData=await apiRes.json();
-      const tag=apiData.tag_name||'';
       resultEl.textContent+='
 
-✅ RELEASES ENCONTRADO:
-• Tag: '+tag+'
-• Nombre: '+(apiData.name||'')+'
-• URL: '+apiData.html_url;
-      if(!foundVersionJson){
-        const curNum=parseFloat(GAME_VERSION.replace('v',''))||0;
-        const relNum=parseFloat(tag.replace('v',''))||0;
-        if(relNum > curNum){
-          resultEl.textContent+='
-
-🟢 ¡HAY RELEASE NUEVO! '+tag;
-        }
-      }
-    } else if(apiRes.status===404){
+✅ Release: '+(apiData.tag_name||'')+' - '+(apiData.name||'');
+    }else if(apiRes.status===404){
       resultEl.textContent+='
 
-ℹ️ No tienes Releases creados aún (normal).
-Esto NO es un error.
-Tu sistema usa version.json, que SÍ funciona.
-
-Para crear un Release:
-GitHub.com > tu repo > Releases > Draft new release > tag v1.38 > Publish';
-    } else {
-      resultEl.textContent+='
-
-ℹ️ Releases API: HTTP '+apiRes.status+' (sin releases)';
+ℹ️ Sin Releases aún (normal) - Usando version.json como fuente principal';
     }
-  }catch(e){
-    resultEl.textContent+='
-
-ℹ️ Releases no disponible: '+e.message+' (usa version.json)';
-  }
-
-  resultEl.textContent+='
-
----
-📁 FUENTE PRINCIPAL:
-https://raw.githubusercontent.com/'+repo+'/main/version.json
-📄 Este index: '+location.href;
+  }catch(e){ resultEl.textContent+='
+ℹ️ Releases no disponible, usando version.json'; }
 }
+
 document.getElementById('btn-check-update').onclick=checkUpdate;
 document.getElementById('btn-update').onclick=()=>{ showMenu('update'); };
 document.getElementById('btn-back-update').onclick=()=>showMenu('main');
@@ -627,73 +586,26 @@ function showMenu(id){ document.querySelectorAll('.menu-overlay').forEach(m=>m.s
 
 
 
-// PWA + Orientation fix v1.37
-function isMobile(){ return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent); }
-async function lockLandscape(){
-  try{
-    if(screen.orientation && screen.orientation.lock){
-      await screen.orientation.lock('landscape').catch(()=>{});
-    }
-  }catch{}
-}
-function requestFullscreenIfNeeded(){
-  try{
-    const el=document.documentElement;
-    if(el.requestFullscreen && !document.fullscreenElement){
-      // only on user gesture, called from play button
-    }
-  }catch{}
-}
-// On play, try to lock landscape and fullscreen
-const origStartGameInit = window.startGameInit || startGameInit;
-window.startGameInit = function(){
-  lockLandscape();
-  try{ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{}); }catch{}
-  origStartGameInit();
-};
-// Register service worker for standalone PWA
+// PWA v1.40 - Registro con update automático
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('./service-worker.js?v=1.37').then(reg=>console.log('SW registered', reg.scope)).catch(err=>console.log('SW fail', err));
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('./service-worker.js?v=1.40', {updateViaCache:'none'}).then(reg=>{
+      console.log('SW v1.40 registered');
+      reg.addEventListener('updatefound', ()=>{
+        const newWorker=reg.installing;
+        newWorker.addEventListener('statechange', ()=>{
+          if(newWorker.state==='installed' && navigator.serviceWorker.controller){
+            console.log('New SW installed, will activate');
+            newWorker.postMessage({type:'SKIP_WAITING'});
+          }
+        });
+      });
+    }).catch(e=>console.log('SW fail',e));
   });
-}
-// Fix d-pad: ensure only 4 buttons, remove any stray play button that overlaps
-document.addEventListener('DOMContentLoaded',()=>{
-  const dpad=document.querySelector('.dpad');
-  if(dpad){
-    // Remove any extra buttons beyond 4
-    const btns=dpad.querySelectorAll('button');
-    if(btns.length>4){
-      for(let i=4;i<btns.length;i++) btns[i].remove();
-    }
-  }
-});
-
-
-// v1.39 SAFETY NET - Si algo falla, no quedarse pegado en intro
-window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    const splash=document.getElementById('splash-overlay');
-    if(splash && splash.style.display!=='none'){
-      console.log('Safety net: forzando hide splash');
-      splash.style.opacity='0';
-      setTimeout(()=>{ splash.style.display='none'; showMenu('main'); }, 500);
-    }
-  }, 3500);
-});
-
-// Service Worker update handling - forzar nueva versión sin borrar datos manualmente
-if('serviceWorker' in navigator){
   navigator.serviceWorker.addEventListener('controllerchange', ()=>{
-    console.log('New SW activated, reloading');
-    // No auto reload to avoid loop, but show hint
+    console.log('Controller changed, reloading for new version');
+    window.location.reload();
   });
-  // Forzar check de updates cada vez que se abre
-  setInterval(()=>{
-    if(navigator.serviceWorker.controller){
-      navigator.serviceWorker.controller.postMessage({type:'SKIP_WAITING'});
-    }
-  }, 10000);
 }
 
 window.addEventListener('resize',setupCanvas);
