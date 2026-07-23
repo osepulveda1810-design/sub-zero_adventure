@@ -1,6 +1,5 @@
 {
-  "version": "1.51",
-  "build": 51,
-  "name": "FIX COMENZAR NIVEL",
-  "notes": "v1.50 funcionaban todos los botones excepto COMENZAR NIVEL - fix: startGameInit robusto con logs, setupCanvas dentro de startLevel, doble botón COMENZAR con fix directo que fuerza PLAYING sin depender de funciones"
+  "version": "1.53",
+  "build": 53,
+  "name": "FIX REAL - Loop simple garantizado"
 }
