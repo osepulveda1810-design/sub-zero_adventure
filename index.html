@@ -67,7 +67,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.37 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">0</span> • PAUSE VISIBLE + SNOW</div></div></div>
+<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.37b PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">0</span> • PAUSE VISIBLE + SNOW</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -99,7 +99,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#e0ffff;letter-spacing:4px">SELECCIONA NIVEL</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px;max-width:760px;width:100%"></div><button class="btn-premium" id="btn-back-main">VOLVER</button></div>
 
 <div id="menu-pause" class="menu-overlay" style="display:none;background:rgba(5,10,20,0.88)"><div style="text-align:center"><div style="font-size:32px;font-weight:900;letter-spacing:6px;color:#7ef0ff">PAUSA</div><div style="color:#4ecca3;font-size:11px;letter-spacing:3px;margin-top:6px">v1.37 • PWA FIX • STANDALONE • osepulveda1810-design</div><div style="margin-top:24px;display:flex;flex-direction:column;gap:12px"><button class="btn-premium" id="btn-resume">▶ CONTINUAR</button><button class="btn-premium" id="btn-save-ingame" style="border-color:#7dd3fc;color:#7dd3fc">💾 GUARDAR PARTIDA</button><div id="save-feedback" style="font-size:11px;color:#4ecca3;height:16px;opacity:0;transition:opacity 0.3s">✔ Partida guardada</div><button class="btn-premium" id="btn-exit-menu" style="border-color:rgba(255,100,100,0.4);color:#ff8a8a">⏏ SALIR AL MENÚ PRINCIPAL</button></div></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Consulta tu repositorio de GitHub para ver si hay una versión más nueva</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" placeholder="osepulveda1810-design/sub-zero_adventure" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Repo vinculado: osepulveda1810-design/sub-zero_adventure\nPages: https://osepulveda1810-design.github.io/sub-zero_adventure/\nPresiona Buscar para verificar última versión.
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Busca actualización en este mismo proyecto local (./version.json y ./manifest.json)</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" placeholder="osepulveda1810-design/sub-zero_adventure" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Modo LOCAL activado - Buscando en ./version.json y en este index.html\nPages: file:// local - misma carpeta\nPresiona Buscar para verificar última versión.
 Ejemplo: osepulveda89/subzero-adventure
 
 El sistema consultará:
@@ -110,7 +110,7 @@ https://api.github.com/repos/TU_REPO/releases/latest</div><button class="btn-pre
 </div>
 <script>
 // v1.37 PREMIUM - MOTOR RECREADO
-const GAME_VERSION="1.37";
+const GAME_VERSION="1.37b";
 console.log("%c SUB-ZERO ADVENTURE v1.37 PREMIUM - HISTORIA + SPRITES REALES + SCROLLING + ICE FIX ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
 let buildNum=parseInt(localStorage.getItem('sz_build_v133')||'0')+1;
 localStorage.setItem('sz_build_v133',buildNum);
@@ -507,40 +507,58 @@ localStorage.setItem('subzero_github_repo', defaultRepo);
 if(savedRepo) repoInput.value=savedRepo;
 
 async function checkUpdate(){
-  const repo=repoInput.value.trim();
   const resultEl=document.getElementById('update-result');
-  if(!repo||!repo.includes('/')){ resultEl.textContent='❌ Ingresa formato usuario/repo\nEj: osepulveda89/subzero-adventure'; return; }
-  localStorage.setItem('subzero_github_repo', repo);
-  resultEl.textContent='🔍 Consultando GitHub...\nhttps://api.github.com/repos/'+repo+'/releases/latest';
+  resultEl.textContent='🔍 Buscando actualización LOCAL...\n• Revisando ./version.json\n• Revisando ./manifest.json\n• Versión en este index: v'+GAME_VERSION+' (BUILD '+buildNum+')';
   try{
-    const res=await fetch('https://api.github.com/repos/'+repo+'/releases/latest');
-    if(!res.ok) throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    const latest=data.tag_name||data.name||'sin tag';
-    const published=data.published_at? new Date(data.published_at).toLocaleString() : 'desconocido';
-    const isNewer=latest!==GAME_VERSION && latest!=='v'+GAME_VERSION;
-    resultEl.innerHTML=
-      '✅ Última release encontrada:\n'+
-      '• Versión: '+latest+'\n'+
-      '• Publicado: '+published+'\n'+
-      '• Nombre: '+(data.name||'')+'\n\n'+
-      '• Tu versión: v'+GAME_VERSION+' (build '+buildNum+')\n'+
-      (isNewer ? '🟢 ¡Hay una actualización disponible!\n' : '🔵 Estás al día\n')+
-      '\nNotas: '+((data.body||'').substring(0,400))+'\n\n'+
-      'URL: '+data.html_url;
-    if(isNewer){
-      resultEl.innerHTML+='\n\n<button onclick="window.open(\''+data.html_url+'\',\'_blank\')" style="margin-top:8px;background:#facc15;color:#000;border:none;padding:8px 14px;border-radius:8px;font-weight:800;cursor:pointer">⬇️ IR A DESCARGAR</button>';
-    }
-  }catch(err){
-    resultEl.textContent='❌ Error consultando GitHub:\n'+err.message+'\n\nPosibles causas:\n• Repo privado o no existe\n• Sin releases (usa tags)\n• Límite de API\n\nPrueba con tu repo público. Si usas rama main sin releases, usa: https://raw.githubusercontent.com/'+repo+'/main/version.json';
-    // Try alternative raw version.json check
+    // 1. Check local version.json (same folder as index)
+    let localVersion=null;
+    let manifestVersion=null;
     try{
-      const rawRes=await fetch('https://raw.githubusercontent.com/'+repo+'/main/version.json');
-      if(rawRes.ok){
-        const vdata=await rawRes.json();
-        resultEl.textContent+='\n\n✅ version.json encontrado:\n'+JSON.stringify(vdata,null,2);
+      const vRes=await fetch('./version.json?v='+Date.now());
+      if(vRes.ok){
+        const vData=await vRes.json();
+        localVersion=vData.version||vData.tag_name||null;
+        resultEl.textContent+='\n\n✅ version.json LOCAL encontrado:\n'+JSON.stringify(vData,null,2);
+      } else {
+        resultEl.textContent+='\n\n⚠️ version.json no encontrado (HTTP '+vRes.status+') - Creando uno por defecto...';
       }
-    }catch{}
+    }catch(e){ resultEl.textContent+='\n\n⚠️ No se pudo leer ./version.json: '+e.message; }
+
+    // 2. Check manifest.json version
+    try{
+      const mRes=await fetch('./manifest.json?v='+Date.now());
+      if(mRes.ok){
+        const mData=await mRes.json();
+        manifestVersion=mData.version||null;
+        resultEl.textContent+='\n\n✅ manifest.json LOCAL: v'+(manifestVersion||'sin version')+' - '+mData.name;
+      }
+    }catch(e){}
+
+    // 3. Compare with current index version
+    const currentVer=GAME_VERSION;
+    const latestLocal = localVersion || manifestVersion || currentVer;
+    
+    // Convert to comparable numbers
+    const curNum=parseFloat(currentVer)||0;
+    const latestNum=parseFloat(latestLocal)||0;
+    
+    let status='';
+    if(latestNum > curNum){
+      status='\n\n🟢 ¡HAY ACTUALIZACIÓN LOCAL!\n• Este index: v'+currentVer+'\n• version.json/manifest: v'+latestLocal+'\n• Debes recargar: Ctrl+F5 o borrar caché';
+    } else if(latestLocal && latestLocal!==currentVer){
+      status='\n\n🔵 Versión local: v'+latestLocal+'\n• Este index: v'+currentVer+'\n• Coinciden en número pero tag distinto';
+    } else {
+      status='\n\n🔵 ESTÁS AL DÍA (LOCAL)\n• Este index: v'+currentVer+' (BUILD '+buildNum+')\n• version.json: '+(localVersion||'no definido, se usará este index')+'\n• No hay versión más nueva en esta carpeta';
+    }
+    
+    resultEl.textContent+=status;
+    resultEl.textContent+='\n\n📁 Archivos revisados en MISMA CARPETA:\n• ./index.html (este archivo) -> GAME_VERSION="'+currentVer+'"\n• ./version.json\n• ./manifest.json\n\n💡 Para probar actualización: edita version.json y cambia "version" a "1.38" y dale Buscar de nuevo.';
+
+    // Also show current file info
+    resultEl.textContent+='\n\n--- INFO ESTE INDEX ---\nBUILD: '+buildNum+'\nFecha: '+new Date().toLocaleString()+'\nURL: '+location.href;
+
+  }catch(err){
+    resultEl.textContent='❌ Error en búsqueda local:\n'+err.message+'\n\nAsegúrate de abrir con Live Server o GitHub Pages, no file://';
   }
 }
 document.getElementById('btn-check-update').onclick=checkUpdate;
