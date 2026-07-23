@@ -1,6 +1,6 @@
 {
-  "version": "1.42",
-  "build": 42,
-  "name": "NO INTRO - Directo al menú",
-  "notes": "Intro eliminada completamente, directo al menú con copo visible, fix definitivo pegado"
+  "version": "1.43",
+  "build": 43,
+  "name": "NO INTRO + BOTONES FIX",
+  "notes": "v1.42 entraba al menú pero botones sin función - fix: re-vinculación robusta de todos los botones con bindMenuButtons + timeouts"
 }
