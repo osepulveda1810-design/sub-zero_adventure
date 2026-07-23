@@ -1,7 +1,7 @@
 {
   "name": "Sub-Zero Adventure v1.38 PREMIUM",
   "short_name": "Sub-Zero",
-  "description": "Beat'em up arcade MK - Historia 8 niveles, PWA standalone, update desde GitHub - osepulveda1810-design",
+  "description": "Beat'em up MK - v1.38 fix 404 GitHub",
   "version": "1.38",
   "start_url": "./index.html",
   "scope": "./",
@@ -38,31 +38,6 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
-    }
-  ],
-  "shortcuts": [
-    {
-      "name": "Jugar Historia",
-      "short_name": "Jugar",
-      "url": "./index.html?action=play",
-      "icons": [
-        {
-          "src": "icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Buscar Actualización",
-      "short_name": "Update",
-      "description": "Desde GitHub",
-      "url": "./index.html?action=update",
-      "icons": [
-        {
-          "src": "icons/icon-192.png",
-          "sizes": "192x192"
-        }
-      ]
     }
   ]
 }
