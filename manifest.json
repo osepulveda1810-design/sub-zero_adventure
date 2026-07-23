@@ -1,14 +1,13 @@
 {
-  "name": "Sub-Zero Adventure v1.39 PREMIUM",
+  "name": "Sub-Zero Adventure v1.40 PREMIUM",
   "short_name": "Sub-Zero",
-  "description": "v1.39 FIX CACHE + INTRO - Network first, no más borrar datos",
-  "version": "1.39",
-  "start_url": "./index.html?v=1.39",
+  "description": "v1.40 FIX INTRO PEGADO - Safety net 2.5s",
+  "version": "1.40",
+  "start_url": "./index.html?v=1.40",
   "scope": "./",
   "display": "standalone",
   "display_override": [
-    "standalone",
-    "fullscreen"
+    "standalone"
   ],
   "orientation": "landscape",
   "background_color": "#16213e",
