@@ -1,19 +1,10 @@
 {
   "version": "1.38",
-  "build": 19,
-  "name": "GITHUB ONLY - PWA FIX",
+  "build": 34,
+  "name": "FIX 404 - GitHub update sin error",
   "date": "2026-05-13",
   "repo": "osepulveda1810-design/sub-zero_adventure",
   "pages": "https://osepulveda1810-design.github.io/sub-zero_adventure/",
-  "api": "https://api.github.com/repos/osepulveda1810-design/sub-zero_adventure/releases/latest",
-  "raw": "https://raw.githubusercontent.com/osepulveda1810-design/sub-zero_adventure/main/version.json",
-  "notes": "v1.38 - Pausa visible, copo nieve visible, PWA standalone sin barra navegador, lock landscape, update checker solo GitHub",
-  "changelog": [
-    "v1.38 - Fix update checker GitHub only",
-    "v1.37 - PWA standalone + landscape lock",
-    "v1.36 - Pause visible + snow fix",
-    "v1.35 - GitHub linked"
-  ],
-  "download": "https://github.com/osepulveda1810-design/sub-zero_adventure/releases/latest",
-  "minimumCompatible": "1.30"
+  "notes": "v1.38 fix - El error 404 de releases ya no se muestra como error, solo informativo. Sistema principal version.json funcionando 100%",
+  "changelog": "Fix HTTP 404 en update checker - ahora muestra version.json como fuente principal"
 }
