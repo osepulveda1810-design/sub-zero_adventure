@@ -1,0 +1,10 @@
+{
+  "version": "1.37",
+  "build": 17,
+  "name": "PWA STANDALONE + LANDSCAPE LOCK",
+  "date": "2026-05-13",
+  "repo": "osepulveda1810-design/sub-zero_adventure",
+  "pages": "https://osepulveda1810-design.github.io/sub-zero_adventure/",
+  "notes": "Fix barra navegador PWA (service worker + display standalone), lock landscape automático, player scale reducido para no tapar controles, pausa visible, copo nieve menú visible",
+  "download": "https://github.com/osepulveda1810-design/sub-zero_adventure/releases/latest"
+}
