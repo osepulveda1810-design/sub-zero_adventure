@@ -1,10 +1,15 @@
 {
-  "name": "Sub-Zero Adventure v1.35 PREMIUM",
+  "name": "Sub-Zero Adventure v1.37 PREMIUM",
   "short_name": "Sub-Zero",
-  "description": "Juego de pelea 2D estilo arcade inspirado en Mortal Kombat. v1.35 PREMIUM con historia 8 niveles, scrolling parallax, hielo 28px visible, pausa con guardado y buscador de updates - osepulveda1810-design/sub-zero_adventure",
+  "description": "Beat'em up 2D arcade Mortal Kombat - Historia 8 niveles, scrolling, hielo 28px, pausa con guardado, PWA standalone landscape - osepulveda1810-design",
+  "version": "1.37",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
+  "display_override": [
+    "standalone",
+    "fullscreen"
+  ],
   "orientation": "landscape",
   "background_color": "#16213e",
   "theme_color": "#0a0e1a",
@@ -35,12 +40,10 @@
       "purpose": "maskable"
     }
   ],
-  "version": "1.35",
   "shortcuts": [
     {
-      "name": "Jugar Historia Completa",
+      "name": "Jugar Historia",
       "short_name": "Jugar",
-      "description": "Continuar 8 niveles - Calles hasta Netherrealm",
       "url": "./index.html?action=play",
       "icons": [
         {
@@ -52,7 +55,6 @@
     {
       "name": "Buscar Actualización",
       "short_name": "Update",
-      "description": "Verificar última versión en GitHub osepulveda1810-design",
       "url": "./index.html?action=update",
       "icons": [
         {
@@ -62,13 +64,8 @@
       ]
     }
   ],
-  "screenshots": [
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Sub-Zero v1.35 PREMIUM - Gameplay"
-    }
-  ]
+  "categories": [
+    "games"
+  ],
+  "prefer_related_applications": false
 }
