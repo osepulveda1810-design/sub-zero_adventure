@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero v1.50 PREMIUM - Rearmado Completo</title>
+<title>Sub-Zero v1.51 PREMIUM - Rearmado Completo</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0a0e1a">
 <style>
@@ -69,7 +69,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" onclick="pauseGame()" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.50 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">50</span> • REARMADO</div></div></div>
+<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" onclick="pauseGame()" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.51 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">50</span> • REARMADO</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -91,7 +91,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div id="menu-main" class="menu-overlay">
 <div class="ice-demo"></div>
 <div class="menu-title">SUB-ZERO</div>
-<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.50 PREMIUM • REARMADO COMPLETO • SIN INTRO</div>
+<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.51 PREMIUM • REARMADO COMPLETO • SIN INTRO</div>
 <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:1px">8 niveles • Scrolling • Hielo 28px • Pausa visible • Update GitHub</div>
 <button class="btn-premium" id="btn-play" onclick="startLevel(0)">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (8)</button>
@@ -106,20 +106,23 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Consulta GitHub: osepulveda1810-design/sub-zero_adventure</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" onclick="checkUpdate()" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Repo: osepulveda1810-design/sub-zero_adventure
 Presiona BUSCAR para verificar version.json en GitHub.</div><button class="btn-premium" id="btn-back-update" onclick="showMenu('main')">VOLVER</button></div></div>
 
-<div id="menu-story" class="menu-overlay" style="display:none"><div class="story-box"><h3 id="story-title" style="color:#4ecca3;letter-spacing:2px"></h3><p id="story-sub" style="color:rgba(160,230,255,0.7);font-size:11px;letter-spacing:3px;margin-top:6px"></p><p id="story-text" style="margin-top:14px;line-height:1.7;color:rgba(255,255,255,0.84);font-size:14px"></p><p id="story-boss" style="margin-top:14px;color:#facc15;font-weight:900;letter-spacing:1px"></p><p id="story-meta" style="margin-top:10px;color:rgba(255,255,255,0.32);font-size:10px"></p></div><button class="btn-premium" id="btn-start-level" onclick="startGameInit()">COMENZAR NIVEL</button><button class="btn-premium" id="btn-back-levels" onclick="showMenu('levels')">VOLVER A NIVELES</button></div>
+<div id="menu-story" class="menu-overlay" style="display:none"><div class="story-box"><h3 id="story-title" style="color:#4ecca3;letter-spacing:2px"></h3><p id="story-sub" style="color:rgba(160,230,255,0.7);font-size:11px;letter-spacing:3px;margin-top:6px"></p><p id="story-text" style="margin-top:14px;line-height:1.7;color:rgba(255,255,255,0.84);font-size:14px"></p><p id="story-boss" style="margin-top:14px;color:#facc15;font-weight:900;letter-spacing:1px"></p><p id="story-meta" style="margin-top:10px;color:rgba(255,255,255,0.32);font-size:10px"></p></div>
+<button class="btn-premium" id="btn-start-level" onclick="console.log('CLICK COMENZAR NIVEL'); try{ startGameInit(); }catch(e){ console.error(e); alert('Error iniciando: '+e.message); }">▶ COMENZAR NIVEL</button>
+<button class="btn-premium" id="btn-start-level-2" onclick="console.log('CLICK COMENZAR FIX'); currentState='PLAYING'; document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; if(!gameLoopStarted){ gameLoopStarted=true; requestAnimationFrame(loop); }" style="border-color:#4ecca3;color:#4ecca3">▶ COMENZAR (FIX DIRECTO)</button>
+<button class="btn-premium" id="btn-back-levels" onclick="showMenu('levels')">VOLVER A NIVELES</button></div>
 
 </div>
 </div>
 <script>
 // v1.50 REARMADO COMPLETO - SIN INTRO, SIN BUGS, TODO DESDE CERO LIMPIO
-const GAME_VERSION="1.50";
+const GAME_VERSION="1.51";
 console.log("%c SUB-ZERO v1.50 REARMADO COMPLETO ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
 
 let buildNum=50;
 try{
-  const s=localStorage.getItem('sz_build_v150');
+  const s=localStorage.getItem('sz_build_v151');
   buildNum=(s?parseInt(s):49)+1;
-  localStorage.setItem('sz_build_v150',buildNum);
+  localStorage.setItem('sz_build_v151',buildNum);
 }catch(e){ buildNum=50; }
 try{ const el=document.getElementById('build-num'); if(el) el.textContent=buildNum; }catch(e){}
 
@@ -359,29 +362,51 @@ function showMenu(id){
   }catch(e){ console.log(e); }
 }
 function startLevel(idx){
+  console.log('startLevel', idx);
   try{
     currentLevel=idx;
     camera.worldWidth=getWorldWidthForLevel(idx);
-    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120;
+    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; player.health=100; score=0;
+    setupCanvas();
     const lvl=LEVELS[idx];
-    document.getElementById('story-title').textContent=lvl.name;
-    document.getElementById('story-sub').textContent=lvl.subtitle||'';
-    document.getElementById('story-text').textContent=lvl.story||'';
-    document.getElementById('story-boss').textContent='JEFE: '+(lvl.boss||'')+' - '+(lvl.bossTitle||'');
-    document.getElementById('story-meta').textContent='Mundo: '+camera.worldWidth+'px - Enemigos: '+lvl.enemyCount;
+    const st=document.getElementById('story-title'); if(st) st.textContent=lvl.name;
+    const ss=document.getElementById('story-sub'); if(ss) ss.textContent=lvl.subtitle||'';
+    const stx=document.getElementById('story-text'); if(stx) stx.textContent=lvl.story||'';
+    const sb=document.getElementById('story-boss'); if(sb) sb.textContent='JEFE: '+(lvl.boss||'')+' - '+(lvl.bossTitle||'');
+    const sm=document.getElementById('story-meta'); if(sm) sm.textContent='Mundo: '+camera.worldWidth+'px - Enemigos: '+lvl.enemyCount;
     showMenu('story');
-  }catch(e){ console.error(e); }
+    console.log('Story menu mostrado');
+  }catch(e){ console.error('startLevel error', e); alert('Error nivel: '+e.message); }
 }
+window.startLevel=startLevel;
+
 function startGameInit(){
+  console.log('startGameInit llamado - v1.51');
   try{
     setupCanvas();
+    console.log('setupCanvas OK, laneBottom:', laneBottom, 'playerLaneY:', playerLaneY);
+  }catch(e){ console.error('setupCanvas error', e); }
+  try{
     currentState='PLAYING';
-    document.getElementById('hud').style.display='flex';
-    document.getElementById('controls').style.display='flex';
+    const hud=document.getElementById('hud');
+    const controls=document.getElementById('controls');
+    if(hud) hud.style.display='flex';
+    if(controls) controls.style.display='flex';
     document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none');
-    if(!gameLoopStarted){ gameLoopStarted=true; lastAnimTime=performance.now(); requestAnimationFrame(loop); }
-  }catch(e){ console.error(e); }
+    console.log('Menus ocultados, iniciando loop, gameLoopStarted:', gameLoopStarted);
+    if(!gameLoopStarted){
+      gameLoopStarted=true;
+      lastAnimTime=performance.now();
+      requestAnimationFrame(loop);
+      console.log('Loop iniciado');
+    } else {
+      console.log('Loop ya estaba iniciado, solo cambiando estado a PLAYING');
+      lastAnimTime=performance.now();
+    }
+  }catch(e){ console.error('startGameInit error', e); alert('Error iniciando juego: '+e.message); }
 }
+window.startGameInit=startGameInit;
+
 function pauseGame(){
   if(currentState!=='PLAYING') return;
   isPaused=true; currentState='PAUSED'; showMenu('pause');
