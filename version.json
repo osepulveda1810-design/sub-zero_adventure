@@ -1,18 +1,6 @@
 {
-  "version": "1.50",
-  "build": 50,
-  "name": "REARMADO COMPLETO - TODO FIX",
-  "date": "2026-05-13",
-  "repo": "osepulveda1810-design/sub-zero_adventure",
-  "pages": "https://osepulveda1810-design.github.io/sub-zero_adventure/",
-  "notes": "v1.50 rearmado completo desde cero limpio: sin intro pegada, sin BUILD 0, sin overlay bloqueador, botones inline+JS, pause visible, copo visible, update checker con version.json, network-first, 8 niveles funcionando",
-  "fixes": [
-    "Intro eliminada",
-    "BUILD 0 fix",
-    "Botones inline fix",
-    "Overlay blocker removed",
-    "Cache network-first",
-    "Pause visible",
-    "Copo visible"
-  ]
+  "version": "1.51",
+  "build": 51,
+  "name": "FIX COMENZAR NIVEL",
+  "notes": "v1.50 funcionaban todos los botones excepto COMENZAR NIVEL - fix: startGameInit robusto con logs, setupCanvas dentro de startLevel, doble botón COMENZAR con fix directo que fuerza PLAYING sin depender de funciones"
 }
