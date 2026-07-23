@@ -1,5 +1,18 @@
 {
-  "version": "1.45",
-  "build": 45,
-  "name": "BOTONES FIX FINAL - INLINE + SAFE"
+  "version": "1.50",
+  "build": 50,
+  "name": "REARMADO COMPLETO - TODO FIX",
+  "date": "2026-05-13",
+  "repo": "osepulveda1810-design/sub-zero_adventure",
+  "pages": "https://osepulveda1810-design.github.io/sub-zero_adventure/",
+  "notes": "v1.50 rearmado completo desde cero limpio: sin intro pegada, sin BUILD 0, sin overlay bloqueador, botones inline+JS, pause visible, copo visible, update checker con version.json, network-first, 8 niveles funcionando",
+  "fixes": [
+    "Intro eliminada",
+    "BUILD 0 fix",
+    "Botones inline fix",
+    "Overlay blocker removed",
+    "Cache network-first",
+    "Pause visible",
+    "Copo visible"
+  ]
 }
