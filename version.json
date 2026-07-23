@@ -1,10 +1,15 @@
 {
-  "version": "1.38",
-  "build": 34,
-  "name": "FIX 404 - GitHub update sin error",
+  "version": "1.39",
+  "build": 35,
+  "name": "FIX CACHE + INTRO PEGADO",
   "date": "2026-05-13",
   "repo": "osepulveda1810-design/sub-zero_adventure",
   "pages": "https://osepulveda1810-design.github.io/sub-zero_adventure/",
-  "notes": "v1.38 fix - El error 404 de releases ya no se muestra como error, solo informativo. Sistema principal version.json funcionando 100%",
-  "changelog": "Fix HTTP 404 en update checker - ahora muestra version.json como fuente principal"
+  "notes": "Fix: service worker network-first para index/version.json, ya no hay que borrar datos manualmente. Fix: intro pegada - safety net que fuerza hide splash a los 3.5s aunque fallen sprites. Build num robusto.",
+  "fixes": [
+    "PWA cache: network-first para index.html y version.json",
+    "Intro pegada: timeout de seguridad 3.5s",
+    "Build 0 fix: localStorage protegido",
+    "Update checker: 404 ya no es error"
+  ]
 }
