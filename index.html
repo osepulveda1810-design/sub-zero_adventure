@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero v1.51 PREMIUM - Rearmado Completo</title>
+<title>Sub-Zero v1.52 DEBUG - Rearmado Completo</title>
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#0a0e1a">
 <style>
@@ -32,7 +32,7 @@ body{background:#050a14;display:flex;justify-content:center;align-items:center;h
 #top-bar{height:62px;min-height:62px;background:rgba(5,10,20,0.98);border-bottom:1px solid rgba(78,204,163,0.22);display:flex;align-items:center;justify-content:space-between;padding:0 18px;backdrop-filter:blur(16px);z-index:80;position:relative}
 .logo{font-weight:900;letter-spacing:5px;color:#7ef0ff;text-shadow:0 0 18px #0ff;font-size:22px}
 .badge{background:#facc15;color:#000;font-weight:900;font-size:11px;padding:6px 12px;border-radius:9999px;letter-spacing:1px;box-shadow:0 0 18px rgba(250,204,21,0.45)}
-#canvas-wrapper{flex:1;position:relative;overflow:hidden;background:#0a0e1a}
+#canvas-wrapper{flex:1;position:relative;overflow:hidden;background:#0a0e1a; pointer-events:auto !important}
 canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:30}
 .hud-box{background:rgba(0,0,0,0.62);border:1px solid rgba(78,204,163,0.22);border-radius:14px;padding:8px 14px;backdrop-filter:blur(10px);min-width:80px}
@@ -52,7 +52,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #btn-kick{grid-column:3;grid-row:2}
 #btn-jump{grid-column:2;grid-row:3;border-radius:18px!important;width:72px!important;height:46px!important;font-size:10px;font-weight:900;letter-spacing:1.2px;color:#e0ffff;background:rgba(255,255,255,0.09)!important}
 .punch-icon,.boot-icon{filter:drop-shadow(0 0 5px #0ff)}
-.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.94);backdrop-filter:blur(22px);z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 24px 24px;overflow-y:auto}
+.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.94);backdrop-filter:blur(22px);z-index:999 !important;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:80px 24px 24px 24px;overflow-y:auto; pointer-events:auto !important}
 #menu-main{display:flex !important}
 .menu-title{font-size:clamp(34px,9vw,68px);font-weight:900;background:linear-gradient(180deg,#a0e6ff 0%,#4ecca3 55%,#0a5c5c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:7px;text-align:center}
 .ice-demo{width:124px;height:124px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0%,#e0f2fe 18%,#7dd3fc 38%,#0e7490 72%);box-shadow:0 0 34px #7dd3fc,0 0 70px rgba(78,204,163,0.45);animation:pulseIce 2.2s ease-in-out infinite;position:relative;margin:22px;display:flex !important}
@@ -60,7 +60,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .ice-demo::after{content:'❄️';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:42px;filter:drop-shadow(0 0 10px #fff)}
 @keyframes pulseIce{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.btn-premium{background:rgba(78,204,163,0.13);border:1.5px solid rgba(78,204,163,0.42);color:#a0e6ff;padding:14px 34px;border-radius:16px;font-weight:800;letter-spacing:2px;cursor:pointer;transition:all 0.28s;margin-top:14px;min-width:260px;text-transform:uppercase;font-size:13px;pointer-events:auto !important;position:relative;z-index:80}
+.btn-premium{background:rgba(78,204,163,0.13);border:1.5px solid rgba(78,204,163,0.42);color:#a0e6ff;padding:14px 34px;border-radius:16px;font-weight:800;letter-spacing:2px;cursor:pointer;transition:all 0.28s;margin-top:14px;min-width:280px;text-transform:uppercase;font-size:13px;pointer-events:auto !important;position:relative;z-index:1000 !important; touch-action:manipulation}
 .btn-premium:hover{background:rgba(78,204,163,0.26);box-shadow:0 0 28px rgba(78,204,163,0.34);transform:translateY(-1px)}
 .btn-premium:active{transform:scale(0.96)}
 .story-box{background:rgba(0,0,0,0.54);border:1px solid rgba(255,255,255,0.09);border-radius:18px;padding:18px;max-width:640px;width:100%;margin-top:18px}
@@ -69,7 +69,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" onclick="pauseGame()" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.51 PREMIUM</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">50</span> • REARMADO</div></div></div>
+<div id="top-bar"><div style="display:flex;align-items:center;gap:12px"><div class="logo">SUB-ZERO</div><button id="pause-btn" onclick="pauseGame()" style="width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#a0e6ff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer">⏸️</button></div><div style="display:flex;gap:10px;align-items:center"><div class="badge">v1.52 DEBUG</div><div style="font-size:10px;color:rgba(255,255,255,0.52)">BUILD <span id="build-num">50</span> • REARMADO</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -91,7 +91,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div id="menu-main" class="menu-overlay">
 <div class="ice-demo"></div>
 <div class="menu-title">SUB-ZERO</div>
-<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.51 PREMIUM • REARMADO COMPLETO • SIN INTRO</div>
+<div style="color:#4ecca3;letter-spacing:5px;font-size:11px;margin-top:-6px;opacity:0.85">v1.52 DEBUG • REARMADO COMPLETO • SIN INTRO</div>
 <div style="font-size:10px;color:rgba(255,255,255,0.42);margin-top:10px;letter-spacing:1px">8 niveles • Scrolling • Hielo 28px • Pausa visible • Update GitHub</div>
 <button class="btn-premium" id="btn-play" onclick="startLevel(0)">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (8)</button>
@@ -106,23 +106,25 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:520px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">BUSCAR ACTUALIZACIÓN</h2><p style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:8px">Consulta GitHub: osepulveda1810-design/sub-zero_adventure</p><div style="margin-top:18px;display:flex;gap:8px"><input id="github-repo" type="text" value="osepulveda1810-design/sub-zero_adventure" style="flex:1;background:rgba(0,0,0,0.5);border:1px solid rgba(78,204,163,0.3);border-radius:12px;padding:12px 14px;color:#fff;font-size:12px"><button class="btn-premium" id="btn-check-update" onclick="checkUpdate()" style="min-width:120px;margin-top:0">🔍 BUSCAR</button></div><div id="update-result" style="margin-top:18px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px;font-size:12px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.7)">Repo: osepulveda1810-design/sub-zero_adventure
 Presiona BUSCAR para verificar version.json en GitHub.</div><button class="btn-premium" id="btn-back-update" onclick="showMenu('main')">VOLVER</button></div></div>
 
-<div id="menu-story" class="menu-overlay" style="display:none"><div class="story-box"><h3 id="story-title" style="color:#4ecca3;letter-spacing:2px"></h3><p id="story-sub" style="color:rgba(160,230,255,0.7);font-size:11px;letter-spacing:3px;margin-top:6px"></p><p id="story-text" style="margin-top:14px;line-height:1.7;color:rgba(255,255,255,0.84);font-size:14px"></p><p id="story-boss" style="margin-top:14px;color:#facc15;font-weight:900;letter-spacing:1px"></p><p id="story-meta" style="margin-top:10px;color:rgba(255,255,255,0.32);font-size:10px"></p></div>
-<button class="btn-premium" id="btn-start-level" onclick="console.log('CLICK COMENZAR NIVEL'); try{ startGameInit(); }catch(e){ console.error(e); alert('Error iniciando: '+e.message); }">▶ COMENZAR NIVEL</button>
-<button class="btn-premium" id="btn-start-level-2" onclick="console.log('CLICK COMENZAR FIX'); currentState='PLAYING'; document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none'); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; if(!gameLoopStarted){ gameLoopStarted=true; requestAnimationFrame(loop); }" style="border-color:#4ecca3;color:#4ecca3">▶ COMENZAR (FIX DIRECTO)</button>
-<button class="btn-premium" id="btn-back-levels" onclick="showMenu('levels')">VOLVER A NIVELES</button></div>
+<div id="menu-story" class="menu-overlay" style="display:none; z-index:1000 !important"><div class="story-box"><h3 id="story-title" style="color:#4ecca3;letter-spacing:2px"></h3><p id="story-sub" style="color:rgba(160,230,255,0.7);font-size:11px;letter-spacing:3px;margin-top:6px"></p><p id="story-text" style="margin-top:14px;line-height:1.7;color:rgba(255,255,255,0.84);font-size:14px"></p><p id="story-boss" style="margin-top:14px;color:#facc15;font-weight:900;letter-spacing:1px"></p><p id="story-meta" style="margin-top:10px;color:rgba(255,255,255,0.32);font-size:10px"></p></div>
+<button class="btn-premium" id="btn-start-level" onclick="alert('CLICK COMENZAR DETECTADO'); startGameInit();" ontouchstart="startGameInit()">▶ COMENZAR NIVEL</button>
+<button class="btn-premium" id="btn-start-level-2" onclick="alert('CLICK FIX DIRECTO'); var m=document.querySelectorAll('.menu-overlay'); for(var i=0;i<m.length;i++){m[i].style.display='none';} var h=document.getElementById('hud'); if(h){h.style.display='flex';} var c=document.getElementById('controls'); if(c){c.style.display='flex';} currentState='PLAYING'; if(!gameLoopStarted){ gameLoopStarted=true; requestAnimationFrame(loop); }" style="border-color:#4ecca3;color:#4ecca3">▶ FIX DIRECTO (SIN ARROW)</button>
+<button class="btn-premium" id="btn-back-levels" onclick="showMenu('levels')">VOLVER A NIVELES</button>
+<div id="debug-log" style="margin-top:15px; color:#facc15; font-size:10px; font-family:monospace"></div>
+</div>
 
 </div>
 </div>
 <script>
 // v1.50 REARMADO COMPLETO - SIN INTRO, SIN BUGS, TODO DESDE CERO LIMPIO
-const GAME_VERSION="1.51";
+const GAME_VERSION="1.52";
 console.log("%c SUB-ZERO v1.50 REARMADO COMPLETO ","background:#001a33;color:#7ef0ff;font-size:16px;padding:10px 14px;border-radius:10px;border:1px solid #0ff");
 
 let buildNum=50;
 try{
-  const s=localStorage.getItem('sz_build_v151');
+  const s=localStorage.getItem('sz_build_v152');
   buildNum=(s?parseInt(s):49)+1;
-  localStorage.setItem('sz_build_v151',buildNum);
+  localStorage.setItem('sz_build_v152',buildNum);
 }catch(e){ buildNum=50; }
 try{ const el=document.getElementById('build-num'); if(el) el.textContent=buildNum; }catch(e){}
 
@@ -350,7 +352,7 @@ function loop(time){
 }
 
 // MENUS - FUNCIONES GLOBALES
-function showMenu(id){
+window.showMenu = function(id){
   try{
     document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none');
     const el=document.getElementById('menu-'+id);
@@ -362,50 +364,49 @@ function showMenu(id){
   }catch(e){ console.log(e); }
 }
 function startLevel(idx){
-  console.log('startLevel', idx);
+  alert('startLevel '+idx+' llamado');
   try{
     currentLevel=idx;
     camera.worldWidth=getWorldWidthForLevel(idx);
-    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; player.health=100; score=0;
+    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; player.health=100;
     setupCanvas();
-    const lvl=LEVELS[idx];
-    const st=document.getElementById('story-title'); if(st) st.textContent=lvl.name;
-    const ss=document.getElementById('story-sub'); if(ss) ss.textContent=lvl.subtitle||'';
-    const stx=document.getElementById('story-text'); if(stx) stx.textContent=lvl.story||'';
-    const sb=document.getElementById('story-boss'); if(sb) sb.textContent='JEFE: '+(lvl.boss||'')+' - '+(lvl.bossTitle||'');
-    const sm=document.getElementById('story-meta'); if(sm) sm.textContent='Mundo: '+camera.worldWidth+'px - Enemigos: '+lvl.enemyCount;
+    var lvl=LEVELS[idx];
+    var st=document.getElementById('story-title'); if(st) st.textContent=lvl.name;
+    var ss=document.getElementById('story-sub'); if(ss) ss.textContent=lvl.subtitle||'';
+    var stx=document.getElementById('story-text'); if(stx) stx.textContent=lvl.story||'';
+    var sb=document.getElementById('story-boss'); if(sb) sb.textContent='JEFE: '+(lvl.boss||'');
+    var sm=document.getElementById('story-meta'); if(sm) sm.textContent='Mundo: '+camera.worldWidth+'px - Enemigos: '+lvl.enemyCount;
     showMenu('story');
-    console.log('Story menu mostrado');
-  }catch(e){ console.error('startLevel error', e); alert('Error nivel: '+e.message); }
+    alert('Historia mostrada, toca COMENZAR NIVEL');
+  }catch(e){ alert('Error startLevel: '+e.message); console.error(e); }
 }
 window.startLevel=startLevel;
 
+
 function startGameInit(){
-  console.log('startGameInit llamado - v1.51');
+  alert('startGameInit llamado');
   try{
     setupCanvas();
-    console.log('setupCanvas OK, laneBottom:', laneBottom, 'playerLaneY:', playerLaneY);
-  }catch(e){ console.error('setupCanvas error', e); }
-  try{
     currentState='PLAYING';
-    const hud=document.getElementById('hud');
-    const controls=document.getElementById('controls');
-    if(hud) hud.style.display='flex';
-    if(controls) controls.style.display='flex';
-    document.querySelectorAll('.menu-overlay').forEach(m=>m.style.display='none');
-    console.log('Menus ocultados, iniciando loop, gameLoopStarted:', gameLoopStarted);
+    var hud=document.getElementById('hud'); if(hud) hud.style.display='flex';
+    var controls=document.getElementById('controls'); if(controls) controls.style.display='flex';
+    var menus=document.querySelectorAll('.menu-overlay');
+    for(var i=0;i<menus.length;i++){ menus[i].style.display='none'; }
     if(!gameLoopStarted){
       gameLoopStarted=true;
       lastAnimTime=performance.now();
       requestAnimationFrame(loop);
-      console.log('Loop iniciado');
+      alert('Juego iniciado - Loop lanzado');
     } else {
-      console.log('Loop ya estaba iniciado, solo cambiando estado a PLAYING');
-      lastAnimTime=performance.now();
+      alert('Juego reanudado');
     }
-  }catch(e){ console.error('startGameInit error', e); alert('Error iniciando juego: '+e.message); }
+  }catch(e){
+    alert('Error startGameInit: '+e.message);
+    console.error(e);
+  }
 }
 window.startGameInit=startGameInit;
+
 
 function pauseGame(){
   if(currentState!=='PLAYING') return;
