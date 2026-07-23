@@ -509,115 +509,107 @@ if(savedRepo) repoInput.value=savedRepo;
 async function checkUpdate(){
   const repo='osepulveda1810-design/sub-zero_adventure';
   const resultEl=document.getElementById('update-result');
-  resultEl.textContent='🔍 Buscando actualización en GitHub...
+  resultEl.textContent='🔍 Buscando en GitHub...
 📦 Repo: '+repo+'
 
-• Consultando releases/latest
-• Consultando version.json en main
-
-Este index: v'+GAME_VERSION+' (BUILD '+buildNum+')';
+• Este index: v'+GAME_VERSION+' (BUILD '+buildNum+')
+• Consultando version.json...';
+  let foundVersionJson=false;
+  let latestVersion=null;
+  let notes='';
   try{
-    // 1. Try GitHub Releases API
-    let latestRelease=null;
-    try{
-      const apiRes=await fetch('https://api.github.com/repos/'+repo+'/releases/latest');
-      if(apiRes.ok){
-        const apiData=await apiRes.json();
-        latestRelease=apiData;
-        const tag=apiData.tag_name||apiData.name;
-        const date=apiData.published_at? new Date(apiData.published_at).toLocaleString() : '';
+    // MÉTODO 1: version.json RAW - TU MÉTODO PRINCIPAL (siempre funciona si tienes el archivo)
+    const rawRes=await fetch('https://raw.githubusercontent.com/'+repo+'/main/version.json?v='+Date.now());
+    if(rawRes.ok){
+      const vData=await rawRes.json();
+      foundVersionJson=true;
+      latestVersion=vData.version||'';
+      notes=vData.notes||'';
+      resultEl.textContent='✅ version.json EN GITHUB ENCONTRADO:
+'+JSON.stringify(vData,null,2);
+      
+      const curNum=parseFloat(GAME_VERSION.replace('v',''))||0;
+      const latestNum=parseFloat(latestVersion.replace('v',''))||0;
+      
+      if(latestNum > curNum){
         resultEl.textContent+='
 
-✅ RELEASE EN GITHUB ENCONTRADO:
-• Versión: '+tag+'
-• Fecha: '+date+'
+🟢 ¡HAY ACTUALIZACIÓN DISPONIBLE!
+• Tu index: v'+GAME_VERSION+'
+• GitHub: v'+latestVersion+'
+• '+notes+'
+
+Recarga con Ctrl+F5 para obtener la nueva versión.';
+      } else if(latestNum === curNum){
+        resultEl.textContent+='
+
+🔵 ESTÁS AL DÍA
+• Tu index: v'+GAME_VERSION+'
+• GitHub version.json: v'+latestVersion+'
+• '+notes;
+      } else {
+        resultEl.textContent+='
+
+🔵 Version local más nueva que GitHub (estás en desarrollo)';
+      }
+    } else {
+      resultEl.textContent+='
+
+⚠️ version.json no encontrado (HTTP '+rawRes.status+')';
+    }
+  }catch(e){
+    resultEl.textContent+='
+
+⚠️ Error leyendo version.json: '+e.message;
+  }
+
+  // MÉTODO 2: Releases API - OPCIONAL, solo si creas Releases
+  try{
+    const apiRes=await fetch('https://api.github.com/repos/'+repo+'/releases/latest');
+    if(apiRes.ok){
+      const apiData=await apiRes.json();
+      const tag=apiData.tag_name||'';
+      resultEl.textContent+='
+
+✅ RELEASES ENCONTRADO:
+• Tag: '+tag+'
 • Nombre: '+(apiData.name||'')+'
-• URL: '+apiData.html_url+'
-• Notas: '+((apiData.body||'').substring(0,300));
-        
-        // Compare versions
+• URL: '+apiData.html_url;
+      if(!foundVersionJson){
         const curNum=parseFloat(GAME_VERSION.replace('v',''))||0;
         const relNum=parseFloat(tag.replace('v',''))||0;
         if(relNum > curNum){
           resultEl.textContent+='
 
-🟢 ¡HAY NUEVA VERSIÓN EN GITHUB!
-Tu versión: v'+GAME_VERSION+' -> Nueva: '+tag+'
-
-Ve a GitHub para descargar.';
-        } else {
-          resultEl.textContent+='
-
-🔵 Estás al día (GitHub Releases)';
+🟢 ¡HAY RELEASE NUEVO! '+tag;
         }
-      } else {
-        resultEl.textContent+='
-
-⚠️ No hay releases o API limit (HTTP '+apiRes.status+') - Probando version.json...';
       }
-    }catch(e){
+    } else if(apiRes.status===404){
       resultEl.textContent+='
 
-⚠️ Error API Releases: '+e.message+' - Probando version.json...';
-    }
+ℹ️ No tienes Releases creados aún (normal).
+Esto NO es un error.
+Tu sistema usa version.json, que SÍ funciona.
 
-    // 2. Try raw version.json from main branch (tu archivo version.json en el repo)
-    try{
-      const rawRes=await fetch('https://raw.githubusercontent.com/'+repo+'/main/version.json?v='+Date.now());
-      if(rawRes.ok){
-        const vData=await rawRes.json();
-        resultEl.textContent+='
-
-✅ version.json EN GITHUB (main):
-'+JSON.stringify(vData,null,2);
-        const latestVer=vData.version||'';
-        const curNum=parseFloat(GAME_VERSION.replace('v',''))||0;
-        const latestNum=parseFloat(latestVer.replace('v',''))||0;
-        if(latestNum > curNum){
-          resultEl.textContent+='
-
-🟢 ¡ACTUALIZACIÓN DISPONIBLE vía version.json!
-• Tu index: v'+GAME_VERSION+'
-• GitHub version.json: v'+latestVer+'
-• Notas: '+(vData.notes||'');
-          if(vData.download){
-            resultEl.textContent+='
-• Descarga: '+vData.download;
-          }
-        } else if(latestVer){
-          resultEl.textContent+='
-
-🔵 version.json coincide - Estás al día';
-        }
-      } else {
-        resultEl.textContent+='
-
-ℹ️ version.json no encontrado en main (HTTP '+rawRes.status+') - Crea uno en la raíz del repo';
-      }
-    }catch(e){
+Para crear un Release:
+GitHub.com > tu repo > Releases > Draft new release > tag v1.38 > Publish';
+    } else {
       resultEl.textContent+='
 
-⚠️ No se pudo leer version.json: '+e.message;
+ℹ️ Releases API: HTTP '+apiRes.status+' (sin releases)';
     }
-
+  }catch(e){
     resultEl.textContent+='
 
----
-📁 FUENTES GITHUB:
-• API: https://api.github.com/repos/'+repo+'/releases/latest
-• RAW: https://raw.githubusercontent.com/'+repo+'/main/version.json
-• Pages: https://osepulveda1810-design.github.io/sub-zero_adventure/
-• Este index: '+location.href;
-
-  }catch(err){
-    resultEl.textContent='❌ Error consultando GitHub:
-'+err.message+'
-
-Verifica:
-• Repo público: '+repo+'
-• Tienes releases o version.json en main
-• Estás en HTTPS (GitHub Pages)';
+ℹ️ Releases no disponible: '+e.message+' (usa version.json)';
   }
+
+  resultEl.textContent+='
+
+---
+📁 FUENTE PRINCIPAL:
+https://raw.githubusercontent.com/'+repo+'/main/version.json
+📄 Este index: '+location.href;
 }
 document.getElementById('btn-check-update').onclick=checkUpdate;
 document.getElementById('btn-update').onclick=()=>{ showMenu('update'); };
