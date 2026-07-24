@@ -1,4 +1,4 @@
-const CACHE_NAME = 'subzero-v1-57-celeste-sprites';
+const CACHE_NAME = 'subzero-v1-58-sprites-nuevos';
 self.addEventListener('install', e=>{ self.skipWaiting(); });
 self.addEventListener('activate', e=>{
   e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE_NAME).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
