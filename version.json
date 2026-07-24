@@ -1,5 +1,7 @@
 {
-  "version": "1.53",
-  "build": 53,
-  "name": "FIX REAL - Loop simple garantizado"
+  "version": "1.57",
+  "build": 57,
+  "name": "CELESTE DARK + SPRITES CONFIGURABLES",
+  "date": "2026-05-13",
+  "notes": "Modo celeste oscuro, nuevo sistema sprites configurable con fallback garantizado, antes fallaban ahora con estado OK/FAIL, 8 niveles, enemigos variados, hielo 28px visible, single file compatible preview"
 }
