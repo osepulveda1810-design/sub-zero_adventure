@@ -1,13 +1,12 @@
 {
-  "name": "Sub-Zero Adventure v1.51 PREMIUM",
+  "name": "Sub-Zero v1.57 CELESTE DARK SPRITES",
   "short_name": "Sub-Zero",
-  "description": "v1.51 FIX COMENZAR NIVEL - Botón comenzar nivel funcionando",
-  "version": "1.51",
-  "start_url": "./index.html?v=1.51",
+  "version": "1.57",
+  "start_url": "./index.html?v=1.57",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
-  "background_color": "#16213e",
+  "background_color": "#050a14",
   "theme_color": "#0a0e1a",
   "icons": [
     {
