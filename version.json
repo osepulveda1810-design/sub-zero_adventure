@@ -1,7 +1,6 @@
 {
-  "version": "1.58",
-  "build": 58,
-  "name": "SPRITES NUEVOS INTEGRADOS - Idle 6f Walk 6f",
-  "date": "2026-05-13",
-  "notes": "Integrados sprites nuevos del usuario: idle 6 frames y walk 6 frames base64 embebidos, modo celeste dark, fallback garantizado, single file"
+  "version": "1.75",
+  "build": 75,
+  "name": "ASSETS EXTERNOS - Carga desde /assets/sprites/player/",
+  "notes": "Cambia a carga externa: walk.png 11 frames 128x256 1408x256 desde assets, sin base64, mas natural y facil de reemplazar. Si mantienes imagen en /assets/sprites/player/walk.png se ve igual de bien pero mas ligero"
 }
