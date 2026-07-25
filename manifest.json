@@ -1,8 +1,8 @@
 {
-  "name": "Sub-Zero v1.58 SPRITES NUEVOS",
+  "name": "Sub-Zero v1.75 ASSETS",
   "short_name": "Sub-Zero",
-  "version": "1.58",
-  "start_url": "./index.html?v=1.58",
+  "version": "1.75",
+  "start_url": "./index.html?v=1.75",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
