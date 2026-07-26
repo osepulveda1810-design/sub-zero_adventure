@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v1.77 PREMIUM - Sprites Configurables</title>
+<title>Sub-Zero's v1.80 - Sprites Configurables</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -68,7 +68,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge">v1.77 PREMIUM</div>
+<div class="badge">v1.81</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -133,14 +133,39 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </div></div>
 
 <div id="menu-story" class="menu-overlay" style="display:none"><div class="story-box"><h3 id="story-title" style="color:#4ecca3;letter-spacing:2px"></h3><p id="story-sub" style="color:rgba(126,240,255,0.6);font-size:10px;letter-spacing:3px;margin-top:4px"></p><p id="story-text" style="margin-top:12px;line-height:1.6;color:rgba(255,255,255,0.82);font-size:13px"></p><p id="story-boss" style="margin-top:12px;color:#facc15;font-weight:800;letter-spacing:1px"></p><p id="story-meta" style="margin-top:8px;color:rgba(255,255,255,0.28);font-size:9px"></p></div>
-<button class="btn-premium" onclick="startGameInit()" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000">▶ COMENZAR NIVEL v1.77</button>
-<button class="btn-premium btn-cyan" onclick="forceStartGame()">⚡ FORZAR INICIO</button>
+<button class="btn-premium" onclick="startGameInit()" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000">▶ COMENZAR NIVEL</button>
+
 <button class="btn-premium" onclick="showMenu('levels')">VOLVER A NIVELES</button>
 </div>
 
 <div id="menu-pause" class="menu-overlay" style="display:none;background:rgba(5,10,20,0.88)"><div style="text-align:center"><div style="font-size:28px;font-weight:900;letter-spacing:5px;color:#7ef0ff">PAUSA</div><div style="color:#4ecca3;font-size:10px;letter-spacing:3px;margin-top:4px">v1.77 • CELESTE DARK • SPRITES</div><div style="margin-top:20px;display:flex;flex-direction:column;gap:10px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium btn-cyan" onclick="saveGameState()">💾 GUARDAR</button><div id="save-feedback" style="font-size:11px;color:#4ecca3;height:14px;opacity:0">✔ Guardado</div><button class="btn-premium" onclick="exitToMenu()" style="border-color:rgba(255,100,100,0.35);color:#ff8a8a">⏏ SALIR AL MENÚ</button></div></div></div>
 
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">ACTUALIZACIÓN</h2><p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px">Modo single file - verificación local</p><div id="update-result" style="margin-top:16px;background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.12);border-radius:12px;padding:12px;font-size:11px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.65)">v1.77 PREMIUM
+
+<div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:640px;width:100%;text-align:left"><h2 style="color:#7ef0ff;letter-spacing:4px;text-align:center">CÓMO JUGAR</h2>
+<div class="story-box" style="margin-top:16px">
+<div style="color:#4ecca3;font-weight:800;letter-spacing:2px;font-size:11px;margin-bottom:8px">🎮 CONTROLES</div>
+<div style="font-size:12px;line-height:1.7;color:rgba(255,255,255,0.85)">
+<b>PC:</b> WASD / Flechas para mover<br>
+<b>J</b> Puño &nbsp; <b>K</b> Patada &nbsp; <b>I</b> Hielo &nbsp; <b>SPACE</b> Salto<br>
+<b>Táctil:</b> Dpad izquierda para moverte + botones derecha para atacar<br>
+<b>SALTO:</b> Mantén dirección + SALTO para saltar avanzando
+</div>
+<div style="height:1px;background:rgba(126,240,255,0.12);margin:14px 0"></div>
+<div style="color:#facc15;font-weight:800;letter-spacing:2px;font-size:11px;margin-bottom:8px">🏆 CÓMO GANAR</div>
+<div style="font-size:13px;line-height:1.7;color:rgba(255,255,255,0.9)">
+Avanza derrotando a los enemigos y al jefe final del nivel para pasar al siguiente nivel.<br><br>
+Cada nivel tiene un número de enemigos. Al eliminarlos aparece el jefe. Derrota al jefe para completar el nivel y desbloquear el siguiente mundo.
+</div>
+<div style="height:1px;background:rgba(126,240,255,0.12);margin:14px 0"></div>
+<div style="color:#7ef0ff;font-weight:800;letter-spacing:2px;font-size:11px;margin-bottom:8px">❄️ HABILIDAD HIELO</div>
+<div style="font-size:12px;line-height:1.6;color:rgba(255,255,255,0.75)">
+Presiona <b style="color:#7ef0ff">I</b> para cargar hielo, vuelve a presionar para lanzar. Congela a los enemigos por 4 segundos.
+</div>
+</div>
+<button class="btn-premium" onclick="showMenu('main')" style="margin-top:18px;width:100%">VOLVER AL MENÚ</button>
+</div></div>
+
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">ACTUALIZACIÓN</h2><p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px">Modo single file - verificación local</p><div id="update-result" style="margin-top:16px;background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.12);border-radius:12px;padding:12px;font-size:11px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.65)">v1.80
 Single file - todo en index.html
 Sin dependencias externas
 Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div></div>
@@ -148,10 +173,10 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.79-3F-IDLE-FIX";
+const GAME_VERSION="1.81";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
-console.log("%c SUB-ZERO v1.77 PREMIUM - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
+console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
 
 
 // Sistema de sprites - carga desde archivos externos
@@ -666,8 +691,8 @@ function pauseGame(){ if(currentState!=='PLAYING') return; isPaused=true; showMe
 function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; }); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; lastAnimTime=performance.now(); }
 function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
 function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; }
-function showHowToPlay(){ alert('CONTROLES:\nWASD / Flechas mover\nJ Puño, K Patada, I Hielo, SPACE Salto\nTáctil: dpad izq + botones der\n\nSPRITES: Configurables en menu 🎨\nSi no existen, usa fallback celeste\n\nHielo: I carga, I lanza, congela 4s'); }
-function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.77 PREMIUM CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
+function showHowToPlay(){ showMenu('howtoplay'); }
+function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.80 CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
 
 function bindKeys(id,dir){
   var el=document.getElementById(id); if(!el) return;
