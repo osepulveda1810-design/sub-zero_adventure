@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+<head><!-- PLAYABLE_TOUCH_PATCH_V1 --><script>
+(function() {
+  if (window.__playableTouchPatchInstalled) return;
+  window.__playableTouchPatchInstalled = true;
+  var origAdd = EventTarget.prototype.addEventListener;
+  var blockedTypes = { touchstart: 1, touchmove: 1, wheel: 1 };
+  EventTarget.prototype.addEventListener = function(type, listener, options) {
+    if (blockedTypes[type]) {
+      if (options === undefined || options === null) {
+        options = { passive: true };
+      } else if (typeof options === 'boolean') {
+        options = { capture: options, passive: true };
+      } else {
+        options = Object.assign({}, options, { passive: true });
+      }
+    }
+    return origAdd.call(this, type, listener, options);
+  };
+})();
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v1.77 PREMIUM - Sprites Configurables</title>
+<title>Sub-Zero's v1.78 JUMP FIX - Sprites Configurables</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -49,7 +68,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge">v1.77 PREMIUM</div>
+<div class="badge">v1.78 JUMP FIX</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -121,7 +140,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 
 <div id="menu-pause" class="menu-overlay" style="display:none;background:rgba(5,10,20,0.88)"><div style="text-align:center"><div style="font-size:28px;font-weight:900;letter-spacing:5px;color:#7ef0ff">PAUSA</div><div style="color:#4ecca3;font-size:10px;letter-spacing:3px;margin-top:4px">v1.77 • CELESTE DARK • SPRITES</div><div style="margin-top:20px;display:flex;flex-direction:column;gap:10px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium btn-cyan" onclick="saveGameState()">💾 GUARDAR</button><div id="save-feedback" style="font-size:11px;color:#4ecca3;height:14px;opacity:0">✔ Guardado</div><button class="btn-premium" onclick="exitToMenu()" style="border-color:rgba(255,100,100,0.35);color:#ff8a8a">⏏ SALIR AL MENÚ</button></div></div></div>
 
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">ACTUALIZACIÓN</h2><p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px">Modo single file - verificación local</p><div id="update-result" style="margin-top:16px;background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.12);border-radius:12px;padding:12px;font-size:11px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.65)">v1.77 PREMIUM
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%;text-align:center"><h2 style="color:#7ef0ff;letter-spacing:3px">ACTUALIZACIÓN</h2><p style="font-size:11px;color:rgba(255,255,255,0.45);margin-top:6px">Modo single file - verificación local</p><div id="update-result" style="margin-top:16px;background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.12);border-radius:12px;padding:12px;font-size:11px;min-height:80px;text-align:left;white-space:pre-wrap;color:rgba(255,255,255,0.65)">v1.78 JUMP FIX
 Single file - todo en index.html
 Sin dependencias externas
 Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div></div>
@@ -129,10 +148,10 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.77";
+const GAME_VERSION="1.78";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
-console.log("%c SUB-ZERO v1.77 PREMIUM - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
+console.log("%c SUB-ZERO v1.78 JUMP FIX - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
 
 
 // Sistema de sprites - carga desde archivos externos
@@ -140,7 +159,7 @@ console.log("%c SUB-ZERO v1.77 PREMIUM - CELESTE DARK + SPRITES CONFIGURABLES ",
 const SPRITE_CONFIG = {
   idle: { file: "idle.png", frames: 4, speed: 85, scale: 1.0, anchorY: 40, fallbackColor: "#00e5ff", desc: "Idle 4F 360x375 desde /assets/sprites/player/idle.png" },
   walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F 360x823 HQ desde /assets/sprites/player/walk.png" },
-  jump: { file: "jump_subzero.png", frames: 3, speed: 100, scale: 1.0, anchorY: 0, fallbackColor: "#a0e6ff", desc: "Salto - 3 frames (fallback)" },
+  jump: { file: "jump.png", frames: 4, speed: 90, scale: 1.15, anchorY: -10, fallbackColor: "#a0e6ff", desc: "Salto 4F - 2 aire + 2 aterrizaje", landingFrames: [2,3] },
   punch: { file: "punch_subzero.png", frames: 3, speed: 60, scale: 1.0, anchorY: 0, fallbackColor: "#4ecca3", desc: "Puño - 3 frames" },
   kick: { file: "kick_subzero.png", frames: 4, speed: 70, scale: 1.0, anchorY: 0, fallbackColor: "#facc15", desc: "Patada - 4 frames" }
 };
@@ -149,7 +168,8 @@ const playerSprites = {};
 const spriteStatus = {};
 let spritesReady = false;
 
-function initSprites(){
+
+  function initSprites(){
   var keys = Object.keys(SPRITE_CONFIG);
   var total = keys.length;
   var loaded = 0;
@@ -306,7 +326,8 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0};
+let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0};
+let GRAVITY=0.78; let JUMP_FORCE=-14.5;
 let _oldPlayer={x:120,y:0,speed:3.2,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8};
 let baseDrawWidth=90, baseDrawHeight=110, laneTop=180, laneBottom=360, playerLaneY=360;
 // v1.60 - Personaje agrandado: 50->90 (80% más grande), escala configurable 1.0 a 2.5
@@ -321,6 +342,16 @@ const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext(
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
+function tryJump(){
+  if(!player.grounded) return;
+  if(player.landingTimer>0) return;
+  player.grounded=false;
+  player.vy=JUMP_FORCE;
+  player.jumpOffset=-2;
+  player.frame=0;
+  player.frameTime=0;
+  player.anim='jump';
+}
 function setupCanvas(){
   try{
     var wrapper=document.getElementById('canvas-wrapper');
@@ -360,7 +391,11 @@ function drawPlayer(time){
   var sc=(1-depth*0.12)*PLAYER_SCALE;
 
   var anim=player.anim||'idle';
-  if(keys.right||keys.left) anim='walk';
+  // Si esta en aire, forzar anim de salto
+  if(!player.grounded) anim='jump';
+  else if(keys.right||keys.left) anim='walk';
+  player.anim=anim;
+
   var cfg=SPRITE_CONFIG[anim]||SPRITE_CONFIG.idle;
   var sprite=playerSprites[anim]||playerSprites.idle;
   var useSprite=spritesReady && sprite && sprite.complete && sprite.naturalWidth>10 && spriteStatus[anim]==='ok';
@@ -426,26 +461,34 @@ function drawPlayer(time){
       var baseX=Math.round(player.x-camera.x);
       var drawX=baseX-Math.round(targetW/2);
       var anchorOffset=cfg.anchorY||0;
-      var drawY=Math.round(playerLaneY-targetH+10+anchorOffset);
+      var jumpOff=Math.round(player.jumpOffset||0);
+      var drawY=Math.round(playerLaneY-targetH+10+anchorOffset+jumpOff);
+      // Sombra eliptica cuando salta
 
-      // IDLE: forzar frame 0 siempre (sin animación de frames)
-      var f = (anim==='idle') ? 0 : (player.frame||0);
+
+      // Lógica de frames por animación
+      var f = player.frame||0;
       if(anim==='idle'){
-        sx = isHorizontal ? 0 : 0;
-        sy = isHorizontal ? 0 : 0;
+        f=0; sx=0; sy=0;
+        player.frame=0; player.frameTime=0;
+      } else if(anim==='jump'){
+        // 0-1 solo en aire, 2-3 SOLO al tocar suelo
+        if(player.grounded){
+          if(player.landingTimer>0){
+            // Landing: 130ms en frame 2, luego 130ms en frame 3
+            f = (player.landingTimer>130) ? 2 : 3;
+          } else { f=0; }
+        } else {
+          // En aire: 0 subiendo, 1 todo lo demas (incluida caida)
+          f = (player.vy < -1) ? 0 : 1;
+        }
+        player.frame=f;
+        if(isHorizontal){ sx=Math.floor(f*sw); sy=0; } else { sx=0; sy=Math.floor(f*sh); }
       } else {
-        if(isHorizontal){ sx=Math.floor(f*sw); sy=0; }
-        else { sx=0; sy=Math.floor(f*sh); }
-      }
-
-      // Solo animar frames si NO es idle
-      if(anim!=='idle'){
+        if(isHorizontal){ sx=Math.floor(f*sw); sy=0; } else { sx=0; sy=Math.floor(f*sh); }
         if(!player.frameTime) player.frameTime=0;
         player.frameTime+=16;
         if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%totalFrames; player.frameTime=0; }
-      } else {
-        player.frame = 0;
-        player.frameTime = 0;
       }
 
       ctx.save();
@@ -478,12 +521,38 @@ function loop(time){
     if(currentState!=='PLAYING') return;
     if(isPaused) return;
     
+    // --- FISICA DE SALTO ---
+    if(!player.grounded){
+      player.vy+=GRAVITY;
+      player.jumpOffset+=player.vy;
+      if(player.jumpOffset>=0){
+        // Tocó suelo
+        player.jumpOffset=0;
+        player.vy=0;
+        player.grounded=true;
+        player.landingTimer=260; // tiempo en frames de aterrizaje (ms)
+        // efecto polvo
+        particles.push({x:player.x,y:playerLaneY,vx:0,vy:0,life:300,color:'#7ef0ff'});
+        spawnText(player.x,playerLaneY-30,'IMPACTO!','#7ef0ff');
+      }
+    } else {
+      if(player.landingTimer>0) player.landingTimer-=16;
+    }
+
     var moving=false;
     if(keys.right){ player.x+=player.speed; player.facingRight=true; moving=true; }
     if(keys.left){ player.x-=player.speed; player.facingRight=false; moving=true; }
-    if(keys.up){ playerLaneY=Math.max(laneTop,playerLaneY-player.speed*0.6); moving=true; }
-    if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
-    if(moving){ player.anim='walk'; } else { player.anim='idle'; }
+    // Solo permitir mov Y (profundidad) si esta en suelo
+    if(player.grounded){
+      if(keys.up){ playerLaneY=Math.max(laneTop,playerLaneY-player.speed*0.6); moving=true; }
+      if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
+    }
+    if(player.grounded){
+      if(player.landingTimer>0) player.anim='jump';
+      else if(moving) player.anim='walk'; else player.anim='idle';
+    } else {
+      player.anim='jump';
+    }
     // up/down ya manejado arriba con walk anim
     if(player.x<20) player.x=20;
     if(player.x>camera.worldWidth-60) player.x=camera.worldWidth-60;
@@ -629,7 +698,7 @@ function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay'
 function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
 function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; }
 function showHowToPlay(){ alert('CONTROLES:\nWASD / Flechas mover\nJ Puño, K Patada, I Hielo, SPACE Salto\nTáctil: dpad izq + botones der\n\nSPRITES: Configurables en menu 🎨\nSi no existen, usa fallback celeste\n\nHielo: I carga, I lanza, congela 4s'); }
-function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.77 PREMIUM CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
+function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.78 JUMP FIX CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
 
 function bindKeys(id,dir){
   var el=document.getElementById(id); if(!el) return;
@@ -645,7 +714,7 @@ document.getElementById('btn-ice').addEventListener('click',function(){
 });
 document.getElementById('btn-punch').addEventListener('click',function(){ player.anim='punch'; player.frame=0; setTimeout(function(){ player.anim='idle'; },300); });
 document.getElementById('btn-kick').addEventListener('click',function(){ player.anim='kick'; player.frame=0; setTimeout(function(){ player.anim='idle'; },350); });
-document.getElementById('btn-jump').addEventListener('click',function(){ player.anim='jump'; setTimeout(function(){ player.anim='idle'; },400); });
+document.getElementById('btn-jump').addEventListener('click',function(){ tryJump(); });
 document.addEventListener('keydown',function(e){
   if(e.key==='d'||e.key==='ArrowRight') keys.right=true;
   if(e.key==='a'||e.key==='ArrowLeft') keys.left=true;
@@ -657,7 +726,7 @@ document.addEventListener('keydown',function(e){
     if(!attachedIce){ attachedIce={x:player.x+40,y:playerLaneY-28,attached:true,life:5000}; }
     else if(attachedIce.attached){ projectiles.push({x:attachedIce.x,y:attachedIce.y,vx:(player.facingRight?1:-1)*7,vy:0,type:'ice',life:3000}); attachedIce=null; }
   }
-  if(e.code==='Space'){ player.anim='jump'; setTimeout(function(){ player.anim='idle'; },400); }
+  if(e.code==='Space'){ tryJump(); }
 });
 document.addEventListener('keyup',function(e){
   if(e.key==='d'||e.key==='ArrowRight') keys.right=false;
