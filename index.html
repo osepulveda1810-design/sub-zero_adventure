@@ -30,6 +30,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #btn-ice{grid-column:2;grid-row:1;background:rgba(126,240,255,0.15)!important;border-color:#7ef0ff!important;box-shadow:0 0 20px rgba(126,240,255,0.45)!important;font-size:22px}
 #btn-punch{grid-column:1;grid-row:2} #btn-kick{grid-column:3;grid-row:2} #btn-jump{grid-column:2;grid-row:3;border-radius:14px!important;width:68px!important;height:42px!important;font-size:10px;font-weight:900;letter-spacing:1px;color:#e0ffff}
 .menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.92);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:76px 20px 20px 20px;overflow-y:auto;pointer-events:auto}
+#menu-main{justify-content:flex-start;padding-top:40px}
 .menu-title{font-size:clamp(32px,8vw,64px);font-weight:900;background:linear-gradient(180deg,#a0e6ff 0%,#7ef0ff 35%,#4ecca3 70%,#0a5c5c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:6px;text-align:center}
 .ice-demo{width:118px;height:118px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff 0%,#e0f2fe 15%,#7ef0ff 38%,#0e7490 72%);box-shadow:0 0 28px #7ef0ff,0 0 60px rgba(78,204,163,0.4);animation:pulseIce 2.2s ease-in-out infinite;position:relative;margin:18px;display:flex}
 .ice-demo::before{content:'';position:absolute;inset:-12px;border-radius:50%;border:2px solid rgba(126,240,255,0.28);animation:spin 5s linear infinite}
@@ -47,7 +48,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 </head>
 <body>
 <div id="game-container">
-<div id="top-bar"><div style="display:flex;align-items:center;gap:10px"><div class="logo">SUB-ZERO</div><button id="pause-btn" onclick="pauseGame()" style="width:36px;height:36px;border-radius:10px;background:rgba(126,240,255,0.1);border:1px solid rgba(126,240,255,0.2);color:#7ef0ff;cursor:pointer">⏸️</button></div><div style="display:flex;gap:8px;align-items:center"><div class="badge">v1.76 PREMIUM</div><div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div></div></div>
+<div id="top-bar"><div></div><div style="display:flex;gap:8px;align-items:center"><div class="badge">v1.76 PREMIUM</div><div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="hud" style="display:none">
@@ -74,8 +75,10 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <button class="btn-premium" id="btn-play" onclick="startLevel(0)">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (8)</button>
 <button class="btn-premium" id="btn-sprites" onclick="showMenu('sprites')" style="border-color:#a78bfa;color:#a78bfa">🎨 SPRITES NUEVOS</button>
-<button class="btn-premium btn-cyan" id="btn-how" onclick="showHowToPlay()">CÓMO JUGAR</button>
-<button class="btn-premium btn-yellow" id="btn-update" onclick="showMenu('update')">🔄 ACTUALIZACIÓN</button>
+<div style="display:flex;justify-content:space-between;width:100%;max-width:640px;margin-top:auto;padding-bottom:20px;gap:10px">
+<button class="btn-premium btn-cyan" id="btn-how" onclick="showHowToPlay()" style="min-width:0;flex:1">CÓMO JUGAR</button>
+<button class="btn-premium btn-yellow" id="btn-update" onclick="showMenu('update')" style="min-width:0;flex:1">🔄 ACTUALIZACIÓN</button>
+</div>
 <div id="sprite-quick-status" style="margin-top:14px;font-size:10px;color:rgba(255,255,255,0.35);font-family:monospace"></div>
 </div>
 
