@@ -1,4 +1,4 @@
-const CACHE_NAME = 'subzero-v1-75-assets-externos';
+const CACHE_NAME = 'subzero-v1-76-assets-externos';
 self.addEventListener('install', e=>{ self.skipWaiting(); });
 self.addEventListener('activate', e=>{
   e.waitUntil(caches.keys().then(keys=>Promise.all(keys.map(k=>{ if(k!==CACHE_NAME) return caches.delete(k); }))).then(()=>self.clients.claim()));

@@ -1,6 +1,6 @@
 {
-  "version": "1.75",
-  "build": 75,
+  "version": "1.76",
+  "build": 76,
   "name": "ASSETS EXTERNOS - Carga desde /assets/sprites/player/",
-  "notes": "Cambia a carga externa: walk.png 11 frames 128x256 1408x256 desde assets, sin base64, mas natural y facil de reemplazar. Si mantienes imagen en /assets/sprites/player/walk.png se ve igual de bien pero mas ligero"
+  "notes": "v1.76: Barra superior transparente, medidas fijas por animación, anchorY configurable, idle estático frame 0, walk proporcionado. Sprites externos desde assets."
 }

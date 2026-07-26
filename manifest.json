@@ -1,8 +1,8 @@
 {
-  "name": "Sub-Zero v1.75 ASSETS",
+  "name": "Sub-Zero v1.76 ASSETS",
   "short_name": "Sub-Zero",
-  "version": "1.75",
-  "start_url": "./index.html?v=1.75",
+  "version": "1.76",
+  "start_url": "./index.html?v=1.76",
   "scope": "./",
   "display": "standalone",
   "orientation": "landscape",
