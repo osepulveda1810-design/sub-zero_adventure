@@ -68,7 +68,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge">v1.81</div>
+<div class="badge">v1.83</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -173,7 +173,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.81";
+const GAME_VERSION="1.83";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -184,7 +184,7 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 const SPRITE_CONFIG = {
   idle: { file: "idle.png", frames: 4, speed: 85, scale: 1.0, anchorY: 40, fallbackColor: "#00e5ff", desc: "Idle 4F 360x375 desde /assets/sprites/player/idle.png" },
   walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F 360x823 HQ desde /assets/sprites/player/walk.png" },
-  jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.15, anchorY: -8, fallbackColor: "#a0e6ff", desc: "Salto 3F - 2 aire + 1 suelo" },
+  jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.30, anchorY: 58, fallbackColor: "#a0e6ff", desc: "Salto 3F - 2 aire + 1 suelo" },
   punch: { file: "punch_subzero.png", frames: 3, speed: 60, scale: 1.0, anchorY: 0, fallbackColor: "#4ecca3", desc: "Puño - 3 frames" },
   kick: { file: "kick_subzero.png", frames: 4, speed: 70, scale: 1.0, anchorY: 0, fallbackColor: "#facc15", desc: "Patada - 4 frames" }
 };
@@ -457,6 +457,9 @@ function drawPlayer(time){
       } else if(anim==='walk'){
         targetW = Math.round(65 * sc * animScale);
         targetH = Math.round(110 * sc * animScale);
+      } else if(anim==='jump'){
+        targetW = Math.round(105 * sc * animScale);
+        targetH = Math.round(125 * sc * animScale);
       } else {
         var baseW=baseDrawWidth*animScale;
         targetW=Math.round(baseW*sc);
@@ -472,7 +475,7 @@ function drawPlayer(time){
 
       var baseX=Math.round(player.x-camera.x);
       var drawX=baseX-Math.round(targetW/2);
-      var anchorOffset=cfg.anchorY||0;
+      var anchorOffset=(cfg.anchorY||0) * sc; // ahora escala con la profundidad
       var jumpOff=Math.round(player.jumpOffset||0);
       var drawY=Math.round(playerLaneY-targetH+10+anchorOffset+jumpOff);
 
