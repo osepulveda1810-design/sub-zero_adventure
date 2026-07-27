@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.04 - Oleadas todos los niveles</title>
+<title>Sub-Zero's v2.11 - ice_charge ensanchado scale 0.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -190,7 +190,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.04";
+const GAME_VERSION="2.11";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -203,7 +203,11 @@ const SPRITE_CONFIG = {
   walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F 360x823 HQ desde /assets/sprites/player/walk.png" },
   jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.20, anchorY: 58, fallbackColor: "#a0e6ff", desc: "Salto 3F - 2 aire + 1 suelo" },
   punch: { file: "punch.png", frames: 4, speed: 60, scale: 1.1, anchorY: 38, fallbackColor: "#4ecca3", desc: "Puño - 3 frames" },
-  kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" }
+  kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" },
+  ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Carga hielo 1F desde /assets/sprites/player/ice_charge.png - SCALE 0.8 ENSANCHADO" },
+  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo 1F desde /assets/sprites/player/ice_shoot.png - SCALE 0.8" },
+  ice_shot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Alias compatibilidad" },
+  ice: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Alias legacy" }
 };
 const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
@@ -367,7 +371,9 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0};
+let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0};
+let ICE_CHARGE_TIME=750;
+let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
 let _oldPlayer={x:120,y:0,speed:3.2,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8};
 let baseDrawWidth=90, baseDrawHeight=110, laneTop=180, laneBottom=360, playerLaneY=360;
@@ -383,9 +389,42 @@ const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext(
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
-function tryKick(){ if(!player.grounded) return; if(player.isPunching || player.isKicking) return; player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
-function tryPunch(){ if(!player.grounded){ /* permitir en aire? no */ return; } if(player.isPunching) return; player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
-function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
+function tryKick(){ if(!player.grounded) return; if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
+function tryPunch(){ if(!player.grounded) return; if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
+function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
+function fireIceProjectile(){
+  var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
+  var sy = attachedIce ? attachedIce.y : playerLaneY-28;
+  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*7.5,vy:0,type:'ice',life:3000});
+  attachedIce=null;
+  player.isChargingIce=false;
+  player.isIceLoaded=false;
+  player.iceChargeTimer=0;
+  player.isShootingIce=true;
+  player.shootIceTimer=0;
+  player.anim='ice_shoot';
+  player.frame=0;
+  player.frameTime=0;
+  spawnText(player.x,playerLaneY-20,'HIELO DISPARADO!','#7ef0ff');
+}
+function tryIce(){
+  if(player.isChargingIce || player.isShootingIce) return;
+  if(player.isPunching || player.isKicking) return;
+  if(!player.grounded) return;
+  if(player.isIceLoaded && attachedIce && attachedIce.attached){
+    fireIceProjectile();
+    return;
+  }
+  player.isChargingIce=true;
+  player.isIceLoaded=false;
+  player.isShootingIce=false;
+  player.iceChargeTimer=0;
+  player.anim='ice_charge';
+  player.frame=0;
+  player.frameTime=0;
+  attachedIce={x:player.x+(player.facingRight?48:-8),y:playerLaneY-28,attached:true,charging:true,life:5000,chargeProgress:0,holdTimer:0};
+  spawnText(player.x,playerLaneY-20,'CARGANDO HIELO...','#7ef0ff');
+}
 function setupCanvas(){
   try{
     var wrapper=document.getElementById('canvas-wrapper');
@@ -496,10 +535,12 @@ function drawPlayer(time){
   var sc=(1-depth*0.12)*PLAYER_SCALE;
 
   var anim=player.anim||'idle';
-  if(player.isPunching) anim='punch';
+  if(player.isShootingIce) anim='ice_shoot';
+  else if(player.isChargingIce || player.isIceLoaded) anim='ice_charge';
+  else if(player.isPunching) anim='punch';
   else if(player.isKicking) anim='kick';
   else if(!player.grounded) anim='jump';
-  else if(player.grounded && (keys.right||keys.left)) anim='walk';
+  else if(player.grounded && (keys.right||keys.left) && !(player.isChargingIce||player.isIceLoaded)) anim='walk';
   var cfg=SPRITE_CONFIG[anim]||SPRITE_CONFIG.idle;
   var sprite=playerSprites[anim]||playerSprites.idle;
   var useSprite=spritesReady && sprite && sprite.complete && sprite.naturalWidth>10 && spriteStatus[anim]==='ok';
@@ -542,7 +583,7 @@ function drawPlayer(time){
       var animScale=cfg.scale||1.0;
       var targetW, targetH;
 
-      // MEDIDAS FIJAS POR ANIMACIÓN (ajustables manualmente)
+      // MEDIDAS FIJAS POR ANIMACIÓN v2.10 - ice_charge 1F + ice_shoot 1F
       if(anim==='idle'){
         targetW = Math.round(100 * sc * animScale);
         targetH = Math.round(110 * sc * animScale);
@@ -557,6 +598,12 @@ function drawPlayer(time){
         targetH = Math.round(125 * sc * animScale);
       } else if(anim==='kick'){
         targetW = Math.round(130 * sc * animScale);
+        targetH = Math.round(130 * sc * animScale);
+      } else if(anim==='ice' || anim==='ice_charge'){
+        targetW = Math.round(170 * sc * animScale); // <-- ENSANCHADO: era 120, ahora 170 para hacerlo mas ancho
+        targetH = Math.round(130 * sc * animScale);
+      } else if(anim==='ice_shot' || anim==='ice_shoot'){
+        targetW = Math.round(125 * sc * animScale);
         targetH = Math.round(130 * sc * animScale);
       } else {
         var baseW=baseDrawWidth*animScale;
@@ -632,6 +679,32 @@ function drawPlayer(time){
         if(player.grounded){ f=(player.landingTimer>0)?2:0; } else { f=(player.vy < -0.5)?0:1; }
         player.frame=f;
         if(isHorizontal){ sx=Math.floor(f*sw); sy=0; } else { sx=0; sy=Math.floor(f*sh); }
+      } else if(anim==='ice' || anim==='ice_charge' || anim==='ice_shoot' || anim==='ice_shot'){
+        totalFrames=cfg.frames||1;
+        if(totalFrames<1) totalFrames=1;
+        sw=Math.floor(sheetW/totalFrames);
+        sh=sheetH;
+        if(f<0) f=0; if(f>=totalFrames) f=0;
+        sx=f*sw; sy=0;
+        if(anim==='ice_shoot' || anim==='ice_shot'){
+          if(!player.frameTime) player.frameTime=0;
+          player.frameTime+=16;
+          if(player.frameTime>cfg.speed){
+            player.frame++;
+            player.frameTime=0;
+            if(player.frame>=totalFrames){
+              player.frame=0;
+              player.isShootingIce=false;
+              player.anim='idle';
+              player.shootIceTimer=0;
+            }
+          }
+        } else {
+          // ice_charge 1F -> no animacion loop
+          player.frame=0;
+          player.frameTime=0;
+          sx=0; sy=0;
+        }
       } else {
         if(isHorizontal){ sx=Math.floor(f*sw); sy=0; } else { sx=0; sy=Math.floor(f*sh); }
         if(!player.frameTime) player.frameTime=0;
@@ -703,14 +776,55 @@ function loop(time){
       }
     } else { player.kickTimer=0; }
 
-    var moving=false;
-    if(keys.right){ player.x+=player.speed; player.facingRight=true; moving=true; }
-    if(keys.left){ player.x-=player.speed; player.facingRight=false; moving=true; }
-    if(player.grounded){
-      if(keys.up){ playerLaneY=Math.max(laneTop,playerLaneY-player.speed*0.6); moving=true; }
-      if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
+    // --- ICE CHARGE LOGIC v2.10: bloquea caminata mientras carga, libera al disparar ---
+    if(player.isShootingIce){
+      player.shootIceTimer+=16;
+      if(player.shootIceTimer>450){
+        player.isShootingIce=false;
+        player.anim='idle';
+        player.shootIceTimer=0;
+      }
     }
-    if(player.isPunching){ player.anim='punch'; }
+    if(player.isChargingIce){
+      player.iceChargeTimer+=16;
+      if(attachedIce){
+        attachedIce.x=player.x+(player.facingRight?48:-8);
+        attachedIce.y=playerLaneY-28;
+        attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
+      }
+      if(player.iceChargeTimer>=ICE_CHARGE_TIME){
+        player.isChargingIce=false;
+        player.isIceLoaded=true;
+        if(attachedIce){
+          attachedIce.charging=false;
+          attachedIce.chargeProgress=1;
+          attachedIce.life=5000;
+          attachedIce.holdTimer=0;
+        }
+        spawnText(player.x,playerLaneY-30,'¡HIELO CARGADO!','#7ef0ff');
+        setTimeout(function(){ if(player.isIceLoaded && attachedIce){ fireIceProjectile(); } }, 200);
+      }
+    }
+    if(player.isIceLoaded && attachedIce){
+      attachedIce.holdTimer+=16;
+      attachedIce.x=player.x+(player.facingRight?48:-8);
+      attachedIce.y=playerLaneY-28;
+      if(attachedIce.holdTimer>=ICE_HOLD_MAX){ fireIceProjectile(); }
+    }
+
+    var moving=false;
+    var iceBlocking = player.isChargingIce || player.isIceLoaded;
+    if(!iceBlocking){
+      if(keys.right){ player.x+=player.speed; player.facingRight=true; moving=true; }
+      if(keys.left){ player.x-=player.speed; player.facingRight=false; moving=true; }
+      if(player.grounded){
+        if(keys.up){ playerLaneY=Math.max(laneTop,playerLaneY-player.speed*0.6); moving=true; }
+        if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
+      }
+    }
+    if(player.isShootingIce){ player.anim='ice_shoot'; }
+    else if(player.isChargingIce || player.isIceLoaded){ player.anim='ice_charge'; }
+    else if(player.isPunching){ player.anim='punch'; }
     else if(player.isKicking){ player.anim='kick'; }
     else if(!player.grounded){ player.anim='jump'; }
     else if(player.landingTimer>0){ player.anim='jump'; }
@@ -782,7 +896,7 @@ function loop(time){
     }
     if(boss && boss.frozen>0) boss.frozen-=16;
     
-    if(attachedIce){ attachedIce.life-=16; if(attachedIce.life<=0) attachedIce=null; else if(attachedIce.attached){ attachedIce.x=player.x+(player.facingRight?48:-8); attachedIce.y=playerLaneY-28; } }
+    if(attachedIce && !player.isChargingIce && !player.isIceLoaded){ attachedIce.life-=16; if(attachedIce.life<=0) attachedIce=null; }
     
     // Dibujo
     var lvl=LEVELS[currentLevel];
@@ -814,9 +928,25 @@ function loop(time){
     }
     if(attachedIce){
       var asx=Math.round(attachedIce.x-camera.x);
-      var g2=ctx.createRadialGradient(asx-4, attachedIce.y-4, 3, asx, attachedIce.y, 28);
-      g2.addColorStop(0,'#fff'); g2.addColorStop(0.5,'#4ecca3'); g2.addColorStop(1,'#0a5c5c');
-      ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(asx,attachedIce.y,28,0,Math.PI*2); ctx.fill();
+      var prog = attachedIce.chargeProgress!=null ? attachedIce.chargeProgress : 1;
+      var r = attachedIce.charging ? 12 + prog*18 : 28;
+      var g2=ctx.createRadialGradient(asx-4, attachedIce.y-4, 3, asx, attachedIce.y, r);
+      if(attachedIce.charging){
+        g2.addColorStop(0,'#fff');
+        g2.addColorStop(0.3,'#7ef0ff');
+        g2.addColorStop(0.6,'#4ecca3');
+        g2.addColorStop(1,'rgba(10,92,92,0.2)');
+      } else {
+        g2.addColorStop(0,'#fff'); g2.addColorStop(0.5,'#4ecca3'); g2.addColorStop(1,'#0a5c5c');
+      }
+      ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r,0,Math.PI*2); ctx.fill();
+      if(attachedIce.charging){
+        ctx.strokeStyle='rgba(126,240,255,0.8)';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(asx,attachedIce.y,r+4, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog);
+        ctx.stroke();
+      }
     }
     
     drawPlayer(time);
@@ -892,7 +1022,7 @@ function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay'
 function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
 function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); }
 function showHowToPlay(){ showMenu('howtoplay'); }
-function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.80 CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
+function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_charge.png 1F + ice_shoot.png 1F'; }
 
 function bindKeys(id,dir){
   var el=document.getElementById(id); if(!el) return;
@@ -902,10 +1032,7 @@ function bindKeys(id,dir){
   el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); el.addEventListener('mouseleave',up);
 }
 bindKeys('btn-up','up'); bindKeys('btn-down','down'); bindKeys('btn-left','left'); bindKeys('btn-right','right');
-document.getElementById('btn-ice').addEventListener('click',function(){
-  if(!attachedIce){ attachedIce={x:player.x+40,y:playerLaneY-28,attached:true,life:5000}; spawnText(player.x,playerLaneY-20,'HIELO CARGADO','#7ef0ff'); }
-  else if(attachedIce.attached){ projectiles.push({x:attachedIce.x,y:attachedIce.y,vx:(player.facingRight?1:-1)*7,vy:0,type:'ice',life:3000}); attachedIce=null; }
-});
+document.getElementById('btn-ice').addEventListener('click',function(){ tryIce(); });
 var bp=document.getElementById('btn-punch');
 if(bp){
   var doPunch=function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } tryPunch(); };
@@ -934,10 +1061,7 @@ document.addEventListener('keydown',function(e){ if((e.code==='KeyJ' || e.key===
   if(e.key==='s'||e.key==='ArrowDown') keys.down=true;
   if(e.key==='j'||e.key==='J'){ player.anim='punch'; player.frame=0; setTimeout(function(){ player.anim='idle'; },300); }
   if(e.key==='k'||e.key==='K'){ player.anim='kick'; player.frame=0; setTimeout(function(){ player.anim='idle'; },350); }
-  if(e.key==='i'||e.key==='I'){
-    if(!attachedIce){ attachedIce={x:player.x+40,y:playerLaneY-28,attached:true,life:5000}; }
-    else if(attachedIce.attached){ projectiles.push({x:attachedIce.x,y:attachedIce.y,vx:(player.facingRight?1:-1)*7,vy:0,type:'ice',life:3000}); attachedIce=null; }
-  }
+  if(e.key==='i'||e.key==='I'){ tryIce(); }
   if(e.code==='Space'){ tryJump(); }
 });
 document.addEventListener('keyup',function(e){
