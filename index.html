@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.03 - Kano Fix + Menu OK</title>
+<title>Sub-Zero's v2.04 - Oleadas todos los niveles</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -85,8 +85,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge">v2.03</div>
-<div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">203</span> • WALK 4F</div>
+<div class="badge">v2.04</div>
+<div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">204</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas><div id="wave-arrow"><div class="arrow-icon">➡️</div><div class="arrow-text">AVANZA</div></div>
@@ -190,7 +190,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.03";
+const GAME_VERSION="2.04";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -321,13 +321,13 @@ initSprites();
 // LEVELS y ENEMIGOS de v1.35
 const LEVELS = [
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug','thug_gun','ninja_renegade'], enemyCount: 12 },
-    { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic','technician','sektor_miniboss'], enemyCount: 6 },
-    { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade','tarkatan','priest_quan'], enemyCount: 6 },
-    { id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio", story: "Sigues el rastro del mapa robado hasta un pantano tenebroso.", bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie','reptile_mutant','shadow_ghost'], enemyCount: 7 },
-    { id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico", story: "Descubres que Kano no actuaba solo.", bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite','cyborg_upgrade','assassin_lk'], enemyCount: 6 },
-    { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan','sindel_priest','shadow_knight'], enemyCount: 12 },
-    { id: 7, name: "Palacio de Shang Tsung", subtitle: "La Isla Maldita", boss: "Shang Tsung", bossTitle: "Hechicero Manipulador", story: "Llegas al corazon del complot. Shang Tsung te espera.", bgColor: [20, 15, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre','demon_quan','statue'], enemyCount: 6 },
-    { id: 8, name: "El Netherrealm", subtitle: "El Origen del Frio", boss: "Noob Saibot", bossTitle: "Bi-Han Resucitado", story: "Tu hermano Bi-Han no descanso en paz. Ha sido resucitado como sombra.", bgColor: [25, 5, 5], groundColor: [50, 15, 10], enemyTypes: ['demon_lord','shadow_clone','hell_beast'], enemyCount: 7 }
+    { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic','technician','sektor_miniboss'], enemyCount: 13 },
+    { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade','tarkatan','priest_quan'], enemyCount: 14 },
+    { id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio", story: "Sigues el rastro del mapa robado hasta un pantano tenebroso.", bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie','reptile_mutant','shadow_ghost'], enemyCount: 14 },
+    { id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico", story: "Descubres que Kano no actuaba solo.", bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite','cyborg_upgrade','assassin_lk'], enemyCount: 14 },
+    { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan','sindel_priest','shadow_knight'], enemyCount: 15 },
+    { id: 7, name: "Templo de la Oscuridad", subtitle: "Alma Corrupta", boss: "Shang Tsung", bossTitle: "Hechicero de Almas", story: "Shang Tsung roba almas para abrir el portal.", bgColor: [20, 10, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre','demon_quan','statue'], enemyCount: 15 },
+    { id: 8, name: "Infierno de Quan Chi", subtitle: "El Final del Linaje", boss: "Noob Saibot", bossTitle: "La Sombra de Bi-Han", story: "Tu hermano ha vuelto como espectro. Debes liberarlo.", bgColor: [30, 10, 10], groundColor: [50, 15, 10], enemyTypes: ['demon_lord','shadow_clone','hell_beast'], enemyCount: 16 }
 ];
 const ENEMY_CONFIGS = {
     thug: { name: "Maton", health: 60, damage: 5, speed: 0.8, color: '#8B4513', height: 50, width: 40 },
