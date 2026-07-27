@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.13 - bola sobre sprite FIX VERSION</title>
+<title>Sub-Zero's v2.15e - FINAL bola en manos Y10 X29 scale 0.6 0.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -80,6 +80,11 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .sprite-item{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,0.06);font-size:11px}
 .sprite-status{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
 .status-ok{background:rgba(78,204,163,0.2);color:#4ecca3} .status-fail{background:rgba(255,100,100,0.15);color:#ff8a8a} .status-loading{background:rgba(250,204,21,0.15);color:#facc15}
+
+/* FIX v2.14c - Menu buttons habilitados */
+.menu-overlay{pointer-events:auto !important;}
+.menu-overlay .btn-premium{pointer-events:auto !important; cursor:pointer !important; z-index:1001 !important; position:relative;}
+#menu-main, #menu-levels, #menu-story, #menu-pause, #menu-howtoplay, #menu-update{pointer-events:auto !important;}
 </style>
 </head>
 <body>
@@ -190,7 +195,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.13";
+const GAME_VERSION="2.15f";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -199,15 +204,13 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 // Sistema de sprites - carga desde archivos externos
 
 const SPRITE_CONFIG = {
-  idle: { file: "idle.png", frames: 4, speed: 85, scale: 1.0, anchorY: 40, fallbackColor: "#00e5ff", desc: "Idle 4F 360x375 desde /assets/sprites/player/idle.png" },
-  walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F 360x823 HQ desde /assets/sprites/player/walk.png" },
-  jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.20, anchorY: 58, fallbackColor: "#a0e6ff", desc: "Salto 3F - 2 aire + 1 suelo" },
-  punch: { file: "punch.png", frames: 4, speed: 60, scale: 1.1, anchorY: 38, fallbackColor: "#4ecca3", desc: "Puño - 3 frames" },
+  idle: { file: "idle.png", frames: 4, speed: 85, scale: 1.0, anchorY: 40, fallbackColor: "#00e5ff", desc: "Idle 4F" },
+  walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F HQ" },
+  jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.20, anchorY: 58, fallbackColor: "#a0e6ff", desc: "Salto 3F" },
+  punch: { file: "punch.png", frames: 4, speed: 60, scale: 1.1, anchorY: 38, fallbackColor: "#4ecca3", desc: "Puño" },
   kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" },
-  ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Carga hielo 1F desde /assets/sprites/player/ice_charge.png - SCALE 0.8 ENSANCHADO" },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo 1F desde /assets/sprites/player/ice_shoot.png - SCALE 0.8" },
-  ice_shot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Alias compatibilidad" },
-  ice: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.8, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Alias legacy" }
+  ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.6, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Carga hielo - SCALE 0.6 FINAL" },
+  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.75, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo - SCALE 0.75 (medida que dejaste)" }
 };
 const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
@@ -787,9 +790,10 @@ function loop(time){
     }
     if(player.isChargingIce){
       player.iceChargeTimer+=16;
+      var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
       if(attachedIce){
-        attachedIce.x=player.x+(player.facingRight?38:-6);
-        attachedIce.y=playerLaneY-48; // v2.12 - un poco mas alto para que se vea sobre el sprite
+        attachedIce.x=player.x+(player.facingRight?29:-29)*_sc; // FINAL X=29 espejado
+        attachedIce.y=playerLaneY - 10 + (player.jumpOffset||0); // FINAL Y=10 en manos - FIX DEFINITIVO
         attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
       }
       if(player.iceChargeTimer>=ICE_CHARGE_TIME){
@@ -807,8 +811,9 @@ function loop(time){
     }
     if(player.isIceLoaded && attachedIce){
       attachedIce.holdTimer+=16;
-      attachedIce.x=player.x+(player.facingRight?48:-8);
-      attachedIce.y=playerLaneY-28;
+      var _sc2=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
+      attachedIce.x=player.x+(player.facingRight?40:-40)*_sc2; // FINAL X=40
+      attachedIce.y=playerLaneY - 18 + (player.jumpOffset||0); // FINAL Y=18
       if(attachedIce.holdTimer>=ICE_HOLD_MAX){ fireIceProjectile(); }
     }
 
@@ -929,28 +934,26 @@ function loop(time){
     
     drawPlayer(time);
 
-    // v2.12 - Bola de hielo SOBRE el sprite (antes estaba detras)
+    // v2.15d FINAL - Bola CHICA 13px sobre manos - scale 0.6 - Y10 X29 / Y18 X40
     if(attachedIce){
       var asx=Math.round(attachedIce.x-camera.x);
       var prog = attachedIce.chargeProgress!=null ? attachedIce.chargeProgress : 1;
-      var r = attachedIce.charging ? 12 + prog*18 : 28;
-      var g2=ctx.createRadialGradient(asx-4, attachedIce.y-4, 3, asx, attachedIce.y, r);
+      var r = attachedIce.charging ? (8 + prog*5) : 13;
+      ctx.save();
+      ctx.fillStyle='rgba(0,0,0,0.28)';
+      ctx.beginPath();
+      ctx.ellipse(asx, attachedIce.y + r*0.5, r*0.6, r*0.25, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+      var g2=ctx.createRadialGradient(asx-2, attachedIce.y-2, 1, asx, attachedIce.y, r);
       if(attachedIce.charging){
-        g2.addColorStop(0,'#fff');
-        g2.addColorStop(0.3,'#7ef0ff');
-        g2.addColorStop(0.6,'#4ecca3');
-        g2.addColorStop(1,'rgba(10,92,92,0.2)');
+        g2.addColorStop(0,'#ffffff'); g2.addColorStop(0.3,'#c8f5ff'); g2.addColorStop(0.55,'#7ef0ff'); g2.addColorStop(0.85,'#2ea8b0'); g2.addColorStop(1,'rgba(10,92,92,0.3)');
       } else {
-        g2.addColorStop(0,'#fff'); g2.addColorStop(0.5,'#4ecca3'); g2.addColorStop(1,'#0a5c5c');
+        g2.addColorStop(0,'#fff'); g2.addColorStop(0.4,'#a0f0ff'); g2.addColorStop(0.7,'#4ecca3'); g2.addColorStop(1,'#0a5c5c');
       }
-      ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r,0,Math.PI*2); ctx.fill();
-      if(attachedIce.charging){
-        ctx.strokeStyle='rgba(126,240,255,0.8)';
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.arc(asx,attachedIce.y,r+4, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog);
-        ctx.stroke();
-      }
+      ctx.save(); ctx.globalCompositeOperation='source-over'; ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=8; ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
+      ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.beginPath(); ctx.arc(asx - r*0.25, attachedIce.y - r*0.25, r*0.22, 0, Math.PI*2); ctx.fill(); ctx.restore();
+      if(attachedIce.charging){ ctx.strokeStyle='rgba(126,240,255,0.85)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r+3, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog); ctx.stroke(); }
     }
     
     for(var fi=floatingTexts.length-1;fi>=0;fi--){
@@ -1086,10 +1089,61 @@ try{ setupCanvas(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite FIX + scale 0.7"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
+
+// FIX v2.14c - Botones menu habilitados + scale 0.7 garantizado
+(function(){
+  function enableMenuButtons(){
+    try{
+      var ids = ['btn-play','btn-levels','btn-how','btn-update'];
+      ids.forEach(function(id){
+        var el = document.getElementById(id);
+        if(el){
+          el.style.pointerEvents='auto';
+          el.style.cursor='pointer';
+          el.disabled=false;
+        }
+      });
+      document.querySelectorAll('.menu-overlay').forEach(function(m){
+        m.style.pointerEvents='auto';
+      });
+      document.querySelectorAll('.btn-premium').forEach(function(b){
+        b.style.pointerEvents='auto';
+        b.style.cursor='pointer';
+      });
+    }catch(e){}
+  }
+  // Ejecutar al cargar y cada vez que se muestra un menu
+  document.addEventListener('DOMContentLoaded', enableMenuButtons);
+  setTimeout(enableMenuButtons, 100);
+  setTimeout(enableMenuButtons, 500);
+  setTimeout(enableMenuButtons, 1500);
+  var _origShowMenu = window.showMenu;
+  window.showMenu = function(id){
+    try{ _origShowMenu(id); }catch(e){ 
+      // fallback si _origShowMenu no existe aun
+      document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; });
+      var el=document.getElementById('menu-'+id);
+      if(el) el.style.display='flex';
+    }
+    enableMenuButtons();
+  };
+  // Fix explicito para botones principales por si onclick inline falla
+  document.addEventListener('DOMContentLoaded', function(){
+    var bp=document.getElementById('btn-play');
+    if(bp) bp.addEventListener('click', function(){ startLevel(0); });
+    var bl=document.getElementById('btn-levels');
+    if(bl) bl.addEventListener('click', function(){ showMenu('levels'); });
+    var bh=document.getElementById('btn-how');
+    if(bh) bh.addEventListener('click', function(){ showHowToPlay(); });
+    var bu=document.getElementById('btn-update');
+    if(bu) bu.addEventListener('click', function(){ showMenu('update'); });
+  });
+})();
+
 </script>
 </body>
 </html>
