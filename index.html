@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.11 - ice_charge ensanchado scale 0.8</title>
+<title>Sub-Zero's v2.13 - bola sobre sprite FIX VERSION</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -85,7 +85,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge">v2.04</div>
+<div class="badge" id="version-badge">v2.13</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">204</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -190,7 +190,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.11";
+const GAME_VERSION="2.13";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -788,8 +788,8 @@ function loop(time){
     if(player.isChargingIce){
       player.iceChargeTimer+=16;
       if(attachedIce){
-        attachedIce.x=player.x+(player.facingRight?48:-8);
-        attachedIce.y=playerLaneY-28;
+        attachedIce.x=player.x+(player.facingRight?38:-6);
+        attachedIce.y=playerLaneY-48; // v2.12 - un poco mas alto para que se vea sobre el sprite
         attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
       }
       if(player.iceChargeTimer>=ICE_CHARGE_TIME){
@@ -926,6 +926,10 @@ function loop(time){
       grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
       ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(psx,p.y,24,0,Math.PI*2); ctx.fill();
     }
+    
+    drawPlayer(time);
+
+    // v2.12 - Bola de hielo SOBRE el sprite (antes estaba detras)
     if(attachedIce){
       var asx=Math.round(attachedIce.x-camera.x);
       var prog = attachedIce.chargeProgress!=null ? attachedIce.chargeProgress : 1;
@@ -948,8 +952,6 @@ function loop(time){
         ctx.stroke();
       }
     }
-    
-    drawPlayer(time);
     
     for(var fi=floatingTexts.length-1;fi>=0;fi--){
       var ft=floatingTexts[fi]; ft.timer+=16; ft.y+=ft.vy;
@@ -1022,7 +1024,7 @@ function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay'
 function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
 function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); }
 function showHowToPlay(){ showMenu('howtoplay'); }
-function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_charge.png 1F + ice_shoot.png 1F'; }
+function checkUpdate(){ var el=document.getElementById('update-result'); var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION;  if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_charge.png 1F + ice_shoot.png 1F'; }
 
 function bindKeys(id,dir){
   var el=document.getElementById(id); if(!el) return;
@@ -1084,6 +1086,7 @@ try{ setupCanvas(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
