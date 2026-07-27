@@ -173,7 +173,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.96";
+const GAME_VERSION="1.97";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -303,12 +303,12 @@ initSprites();
 
 // LEVELS y ENEMIGOS de v1.35
 const LEVELS = [
-    { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug','thug_gun','ninja_renegade'], enemyCount: 5 },
+    { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug','thug_gun','ninja_renegade'], enemyCount: 12 },
     { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic','technician','sektor_miniboss'], enemyCount: 6 },
     { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade','tarkatan','priest_quan'], enemyCount: 6 },
     { id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio", story: "Sigues el rastro del mapa robado hasta un pantano tenebroso.", bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie','reptile_mutant','shadow_ghost'], enemyCount: 7 },
     { id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico", story: "Descubres que Kano no actuaba solo.", bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite','cyborg_upgrade','assassin_lk'], enemyCount: 6 },
-    { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan','sindel_priest','shadow_knight'], enemyCount: 5 },
+    { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan','sindel_priest','shadow_knight'], enemyCount: 12 },
     { id: 7, name: "Palacio de Shang Tsung", subtitle: "La Isla Maldita", boss: "Shang Tsung", bossTitle: "Hechicero Manipulador", story: "Llegas al corazon del complot. Shang Tsung te espera.", bgColor: [20, 15, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre','demon_quan','statue'], enemyCount: 6 },
     { id: 8, name: "El Netherrealm", subtitle: "El Origen del Frio", boss: "Noob Saibot", bossTitle: "Bi-Han Resucitado", story: "Tu hermano Bi-Han no descanso en paz. Ha sido resucitado como sombra.", bgColor: [25, 5, 5], groundColor: [50, 15, 10], enemyTypes: ['demon_lord','shadow_clone','hell_beast'], enemyCount: 7 }
 ];
@@ -390,14 +390,38 @@ function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
   return {name:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,damage:cfg.damage,dead:false,frozen:0};
 }
-function spawnEnemy(){
-  var lvl=LEVELS[currentLevel]; if(!lvl||enemiesDefeated>=lvl.enemyCount) return;
-  if(enemies.length>=4) return;
-  var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
-  var x=camera.x+canvas.width+60+Math.random()*100;
-  var laneY=laneTop+14+Math.random()*(laneBottom-laneTop-28);
-  var e=createEnemy(type,x,laneY); if(e) enemies.push(e);
+var currentWave=0, totalWaves=3, waveSize=4, waveInProgress=false;
+function spawnWave(){
+  var lvl=LEVELS[currentLevel]; if(!lvl) return;
+  if(enemiesDefeated>=lvl.enemyCount) return;
+  if(enemies.length>0) return; // espera a limpiar oleada
+  if(currentWave>=totalWaves) return;
+  var remaining=lvl.enemyCount - enemiesDefeated - enemies.length;
+  if(remaining<=0) return;
+  var toSpawn=Math.min(waveSize, remaining);
+  // si es ultima oleada, spawnea lo que quede (puede ser menos)
+  for(var i=0;i<toSpawn;i++){
+    var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
+    var x=camera.x+canvas.width+60+Math.random()*180 + i*40;
+    var laneY=laneTop+14+Math.random()*(laneBottom-laneTop-28);
+    var e=createEnemy(type,x,laneY); if(e) enemies.push(e);
+  }
+  currentWave++;
+  waveInProgress=true;
+  spawnText(camera.x+canvas.width/2, 100, 'OLEADA '+currentWave+'/'+totalWaves+' - '+toSpawn+' ENEMIGOS', '#facc15');
+  console.log('Wave '+currentWave+' spawned '+toSpawn);
 }
+function spawnEnemy(){
+  // legacy single spawn - ahora delega a wave
+  spawnWave();
+}
+function resetWaves(){
+  currentWave=0;
+  totalWaves=3;
+  waveSize=4;
+  waveInProgress=false;
+}
+
 function spawnBoss(){
   var lvl=LEVELS[currentLevel]; boss=createBoss(lvl.boss,camera.worldWidth-200,(laneTop+laneBottom)/2); bossSpawned=true;
   spawnText(camera.x+canvas.width/2,150,'! '+lvl.boss.toUpperCase()+' !','#ffd700');
@@ -652,7 +676,13 @@ function loop(time){
     if(player.x>camera.worldWidth-60) player.x=camera.worldWidth-60;
     
     updateCamera();
-    spawnTimer+=16; if(spawnTimer>3000){ spawnEnemy(); spawnTimer=0; }
+    // Sistema de oleadas: si no hay enemigos vivos, spawnea siguiente oleada
+    if(enemies.length===0 && !bossSpawned){
+      spawnTimer+=16;
+      if(spawnTimer>1800){ spawnWave(); spawnTimer=0; }
+    } else {
+      spawnTimer=0;
+    }
     if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount) spawnBoss();
     
     // Projectiles
@@ -764,7 +794,7 @@ function showMenu(id){
 function startLevel(idx){
   try{
     currentLevel=idx; camera.worldWidth=getWorldWidthForLevel(idx);
-    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; player.x=120; player.health=100; score=0;
+    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; enemiesDefeated=0; bossSpawned=false; if(typeof resetWaves==='function') resetWaves(); player.x=120; player.health=100; score=0;
     setupCanvas();
     var lvl=LEVELS[idx];
     document.getElementById('story-title').textContent=lvl.name;
@@ -772,7 +802,7 @@ function startLevel(idx){
     document.getElementById('story-text').textContent=lvl.story;
     document.getElementById('story-boss').textContent='JEFE: '+lvl.boss+' - '+lvl.bossTitle;
     document.getElementById('story-meta').textContent='Mundo: '+camera.worldWidth+'px • Enemigos: '+lvl.enemyCount+' • Tipos: '+lvl.enemyTypes.join(', ');
-    showMenu('story');
+    showMenu('story'); setTimeout(function(){ if(typeof spawnWave==='function'){ spawnWave(); } }, 400);
   }catch(e){ alert('Error nivel: '+e.message); }
 }
 function startGameInit(){
@@ -790,7 +820,7 @@ function forceStartGame(){ try{ currentState='PLAYING'; isPaused=false; document
 function pauseGame(){ if(currentState!=='PLAYING') return; isPaused=true; showMenu('pause'); document.getElementById('controls').style.display='none'; }
 function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; }); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; lastAnimTime=performance.now(); }
 function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
-function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; }
+function exitToMenu(){ currentState='MENU'; isPaused=false; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); }
 function showHowToPlay(){ showMenu('howtoplay'); }
 function checkUpdate(){ var el=document.getElementById('update-result'); if(!el) return; el.textContent='v1.80 CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias'; }
 
