@@ -173,7 +173,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.97";
+const GAME_VERSION="1.98";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -390,37 +390,58 @@ function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
   return {name:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,damage:cfg.damage,dead:false,frozen:0};
 }
-var currentWave=0, totalWaves=3, waveSize=4, waveInProgress=false;
+var currentWave=0, totalWaves=3, waveSize=5, waveInProgress=false;
+function getAliveCount(){ var c=0; for(var i=0;i<enemies.length;i++){ if(!enemies[i].dead) c++; } return c; }
 function spawnWave(){
   var lvl=LEVELS[currentLevel]; if(!lvl) return;
   if(enemiesDefeated>=lvl.enemyCount) return;
-  if(enemies.length>0) return; // espera a limpiar oleada
+  if(getAliveCount()>0) return;
   if(currentWave>=totalWaves) return;
-  var remaining=lvl.enemyCount - enemiesDefeated - enemies.length;
+  // limpiar muertos del array para no acumular
+  var aliveOnly=[]; for(var i=0;i<enemies.length;i++){ if(!enemies[i].dead) aliveOnly.push(enemies[i]); }
+  // si ya limpiamos, pero queremos contar solo derrotados, no importa
+  // calcular restantes reales
+  var remaining=lvl.enemyCount - enemiesDefeated;
   if(remaining<=0) return;
   var toSpawn=Math.min(waveSize, remaining);
-  // si es ultima oleada, spawnea lo que quede (puede ser menos)
+  // variación 4 o 5 aleatorio
+  if(remaining>=5 && Math.random()>0.5) toSpawn=5; else toSpawn=Math.min(4, remaining);
+  if(currentWave===totalWaves-1) toSpawn=remaining; // ultima oleada todo lo que quede
+
   for(var i=0;i<toSpawn;i++){
     var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
-    var x=camera.x+canvas.width+60+Math.random()*180 + i*40;
+    // LADO ALEATORIO: 50% adelante (derecha), 50% atrás (izquierda)
+    var fromFront = Math.random()>0.5;
+    var x;
+    if(fromFront){
+      x=camera.x+canvas.width+60+Math.random()*120 + i*35;
+    } else {
+      x=camera.x-80-Math.random()*120 - i*30;
+      if(x<20) x=20+Math.random()*80;
+    }
     var laneY=laneTop+14+Math.random()*(laneBottom-laneTop-28);
-    var e=createEnemy(type,x,laneY); if(e) enemies.push(e);
+    var e=createEnemy(type,x,laneY); 
+    if(e){ 
+      e.fromFront=fromFront;
+      // si viene de atrás, que camine hacia adelante
+      enemies.push(e); 
+    }
   }
   currentWave++;
   waveInProgress=true;
-  spawnText(camera.x+canvas.width/2, 100, 'OLEADA '+currentWave+'/'+totalWaves+' - '+toSpawn+' ENEMIGOS', '#facc15');
-  console.log('Wave '+currentWave+' spawned '+toSpawn);
+  if(typeof spawnText==='function') spawnText(camera.x+canvas.width/2, 110, 'OLEADA '+currentWave+'/'+totalWaves+' - '+toSpawn+' ENEMIGOS', '#facc15');
+  console.log('Wave '+currentWave+' spawned '+toSpawn+' (remaining '+remaining+')');
 }
-function spawnEnemy(){
-  // legacy single spawn - ahora delega a wave
-  spawnWave();
-}
+function spawnEnemy(){ spawnWave(); }
 function resetWaves(){
   currentWave=0;
   totalWaves=3;
-  waveSize=4;
+  waveSize=5;
   waveInProgress=false;
+  // limpiar array de muertos al reset
+  enemies=[];
 }
+
 
 function spawnBoss(){
   var lvl=LEVELS[currentLevel]; boss=createBoss(lvl.boss,camera.worldWidth-200,(laneTop+laneBottom)/2); bossSpawned=true;
@@ -677,13 +698,37 @@ function loop(time){
     
     updateCamera();
     // Sistema de oleadas: si no hay enemigos vivos, spawnea siguiente oleada
-    if(enemies.length===0 && !bossSpawned){
+    if(getAliveCount()===0 && !bossSpawned && enemiesDefeated < LEVELS[currentLevel].enemyCount){
       spawnTimer+=16;
-      if(spawnTimer>1800){ spawnWave(); spawnTimer=0; }
+      if(spawnTimer>1500){ 
+        // limpiar muertos del array
+        var filtered=[]; for(var j=0;j<enemies.length;j++){ if(!enemies[j].dead) filtered.push(enemies[j]); }
+        // si filtered vacio, en realidad ya limpiamos arriba, pero mantenemos defeated count
+        // No borramos si queremos historial, pero para siguiente oleada si
+        if(filtered.length===0){
+          // remover muertos fisicamente para que getAliveCount funcione, pero defeated ya cuenta
+          enemies=[];
+        }
+        spawnWave(); 
+        spawnTimer=0; 
+      }
     } else {
-      spawnTimer=0;
+      // si quedan vivos, reset timer pero no spawnear
+      if(getAliveCount()>0) spawnTimer=0;
+      else spawnTimer+=16;
     }
-    if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount) spawnBoss();
+    // Auto-limpiar enemigos muertos que llevan tiempo muertos para no acumular
+    for(var ei=enemies.length-1; ei>=0; ei--){
+      if(enemies[ei].dead){
+        if(!enemies[ei].deadTimer) enemies[ei].deadTimer=0;
+        enemies[ei].deadTimer+=16;
+        if(enemies[ei].deadTimer>1200){
+          // lo sacamos pero mantenemos defeated ya contado
+          enemies.splice(ei,1);
+        }
+      }
+    }
+    if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount && getAliveCount()===0){ spawnBoss(); }
     
     // Projectiles
     for(var i=projectiles.length-1;i>=0;i--){
