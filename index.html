@@ -34,6 +34,23 @@ body{background:#050a14;display:flex;justify-content:center;align-items:center;h
 .logo{font-weight:900;letter-spacing:5px;color:#7ef0ff;text-shadow:0 0 18px #0ff, 0 0 32px rgba(126,240,255,0.35);font-size:22px}
 .badge{background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;font-weight:900;font-size:11px;padding:6px 14px;border-radius:9999px;letter-spacing:1px;box-shadow:0 0 18px rgba(126,240,255,0.5)}
 #canvas-wrapper{flex:1;position:relative;overflow:hidden;background:#0a0e1a; min-height:300px; pointer-events:auto}
+
+#wave-arrow{
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  z-index:40; display:none; flex-direction:column; align-items:center;
+  pointer-events:none;
+}
+#wave-arrow .arrow-icon{
+  font-size:56px; color:#facc15; text-shadow:0 0 20px #facc15, 0 0 40px #ffaa00;
+  animation: arrowBounce 0.8s ease-in-out infinite;
+}
+#wave-arrow .arrow-text{
+  background:rgba(0,0,0,0.7); border:1px solid #facc15; color:#facc15;
+  padding:6px 14px; border-radius:20px; font-weight:900; letter-spacing:2px;
+  font-size:12px; margin-top:8px;
+}
+@keyframes arrowBounce{0%,100%{transform:translateX(0)}50%{transform:translateX(18px)}}
+
 canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #hud{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:8px;pointer-events:none;z-index:30}
 .hud-box{background:rgba(5,10,20,0.72);border:1px solid rgba(126,240,255,0.18);border-radius:14px;padding:8px 14px;backdrop-filter:blur(10px);min-width:80px}
@@ -72,7 +89,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">66</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
-<canvas id="gameCanvas"></canvas>
+<canvas id="gameCanvas"></canvas><div id="wave-arrow"><div class="arrow-icon">➡️</div><div class="arrow-text">AVANZA</div></div>
 <div id="hud" style="display:none">
 <div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:4px;background:rgba(255,255,255,0.12);border-radius:4px;margin-top:4px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff);border-radius:4px"></div></div></div>
 <div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/8</div><div style="font-size:9px;color:rgba(255,255,255,0.45)" id="hud-progress">0%</div></div>
@@ -173,7 +190,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.98";
+const GAME_VERSION="2.01";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -339,7 +356,7 @@ const ENEMY_CONFIGS = {
     hell_beast: { name: "Bestia del Infierno", health: 130, damage: 18, speed: 0.9, color: '#FF4500', height: 70, width: 54 }
 };
 const BOSS_CONFIGS = {
-    "Kano": { health: 220, damage: 8, speed: 1.2, color: '#FFD700', height: 80, width: 52 },
+    "Kano": { health: 180, damage: 8, speed: 1.2, color: '#FFD700', height: 80, width: 52 },
     "Sektor": { health: 300, damage: 10, speed: 1.0, color: '#DC143C', height: 85, width: 54 },
     "Baraka": { health: 380, damage: 12, speed: 1.5, color: '#8B0000', height: 78, width: 48 },
     "Reptile": { health: 340, damage: 10, speed: 1.8, color: '#228B22', height: 75, width: 46 },
@@ -390,47 +407,59 @@ function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
   return {name:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,damage:cfg.damage,dead:false,frozen:0};
 }
-var currentWave=0, totalWaves=3, waveSize=5, waveInProgress=false;
+var currentWave=0, totalWaves=3, waveSize=5, waveInProgress=false, nextWaveTriggerX=0, waitingForAdvance=false;
 function getAliveCount(){ var c=0; for(var i=0;i<enemies.length;i++){ if(!enemies[i].dead) c++; } return c; }
+function showWaveArrow(show, text){
+  var el=document.getElementById('wave-arrow');
+  if(!el) return;
+  if(show){
+    el.style.display='flex';
+    if(text) el.querySelector('.arrow-text').textContent=text;
+  } else {
+    el.style.display='none';
+  }
+}
 function spawnWave(){
   var lvl=LEVELS[currentLevel]; if(!lvl) return;
   if(enemiesDefeated>=lvl.enemyCount) return;
   if(getAliveCount()>0) return;
   if(currentWave>=totalWaves) return;
-  // limpiar muertos del array para no acumular
-  var aliveOnly=[]; for(var i=0;i<enemies.length;i++){ if(!enemies[i].dead) aliveOnly.push(enemies[i]); }
-  // si ya limpiamos, pero queremos contar solo derrotados, no importa
-  // calcular restantes reales
   var remaining=lvl.enemyCount - enemiesDefeated;
   if(remaining<=0) return;
   var toSpawn=Math.min(waveSize, remaining);
-  // variación 4 o 5 aleatorio
   if(remaining>=5 && Math.random()>0.5) toSpawn=5; else toSpawn=Math.min(4, remaining);
-  if(currentWave===totalWaves-1) toSpawn=remaining; // ultima oleada todo lo que quede
+  if(currentWave===totalWaves-1) toSpawn=remaining;
+
+  // ZONA DE SPAWN PROGRESIVA: cada oleada mas adelante
+  var baseOffset = 200 + currentWave*350; // oleada 0=200, 1=550, 2=900 px adelante del player
+  var spawnCenterX = player.x + baseOffset;
+  if(spawnCenterX < camera.worldWidth-300) {} else { spawnCenterX = camera.worldWidth-400; }
 
   for(var i=0;i<toSpawn;i++){
     var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
-    // LADO ALEATORIO: 50% adelante (derecha), 50% atrás (izquierda)
-    var fromFront = Math.random()>0.5;
+    // 70% adelante, 30% atras (para que no sea frustrante, pero si sorpresa)
+    var fromFront = Math.random()>0.3;
     var x;
     if(fromFront){
-      x=camera.x+canvas.width+60+Math.random()*120 + i*35;
+      x=spawnCenterX + Math.random()*160 + i*40;
     } else {
-      x=camera.x-80-Math.random()*120 - i*30;
-      if(x<20) x=20+Math.random()*80;
+      x=player.x - 120 - Math.random()*80 - i*20;
+      if(x<20) x=20+Math.random()*60;
     }
     var laneY=laneTop+14+Math.random()*(laneBottom-laneTop-28);
     var e=createEnemy(type,x,laneY); 
     if(e){ 
       e.fromFront=fromFront;
-      // si viene de atrás, que camine hacia adelante
       enemies.push(e); 
     }
   }
   currentWave++;
   waveInProgress=true;
+  waitingForAdvance=false;
+  showWaveArrow(false);
+  nextWaveTriggerX=0;
   if(typeof spawnText==='function') spawnText(camera.x+canvas.width/2, 110, 'OLEADA '+currentWave+'/'+totalWaves+' - '+toSpawn+' ENEMIGOS', '#facc15');
-  console.log('Wave '+currentWave+' spawned '+toSpawn+' (remaining '+remaining+')');
+  console.log('Wave '+currentWave+' spawned '+toSpawn+' at '+spawnCenterX);
 }
 function spawnEnemy(){ spawnWave(); }
 function resetWaves(){
@@ -438,9 +467,23 @@ function resetWaves(){
   totalWaves=3;
   waveSize=5;
   waveInProgress=false;
-  // limpiar array de muertos al reset
+  nextWaveTriggerX=0;
+  waitingForAdvance=false;
   enemies=[];
+  showWaveArrow(false);
 }
+function prepareNextWaveAdvance(){
+  if(waitingForAdvance) return;
+  if(currentWave>=totalWaves) return;
+  if(enemiesDefeated>=LEVELS[currentLevel].enemyCount) return;
+  waitingForAdvance=true;
+  nextWaveTriggerX = player.x + 350 + currentWave*200;
+  // clamp
+  if(nextWaveTriggerX>camera.worldWidth-200) nextWaveTriggerX=camera.worldWidth-300;
+  showWaveArrow(true, 'AVANZA - OLEADA '+(currentWave+1)+'/'+totalWaves+' ➡️');
+  if(typeof spawnText==='function') spawnText(player.x, playerLaneY-60, 'AVANZA PARA SIGUIENTE OLEADA', '#facc15');
+}
+
 
 
 function spawnBoss(){
@@ -558,18 +601,41 @@ function drawPlayer(time){
             player.punchTimer=0;
           } else if(player.frame>=2 && !player.attackHit){
             player.attackHit=true;
-            enemies.forEach(function(en){
-              if(en.dead) return;
-              var dx=en.x-player.x; var dy=Math.abs((en.y||playerLaneY)-playerLaneY);
-              if(Math.abs(dx)<140 && dy<75){
-                en.health-=15;
-                en.hitTimer=18;
-                en.frozen=0;
-                en.x += (player.facingRight?1:-1)*18;
-                if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff');
-                if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-20, '+15','#4ecca3'); }
+            var hits=0;
+            var candidates=[];
+            for(var i=0;i<enemies.length;i++){
+              var en=enemies[i]; if(en.dead) continue;
+              var dx=en.x-player.x;
+              var enY=en.laneY||en.y||playerLaneY;
+              var dy=Math.abs(enY-playerLaneY);
+              var inFront = (player.facingRight && dx>5 && dx<110) || (!player.facingRight && dx<-5 && dx>-110);
+              if(inFront && dy<60) candidates.push({en:en, dist:Math.abs(dx)+dy});
+            }
+            candidates.sort(function(a,b){return a.dist-b.dist;});
+            for(var ci=0; ci<Math.min(2, candidates.length); ci++){
+              var en=candidates[ci].en;
+              en.health-=15;
+              en.hitTimer=12;
+              en.frozen=0;
+              en.x += (player.facingRight?1:-1)*12;
+              if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff');
+              if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; }
+              hits++;
+            }
+            // BOSS DANIO PUNCH
+            if(boss && !boss.dead){
+              var bdx=boss.x-player.x;
+              var bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY);
+              var bFront = (player.facingRight && bdx>0 && bdx<130) || (!player.facingRight && bdx<0 && bdx>-130);
+              if(bFront && bdy<70){
+                boss.health-=12;
+                boss.hitTimer=10;
+                boss.frozen=0;
+                boss.x += (player.facingRight?1:-1)*6;
+                if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'PUM BOSS 12','#ffcc00');
+                if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; }
               }
-            });
+            }
           }
         }
       } else if(anim==='kick'){
@@ -591,20 +657,39 @@ function drawPlayer(time){
             player.kickTimer=0;
           } else if(player.frame>=1 && !player.kickHit){
             player.kickHit=true;
-            enemies.forEach(function(en){
-              if(en.dead) return;
-              var dx=en.x-player.x; var dy=Math.abs((en.y||playerLaneY)-playerLaneY);
-              if(Math.abs(dx)<165 && dy<85){
-                en.health-=25;
-                en.hitTimer=20;
-                en.frozen=0;
-                en.x += (player.facingRight?1:-1)*28;
-                if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15');
-                if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-20, '+20','#facc15'); }
+            var candsK=[];
+            for(var i=0;i<enemies.length;i++){
+              var en=enemies[i]; if(en.dead) continue;
+              var dx=en.x-player.x;
+              var enY=en.laneY||en.y||playerLaneY;
+              var dy=Math.abs(enY-playerLaneY);
+              var inFrontK = (player.facingRight && dx>10 && dx<135) || (!player.facingRight && dx<-10 && dx>-135);
+              if(inFrontK && dy<65) candsK.push({en:en, dist:Math.abs(dx)+dy});
+            }
+            candsK.sort(function(a,b){return a.dist-b.dist;});
+            for(var ci=0; ci<Math.min(2, candsK.length); ci++){
+              var en=candsK[ci].en;
+              en.health-=25;
+              en.hitTimer=14;
+              en.frozen=0;
+              en.x += (player.facingRight?1:-1)*18;
+              if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15');
+              if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; }
+            }
+            if(boss && !boss.dead){
+              var bdx=boss.x-player.x;
+              var bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY);
+              var bFrontK = (player.facingRight && bdx>0 && bdx<145) || (!player.facingRight && bdx<0 && bdx>-145);
+              if(bFrontK && bdy<75){
+                boss.health-=22;
+                boss.hitTimer=12;
+                boss.frozen=0;
+                boss.x += (player.facingRight?1:-1)*10;
+                if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK BOSS 22','#ff7700');
+                if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; }
               }
-            });
+            }
           }
-        }
       } else if(anim==='jump'){
         if(player.grounded){ f=(player.landingTimer>0)?2:0; } else { f=(player.vy < -0.5)?0:1; }
         player.frame=f;
@@ -697,37 +782,39 @@ function loop(time){
     if(player.x>camera.worldWidth-60) player.x=camera.worldWidth-60;
     
     updateCamera();
-    // Sistema de oleadas: si no hay enemigos vivos, spawnea siguiente oleada
-    if(getAliveCount()===0 && !bossSpawned && enemiesDefeated < LEVELS[currentLevel].enemyCount){
-      spawnTimer+=16;
-      if(spawnTimer>1500){ 
-        // limpiar muertos del array
-        var filtered=[]; for(var j=0;j<enemies.length;j++){ if(!enemies[j].dead) filtered.push(enemies[j]); }
-        // si filtered vacio, en realidad ya limpiamos arriba, pero mantenemos defeated count
-        // No borramos si queremos historial, pero para siguiente oleada si
-        if(filtered.length===0){
-          // remover muertos fisicamente para que getAliveCount funcione, pero defeated ya cuenta
-          enemies=[];
-        }
-        spawnWave(); 
-        spawnTimer=0; 
-      }
-    } else {
-      // si quedan vivos, reset timer pero no spawnear
-      if(getAliveCount()>0) spawnTimer=0;
-      else spawnTimer+=16;
-    }
-    // Auto-limpiar enemigos muertos que llevan tiempo muertos para no acumular
+    // Sistema de oleadas con avance
+    // Auto-limpiar muertos
     for(var ei=enemies.length-1; ei>=0; ei--){
       if(enemies[ei].dead){
         if(!enemies[ei].deadTimer) enemies[ei].deadTimer=0;
         enemies[ei].deadTimer+=16;
-        if(enemies[ei].deadTimer>1200){
-          // lo sacamos pero mantenemos defeated ya contado
+        if(enemies[ei].deadTimer>1000){
           enemies.splice(ei,1);
         }
       }
     }
+
+    if(!bossSpawned && getAliveCount()===0 && enemiesDefeated < LEVELS[currentLevel].enemyCount){
+      if(!waitingForAdvance){
+        // Primera vez que limpia, prepara flecha
+        prepareNextWaveAdvance();
+        spawnTimer=0;
+      } else {
+        // Esperando que el jugador avance
+        showWaveArrow(true, 'AVANZA - OLEADA '+(currentWave+1)+'/'+totalWaves+' ➡️');
+        // Si el jugador avanzo lo suficiente, spawnea
+        if(player.x >= nextWaveTriggerX - 80){
+          spawnWave();
+          spawnTimer=0;
+        }
+      }
+    } else if(getAliveCount()>0){
+      // Hay enemigos, oculta flecha y resetea espera
+      showWaveArrow(false);
+      waitingForAdvance=false;
+      spawnTimer=0;
+    }
+
     if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount && getAliveCount()===0){ spawnBoss(); }
     
     // Projectiles
