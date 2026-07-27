@@ -173,7 +173,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.89";
+const GAME_VERSION="1.92";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -186,7 +186,7 @@ const SPRITE_CONFIG = {
   walk: { file: "walk.png", frames: 4, speed:130, scale: 1.1, anchorY: 40, fallbackColor: "#7ef0ff", desc: "Walk 4F 360x823 HQ desde /assets/sprites/player/walk.png" },
   jump: { file: "jump.png", frames: 3, speed: 90, scale: 1.20, anchorY: 58, fallbackColor: "#a0e6ff", desc: "Salto 3F - 2 aire + 1 suelo" },
   punch: { file: "punch.png", frames: 4, speed: 60, scale: 1.1, anchorY: 38, fallbackColor: "#4ecca3", desc: "Puño - 3 frames" },
-  kick: { file: "kick_subzero.png", frames: 4, speed: 70, scale: 1.0, anchorY: 0, fallbackColor: "#facc15", desc: "Patada - 4 frames" }
+  kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" }
 };
 const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
@@ -366,6 +366,7 @@ const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext(
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
+function tryKick(){ if(!player.grounded) return; if(player.isPunching || player.isKicking) return; player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
 function tryPunch(){ if(!player.grounded){ /* permitir en aire? no */ return; } if(player.isPunching) return; player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
 function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
 function setupCanvas(){
@@ -408,6 +409,7 @@ function drawPlayer(time){
 
   var anim=player.anim||'idle';
   if(player.isPunching) anim='punch';
+  else if(player.isKicking) anim='kick';
   else if(!player.grounded) anim='jump';
   else if(player.grounded && (keys.right||keys.left)) anim='walk';
   var cfg=SPRITE_CONFIG[anim]||SPRITE_CONFIG.idle;
@@ -465,6 +467,9 @@ function drawPlayer(time){
       } else if(anim==='punch'){
         targetW = Math.round(110 * sc * animScale);
         targetH = Math.round(125 * sc * animScale);
+      } else if(anim==='kick'){
+        targetW = Math.round(130 * sc * animScale);
+        targetH = Math.round(130 * sc * animScale);
       } else {
         var baseW=baseDrawWidth*animScale;
         targetW=Math.round(baseW*sc);
@@ -490,13 +495,11 @@ function drawPlayer(time){
         f=0; sx=0; sy=0;
         player.frame=0; player.frameTime=0;
       } else if(anim==='punch'){
-        // 4 FRAMES EXACTOS - HORIZONTAL FORZADO
         totalFrames=4;
         sw=Math.floor(sheetW/4);
         sh=sheetH;
         if(f<0) f=0; if(f>=4) f=3;
         sx=f*sw; sy=0;
-        // Avance de frames
         if(!player.frameTime) player.frameTime=0;
         player.frameTime+=16;
         if(player.frameTime>cfg.speed){
@@ -521,6 +524,36 @@ function drawPlayer(time){
             });
           }
         }
+      } else if(anim==='kick'){
+        totalFrames=4;
+        sw=Math.floor(sheetW/4);
+        sh=sheetH;
+        if(f<0) f=0; if(f>=4) f=3;
+        sx=f*sw; sy=0;
+        if(!player.frameTime) player.frameTime=0;
+        player.frameTime+=16;
+        if(player.frameTime>cfg.speed){
+          player.frame++;
+          player.frameTime=0;
+          if(player.frame>=4){
+            player.frame=0;
+            player.anim='idle';
+            player.isKicking=false;
+            player.kickHit=false;
+            player.kickTimer=0;
+          } else if(player.frame>=1 && !player.kickHit){
+            player.kickHit=true;
+            enemies.forEach(function(en){
+              if(!en.alive) return;
+              var dx=en.x-player.x; var dy=Math.abs((en.y||playerLaneY)-playerLaneY);
+              if(Math.abs(dx)<150 && dy<80){
+                en.health-=50;
+                en.hitTimer=16;
+                if(en.health<=0){ en.alive=false; if(typeof addScore==='function') addScore(20); }
+              }
+            });
+          }
+        }
       } else if(anim==='jump'){
         if(player.grounded){ f=(player.landingTimer>0)?2:0; } else { f=(player.vy < -0.5)?0:1; }
         player.frame=f;
@@ -533,6 +566,7 @@ function drawPlayer(time){
       }
 
       ctx.save();
+
       ctx.imageSmoothingEnabled=false;
       if(!player.facingRight){ 
         ctx.scale(-1,1); 
@@ -762,12 +796,20 @@ if(bp){
   bp.addEventListener('mousedown', doPunch);
   bp.addEventListener('click', doPunch);
 }
+var bk=document.getElementById('btn-kick');
+if(bk){
+  var doKick=function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } tryKick(); };
+  bk.addEventListener('touchstart', doKick, {passive:false});
+  bk.addEventListener('mousedown', doKick);
+  bk.addEventListener('click', doKick);
+}
 var bj=document.getElementById('btn-jump');
 function handleJump(e){ e.preventDefault(); tryJump(); }
 bj.addEventListener('touchstart', handleJump, {passive:false});
 bj.addEventListener('mousedown', handleJump);
 bj.addEventListener('click',function(e){ e.preventDefault(); tryJump(); });
 document.addEventListener('keydown',function(e){ if((e.code==='KeyJ' || e.key==='j' || e.key==='J') && !e.repeat){ e.preventDefault(); tryPunch(); return; }
+  if((e.code==='KeyK' || e.key==='k' || e.key==='K') && !e.repeat){ e.preventDefault(); tryKick(); return; }
 
   if(e.key==='d'||e.key==='ArrowRight') keys.right=true;
   if(e.key==='a'||e.key==='ArrowLeft') keys.left=true;
