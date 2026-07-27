@@ -173,7 +173,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="1.92";
+const GAME_VERSION="1.96";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -313,40 +313,40 @@ const LEVELS = [
     { id: 8, name: "El Netherrealm", subtitle: "El Origen del Frio", boss: "Noob Saibot", bossTitle: "Bi-Han Resucitado", story: "Tu hermano Bi-Han no descanso en paz. Ha sido resucitado como sombra.", bgColor: [25, 5, 5], groundColor: [50, 15, 10], enemyTypes: ['demon_lord','shadow_clone','hell_beast'], enemyCount: 7 }
 ];
 const ENEMY_CONFIGS = {
-    thug: { name: "Maton", health: 30, damage: 5, speed: 0.8, color: '#8B4513', height: 50, width: 40 },
-    thug_gun: { name: "Maton Armado", health: 25, damage: 8, speed: 0.5, color: '#556B2F', height: 50, width: 40 },
-    ninja_renegade: { name: "Ninja Renegado", health: 40, damage: 6, speed: 1.2, color: '#2F4F4F', height: 55, width: 38 },
+    thug: { name: "Maton", health: 60, damage: 5, speed: 0.8, color: '#8B4513', height: 50, width: 40 },
+    thug_gun: { name: "Maton Armado", health: 50, damage: 8, speed: 0.5, color: '#556B2F', height: 50, width: 40 },
+    ninja_renegade: { name: "Ninja Renegado", health: 70, damage: 6, speed: 1.2, color: '#2F4F4F', height: 55, width: 38 },
     cyborg_basic: { name: "Ciborg LK", health: 60, damage: 7, speed: 0.6, color: '#708090', height: 60, width: 44 },
-    technician: { name: "Tecnico", health: 20, damage: 4, speed: 0.7, color: '#4682B4', height: 48, width: 36 },
+    technician: { name: "Tecnico", health: 50, damage: 4, speed: 0.7, color: '#4682B4', height: 48, width: 36 },
     sektor_miniboss: { name: "Sektor Mini", health: 100, damage: 10, speed: 0.9, color: '#DC143C', height: 65, width: 46 },
-    monk_renegade: { name: "Monje Corrupto", health: 45, damage: 6, speed: 0.9, color: '#8B6914', height: 52, width: 40 },
-    tarkatan: { name: "Tarkatano", health: 55, damage: 10, speed: 1.3, color: '#8B0000', height: 58, width: 42 },
-    priest_quan: { name: "Sacerdote Oscuro", health: 35, damage: 8, speed: 0.6, color: '#4B0082', height: 50, width: 38 },
+    monk_renegade: { name: "Monje Corrupto", health: 65, damage: 6, speed: 0.9, color: '#8B6914', height: 52, width: 40 },
+    tarkatan: { name: "Tarkatano", health: 75, damage: 10, speed: 1.3, color: '#8B0000', height: 58, width: 42 },
+    priest_quan: { name: "Sacerdote Oscuro", health: 60, damage: 8, speed: 0.6, color: '#4B0082', height: 50, width: 38 },
     zombie: { name: "Zombi", health: 70, damage: 8, speed: 0.4, color: '#556B2F', height: 55, width: 42 },
-    reptile_mutant: { name: "Reptil Mutante", health: 50, damage: 7, speed: 1.1, color: '#228B22', height: 52, width: 40 },
-    shadow_ghost: { name: "Sombra Espectral", health: 40, damage: 9, speed: 1.0, color: '#483D8B', height: 60, width: 36 },
+    reptile_mutant: { name: "Reptil Mutante", health: 70, damage: 7, speed: 1.1, color: '#228B22', height: 52, width: 40 },
+    shadow_ghost: { name: "Sombra Espectral", health: 60, damage: 9, speed: 1.0, color: '#483D8B', height: 60, width: 36 },
     soldier_elite: { name: "Soldado Elite", health: 65, damage: 9, speed: 0.8, color: '#2F4F4F', height: 58, width: 44 },
     cyborg_upgrade: { name: "Ciborg MK-II", health: 80, damage: 10, speed: 0.7, color: '#696969', height: 62, width: 46 },
-    assassin_lk: { name: "Asesino LK", health: 50, damage: 12, speed: 1.4, color: '#191970', height: 55, width: 40 },
+    assassin_lk: { name: "Asesino LK", health: 75, damage: 12, speed: 1.4, color: '#191970', height: 55, width: 40 },
     shokan: { name: "Guerrero Shokan", health: 100, damage: 14, speed: 0.7, color: '#8B4513', height: 80, width: 55 },
-    sindel_priest: { name: "Sacerdotisa", health: 45, damage: 10, speed: 0.9, color: '#9370DB', height: 55, width: 40 },
+    sindel_priest: { name: "Sacerdotisa", health: 65, damage: 10, speed: 0.9, color: '#9370DB', height: 55, width: 40 },
     shadow_knight: { name: "Caballero Sombra", health: 85, damage: 12, speed: 0.8, color: '#2C2C2C', height: 65, width: 48 },
-    spectre: { name: "Espectro", health: 60, damage: 11, speed: 1.0, color: '#7B68EE', height: 58, width: 38 },
+    spectre: { name: "Espectro", health: 75, damage: 11, speed: 1.0, color: '#7B68EE', height: 58, width: 38 },
     demon_quan: { name: "Demonio", health: 80, damage: 13, speed: 0.8, color: '#DC143C', height: 65, width: 44 },
     statue: { name: "Estatua Animada", health: 120, damage: 15, speed: 0.5, color: '#808080', height: 75, width: 50 },
     demon_lord: { name: "Senor Demonio", health: 110, damage: 16, speed: 0.7, color: '#8B0000', height: 75, width: 50 },
-    shadow_clone: { name: "Clon de Sombra", health: 50, damage: 12, speed: 1.3, color: '#000000', height: 58, width: 40 },
+    shadow_clone: { name: "Clon de Sombra", health: 70, damage: 12, speed: 1.3, color: '#000000', height: 58, width: 40 },
     hell_beast: { name: "Bestia del Infierno", health: 130, damage: 18, speed: 0.9, color: '#FF4500', height: 70, width: 54 }
 };
 const BOSS_CONFIGS = {
-    "Kano": { health: 150, damage: 8, speed: 1.2, color: '#FFD700', height: 80, width: 52 },
-    "Sektor": { health: 200, damage: 10, speed: 1.0, color: '#DC143C', height: 85, width: 54 },
-    "Baraka": { health: 250, damage: 12, speed: 1.5, color: '#8B0000', height: 78, width: 48 },
-    "Reptile": { health: 220, damage: 10, speed: 1.8, color: '#228B22', height: 75, width: 46 },
-    "Cyrax": { health: 280, damage: 14, speed: 1.3, color: '#FFD700', height: 82, width: 52 },
-    "Goro": { health: 400, damage: 18, speed: 0.8, color: '#8B4513', height: 110, width: 72 },
-    "Shang Tsung": { health: 350, damage: 15, speed: 1.0, color: '#4B0082', height: 85, width: 54 },
-    "Noob Saibot": { health: 500, damage: 20, speed: 1.4, color: '#000000', height: 85, width: 54 }
+    "Kano": { health: 220, damage: 8, speed: 1.2, color: '#FFD700', height: 80, width: 52 },
+    "Sektor": { health: 300, damage: 10, speed: 1.0, color: '#DC143C', height: 85, width: 54 },
+    "Baraka": { health: 380, damage: 12, speed: 1.5, color: '#8B0000', height: 78, width: 48 },
+    "Reptile": { health: 340, damage: 10, speed: 1.8, color: '#228B22', height: 75, width: 46 },
+    "Cyrax": { health: 420, damage: 14, speed: 1.3, color: '#FFD700', height: 82, width: 52 },
+    "Goro": { health: 600, damage: 18, speed: 0.8, color: '#8B4513', height: 110, width: 72 },
+    "Shang Tsung": { health: 520, damage: 15, speed: 1.0, color: '#4B0082', height: 85, width: 54 },
+    "Noob Saibot": { health: 750, damage: 20, speed: 1.4, color: '#000000', height: 85, width: 54 }
 };
 
 // Core
@@ -514,12 +514,15 @@ function drawPlayer(time){
           } else if(player.frame>=2 && !player.attackHit){
             player.attackHit=true;
             enemies.forEach(function(en){
-              if(!en.alive) return;
+              if(en.dead) return;
               var dx=en.x-player.x; var dy=Math.abs((en.y||playerLaneY)-playerLaneY);
-              if(Math.abs(dx)<130 && dy<70){
-                en.health-=40;
-                en.hitTimer=14;
-                if(en.health<=0){ en.alive=false; if(typeof addScore==='function') addScore(15); }
+              if(Math.abs(dx)<140 && dy<75){
+                en.health-=15;
+                en.hitTimer=18;
+                en.frozen=0;
+                en.x += (player.facingRight?1:-1)*18;
+                if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff');
+                if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-20, '+15','#4ecca3'); }
               }
             });
           }
@@ -544,12 +547,15 @@ function drawPlayer(time){
           } else if(player.frame>=1 && !player.kickHit){
             player.kickHit=true;
             enemies.forEach(function(en){
-              if(!en.alive) return;
+              if(en.dead) return;
               var dx=en.x-player.x; var dy=Math.abs((en.y||playerLaneY)-playerLaneY);
-              if(Math.abs(dx)<150 && dy<80){
-                en.health-=50;
-                en.hitTimer=16;
-                if(en.health<=0){ en.alive=false; if(typeof addScore==='function') addScore(20); }
+              if(Math.abs(dx)<165 && dy<85){
+                en.health-=25;
+                en.hitTimer=20;
+                en.frozen=0;
+                en.x += (player.facingRight?1:-1)*28;
+                if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15');
+                if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-20, '+20','#facc15'); }
               }
             });
           }
@@ -605,20 +611,29 @@ function loop(time){
       }
     } else if(player.landingTimer>0){ player.landingTimer-=16; }
 
-    // --- PUNCH RESET FALLBACK (por si el sprite falla, no se quede trabado) ---
+    // --- PUNCH & KICK RESET FALLBACK ---
     if(player.isPunching){
       if(!player.punchTimer) player.punchTimer=0;
       player.punchTimer+=16;
-      if(player.punchTimer>400){ // 4 frames * 75ms = 300 + margen
+      if(player.punchTimer>400){
         player.isPunching=false;
         player.anim='idle';
         player.frame=0;
         player.punchTimer=0;
         player.attackHit=false;
       }
-    } else {
-      player.punchTimer=0;
-    }
+    } else { player.punchTimer=0; }
+    if(player.isKicking){
+      if(!player.kickTimer) player.kickTimer=0;
+      player.kickTimer+=16;
+      if(player.kickTimer>450){
+        player.isKicking=false;
+        player.anim='idle';
+        player.frame=0;
+        player.kickTimer=0;
+        player.kickHit=false;
+      }
+    } else { player.kickTimer=0; }
 
     var moving=false;
     if(keys.right){ player.x+=player.speed; player.facingRight=true; moving=true; }
@@ -627,7 +642,9 @@ function loop(time){
       if(keys.up){ playerLaneY=Math.max(laneTop,playerLaneY-player.speed*0.6); moving=true; }
       if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
     }
-    if(!player.grounded){ player.anim='jump'; }
+    if(player.isPunching){ player.anim='punch'; }
+    else if(player.isKicking){ player.anim='kick'; }
+    else if(!player.grounded){ player.anim='jump'; }
     else if(player.landingTimer>0){ player.anim='jump'; }
     else if(moving){ player.anim='walk'; } else { player.anim='idle'; }
     // up/down ya manejado arriba con walk anim
