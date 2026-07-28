@@ -319,6 +319,30 @@ const ENEMY_SPRITE_CONFIG = {
     hit: { file: "thug/hit.png", frames: 1, speed: 200, scale: 0.88 },
     dead: { file: "thug/dead.png", frames: 1, speed: 200, scale: 0.88 },
     frozen: { file: "thug/frozen.png", frames: 1, speed: 200, scale: 1.0 }
+  },
+  thug_gun: {
+    idle: { file: "thug_gun/idle.png", frames: 1, speed: 140, scale: 0.88 },
+    walk: { file: "thug_gun/walk.png", frames: 4, speed: 160, scale: 0.88 },
+    attack: { file: "thug_gun/attack.png", frames: 3, speed: 100, scale: 0.88 },
+    hit: { file: "thug_gun/hit.png", frames: 1, speed: 200, scale: 0.88 },
+    dead: { file: "thug_gun/dead.png", frames: 1, speed: 200, scale: 0.88 },
+    frozen: { file: "thug_gun/frozen.png", frames: 1, speed: 200, scale: 1.0 }
+  },
+  ninja_renegade: {
+    idle: { file: "ninja_renegade/idle.png", frames: 1, speed: 140, scale: 0.85 },
+    walk: { file: "ninja_renegade/walk.png", frames: 4, speed: 160, scale: 0.85 },
+    attack: { file: "ninja_renegade/attack.png", frames: 3, speed: 100, scale: 0.85 },
+    hit: { file: "ninja_renegade/hit.png", frames: 1, speed: 200, scale: 0.85 },
+    dead: { file: "ninja_renegade/dead.png", frames: 1, speed: 200, scale: 0.85 },
+    frozen: { file: "ninja_renegade/frozen.png", frames: 1, speed: 200, scale: 0.95 }
+  },
+  tarkatan: {
+    idle: { file: "tarkatan/idle.png", frames: 1, speed: 140, scale: 0.9 },
+    walk: { file: "tarkatan/walk.png", frames: 4, speed: 160, scale: 0.9 },
+    attack: { file: "tarkatan/attack.png", frames: 3, speed: 100, scale: 0.9 },
+    hit: { file: "tarkatan/hit.png", frames: 1, speed: 200, scale: 0.9 },
+    dead: { file: "tarkatan/dead.png", frames: 1, speed: 200, scale: 0.9 },
+    frozen: { file: "tarkatan/frozen.png", frames: 1, speed: 200, scale: 1.05 }
   }
 };
 const enemySprites = {};
@@ -1081,12 +1105,12 @@ function loop(time){
       if(e.dead && (e.deadTimer||0)>900) continue; // deja ver anim dead 900ms
       var ex=Math.round(e.x-camera.x); if(ex<-80||ex>canvas.width+80) continue;
       var ey = e.laneY;
-      // THUG CON SPRITE - INTEGRADO FROZEN.PNG v2.31 FINAL
-      if(e.type==='thug' && enemySprites.thug){
+      // SPRITES ENEMIGOS GENERICO - v2.33 - soporta thug, thug_gun, ninja, etc
+      if(enemySprites[e.type]){
         var eAnim = getEnemyAnim(e); // dead > frozen > hit > attack > walk > idle
-        var eCfg = (ENEMY_SPRITE_CONFIG.thug[eAnim]||ENEMY_SPRITE_CONFIG.thug.idle);
-        var eSprite = enemySprites.thug[eAnim] || enemySprites.thug.idle;
-        var statusKey = 'thug_'+eAnim;
+        var eCfg = (ENEMY_SPRITE_CONFIG[e.type][eAnim]||ENEMY_SPRITE_CONFIG[e.type].idle);
+        var eSprite = enemySprites[e.type][eAnim] || enemySprites[e.type].idle;
+        var statusKey = e.type+'_'+eAnim;
         var useESprite = eSprite && eSprite.complete && eSprite.naturalWidth>10 && (enemySpriteStatus[statusKey]==='ok' || enemySpriteStatus[statusKey]==='loading');
         if(useESprite){
           try{
@@ -1140,7 +1164,7 @@ function loop(time){
             ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, ey-46, e.width, 3);
             ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, ey-46, e.width*(e.health/e.maxHealth), 3);
             continue;
-          }catch(err){ console.log('thug draw err',err); }
+          }catch(err){ console.log(e.type+' draw err',err); }
         }
       }
       ctx.fillStyle=e.frozen>0?'#7ef0ff':e.color; ctx.fillRect(ex, ey-40, e.width, e.height);
