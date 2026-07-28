@@ -1,11 +1,11 @@
 {
   "name": "Sub-Zero's Adventures",
   "short_name": "Sub-Zero",
-  "description": "Aventura de acción con Sub-Zero. Lucha contra el clan Dragon Negro, domina el hielo y derrota a Kano.",
+  "description": "Aventura de acción con Sub-Zero v2.34-THUG_GUN. Thug y Thug Gun con frozen, hit y dead. Clan Dragon Negro.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "portrait",
   "background_color": "#0a0e1a",
   "theme_color": "#00e5ff",
   "lang": "es",
@@ -83,19 +83,42 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sub-Zero's Adventures"
+    }
+  ],
   "shortcuts": [
     {
-      "name": "Jugar",
-      "short_name": "Jugar",
-      "description": "Comenzar historia",
-      "url": "./",
+      "name": "Jugar Historia",
+      "short_name": "Historia",
+      "description": "Comenzar la historia completa",
+      "url": "./?action=play",
       "icons": [
         {
           "src": "icons/icon-192x192.png",
-          "sizes": "192x192",
-          "type": "image/png"
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Niveles",
+      "short_name": "Niveles",
+      "description": "Seleccionar nivel",
+      "url": "./?action=levels",
+      "icons": [
+        {
+          "src": "icons/icon-192x192.png",
+          "sizes": "192x192"
         }
       ]
     }
-  ]
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "version": "2.35-FIX-DEBUG"
 }

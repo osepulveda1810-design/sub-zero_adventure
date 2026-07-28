@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.15e - FINAL bola en manos Y10 X29 scale 0.6 0.8</title>
+<title>Sub-Zero's v2.35-FIX-DEBUG - Fix Debug</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00e5ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -208,7 +208,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.27-PWA-READY";
+const GAME_VERSION = '2.35-FIX-DEBUG';
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -1115,6 +1115,10 @@ function loop(time){
         if(useESprite){
           try{
             var totalFrames = eCfg.frames||1;
+            // FIX v2.35 - Reset frame al cambiar de anim para evitar desaparicion
+            if(e._lastAnim !== eAnim){ e.frame=0; e.frameTime=0; e._lastAnim=eAnim; }
+            // Clamp frame dentro del rango de la anim actual
+            if((e.frame||0) >= totalFrames) e.frame=0;
             var sheetW = eSprite.naturalWidth;
             var sheetH = eSprite.naturalHeight;
             var sw = Math.floor(sheetW/totalFrames);
@@ -1215,8 +1219,7 @@ function loop(time){
     }
     
     ctx.fillStyle='#7ef0ff'; ctx.font='bold 12px monospace'; ctx.fillText('NIVEL '+(currentLevel+1)+' - '+lvl.name, 14, 26);
-    ctx.fillStyle='rgba(126,240,255,0.5)'; ctx.font='10px monospace'; ctx.fillText('Sprites: '+(Object.values(spriteStatus).filter(function(s){return s==='ok'}).length)+'/'+Object.keys(spriteStatus).length+' OK', 14, 42);
-    try{ var eOk = Object.values(enemySpriteStatus).filter(function(s){return s==='ok'}).length; var eTotal = Object.keys(enemySpriteStatus).length; ctx.fillStyle='#facc15'; ctx.fillText('Thug: '+eOk+'/'+eTotal+' '+JSON.stringify(enemySpriteStatus), 14, 56); }catch(e){}
+    // Debug removido v2.35 - sin letras amarillas
     
     try{
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
@@ -1344,7 +1347,7 @@ try{ setupCanvas(); initEnemySprites(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite FIX + scale 0.7"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Fix Debug"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;

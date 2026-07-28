@@ -1,4 +1,4 @@
-const CACHE_NAME = 'subzero-v2-27-pwa';
+const CACHE_NAME = 'subzero-v2.35-fix-debug';
 const urlsToCache = [
   './',
   './index.html',
