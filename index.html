@@ -195,7 +195,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION="2.15f";
+const GAME_VERSION="2.26-SCALE-0.75";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -210,7 +210,9 @@ const SPRITE_CONFIG = {
   punch: { file: "punch.png", frames: 4, speed: 60, scale: 1.1, anchorY: 38, fallbackColor: "#4ecca3", desc: "Puño" },
   kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" },
   ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.6, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Carga hielo - SCALE 0.6 FINAL" },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.75, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo - SCALE 0.75 (medida que dejaste)" }
+  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.75, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo - SCALE 0.75" },
+  kick_air: { file: "kick_air.png", frames: 1, speed: 300, scale: 0.7, anchorY: 45, fallbackColor: "#7ef0ff", desc: "Patada aire 1F" },
+  punch_air: { file: "punch_air.png", frames: 1, speed: 300, scale: 0.7, anchorY: 45, fallbackColor: "#4ecca3", desc: "Combo aire 1F" }
 };
 const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
@@ -374,7 +376,7 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0};
+let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, isKickAir:false, kickAirTimer:0, kickAirHit:false, isPunchAir:false, punchAirTimer:0, punchAirHit:false};
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
@@ -392,8 +394,24 @@ const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext(
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
-function tryKick(){ if(!player.grounded) return; if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
-function tryPunch(){ if(!player.grounded) return; if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
+function tryKick(){ 
+  if(player.isChargingIce || player.isIceLoaded || player.isShootingIce) return;
+  if(player.isPunching || player.isKicking || player.isPunchAir || player.isKickAir) return;
+  if(player.grounded){
+    player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0;
+  } else {
+    player.isKickAir=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickAirHit=false; player.kickAirTimer=0;
+  }
+}
+function tryPunch(){ 
+  if(player.isChargingIce || player.isIceLoaded || player.isShootingIce) return;
+  if(player.isPunching || player.isKicking || player.isPunchAir || player.isKickAir) return;
+  if(player.grounded){
+    player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0;
+  } else {
+    player.isPunchAir=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.punchAirHit=false; player.punchAirTimer=0;
+  }
+}
 function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
@@ -540,6 +558,8 @@ function drawPlayer(time){
   var anim=player.anim||'idle';
   if(player.isShootingIce) anim='ice_shoot';
   else if(player.isChargingIce || player.isIceLoaded) anim='ice_charge';
+  else if(player.isPunchAir) anim='punch_air';
+  else if(player.isKickAir) anim='kick_air';
   else if(player.isPunching) anim='punch';
   else if(player.isKicking) anim='kick';
   else if(!player.grounded) anim='jump';
@@ -593,6 +613,36 @@ function drawPlayer(time){
       } else if(anim==='walk'){
         targetW = Math.round(65 * sc * animScale);
         targetH = Math.round(110 * sc * animScale);
+      } else if(anim==='kick_air'){
+        targetW = Math.round(130 * sc * animScale);
+        targetH = Math.round(130 * sc * animScale);
+        totalFrames=cfg.frames||1;
+        sw=Math.floor(sheetW/totalFrames);
+        sh=sheetH;
+        sx=0; sy=0;
+        if(totalFrames<=1){
+          player.frame=0;
+          if(!player.kickAirHit){
+            player.kickAirHit=true;
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=14; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK AIR 30','#7ef0ff'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=12; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK AIR BOSS 28','#00e5ff'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+          }
+        }
+      } else if(anim==='punch_air'){
+        targetW = Math.round(110 * sc * animScale);
+        targetH = Math.round(125 * sc * animScale);
+        totalFrames=cfg.frames||1;
+        sw=Math.floor(sheetW/totalFrames);
+        sh=sheetH;
+        sx=0; sy=0;
+        if(totalFrames<=1){
+          player.frame=0;
+          if(!player.punchAirHit){
+            player.punchAirHit=true;
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=12; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'COMBO AIR 20','#4ecca3'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=10; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'COMBO AIR BOSS 18','#4ecca3'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+          }
+        }
       } else if(anim==='jump'){
         targetW = Math.round(105 * sc * animScale);
         targetH = Math.round(125 * sc * animScale);
@@ -729,9 +779,18 @@ function drawPlayer(time){
     }catch(e){ console.log('sprite draw error',e); }
   }
 
+  // Si jump también falló, usa idle
+  if(!useSprite && anim==='jump'){
+    var idleSprite=playerSprites['idle'];
+    var idleStatus=spriteStatus['idle'];
+    if(idleSprite && idleSprite.complete && idleSprite.naturalWidth>10 && idleStatus==='ok'){
+      anim='idle'; sprite=idleSprite; status=idleStatus; useSprite=true;
+    }
+  }
+  var jumpOffFallback=Math.round(player.jumpOffset||0);
   var w=Math.round(baseDrawWidth*sc), h=Math.round(baseDrawHeight*sc);
   var x=Math.round(player.x-camera.x)-Math.round(w/2);
-  var y=Math.round(playerLaneY-h+10);
+  var y=Math.round(playerLaneY-h+10+jumpOffFallback);
   var grad=ctx.createLinearGradient(x,y,x,y+h);
   grad.addColorStop(0,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
   ctx.fillStyle=grad; ctx.fillRect(x,y,w,h);
@@ -752,10 +811,13 @@ function loop(time){
       player.jumpOffset+=player.vy;
       if(player.jumpOffset>=0){
         player.jumpOffset=0; player.vy=0; player.grounded=true; player.landingTimer=180;
+        // Al aterrizar, limpiar aereos
+        player.isKickAir=false; player.isPunchAir=false;
+        player.kickAirTimer=0; player.punchAirTimer=0;
       }
     } else if(player.landingTimer>0){ player.landingTimer-=16; }
 
-    // --- PUNCH & KICK RESET FALLBACK ---
+    // --- PUNCH & KICK RESET FALLBACK (con AIR) ---
     if(player.isPunching){
       if(!player.punchTimer) player.punchTimer=0;
       player.punchTimer+=16;
@@ -778,6 +840,28 @@ function loop(time){
         player.kickHit=false;
       }
     } else { player.kickTimer=0; }
+    if(player.isKickAir){
+      if(!player.kickAirTimer) player.kickAirTimer=0;
+      player.kickAirTimer+=16;
+      if(player.kickAirTimer>450){
+        player.isKickAir=false;
+        player.anim=player.grounded?'idle':'jump';
+        player.frame=0;
+        player.kickAirTimer=0;
+        player.kickAirHit=false;
+      }
+    } else { player.kickAirTimer=0; }
+    if(player.isPunchAir){
+      if(!player.punchAirTimer) player.punchAirTimer=0;
+      player.punchAirTimer+=16;
+      if(player.punchAirTimer>400){
+        player.isPunchAir=false;
+        player.anim=player.grounded?'idle':'jump';
+        player.frame=0;
+        player.punchAirTimer=0;
+        player.punchAirHit=false;
+      }
+    } else { player.punchAirTimer=0; }
 
     // --- ICE CHARGE LOGIC v2.10: bloquea caminata mientras carga, libera al disparar ---
     if(player.isShootingIce){
@@ -829,6 +913,8 @@ function loop(time){
     }
     if(player.isShootingIce){ player.anim='ice_shoot'; }
     else if(player.isChargingIce || player.isIceLoaded){ player.anim='ice_charge'; }
+    else if(player.isPunchAir){ player.anim='punch_air'; }
+    else if(player.isKickAir){ player.anim='kick_air'; }
     else if(player.isPunching){ player.anim='punch'; }
     else if(player.isKicking){ player.anim='kick'; }
     else if(!player.grounded){ player.anim='jump'; }
@@ -897,7 +983,8 @@ function loop(time){
     if(boss && !boss.dead && boss.frozen<=0){
       var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
       if(d>70){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; }
-      if(Math.abs(dx)<60 && Math.abs(dy)<40){ player.health-=0.25; }
+      var airOffset = Math.abs(player.jumpOffset||0);
+      if(airOffset>30){} else { if(Math.abs(dx)<60 && Math.abs(dy)<40){ player.health-=0.25; } }
     }
     if(boss && boss.frozen>0) boss.frozen-=16;
     
@@ -1052,6 +1139,8 @@ if(bk){
   bk.addEventListener('mousedown', doKick);
   bk.addEventListener('click', doKick);
 }
+var btnSpecial=document.getElementById('btn-special');
+if(btnSpecial){ var doSpecial=function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } tryPunch(); }; btnSpecial.addEventListener('touchstart', doSpecial, {passive:false}); btnSpecial.addEventListener('mousedown', doSpecial); btnSpecial.addEventListener('click', doSpecial); btnSpecial.style.opacity='1'; btnSpecial.style.pointerEvents='auto'; }
 var bj=document.getElementById('btn-jump');
 function handleJump(e){ e.preventDefault(); tryJump(); }
 bj.addEventListener('touchstart', handleJump, {passive:false});
