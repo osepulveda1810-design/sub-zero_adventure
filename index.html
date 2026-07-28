@@ -627,8 +627,8 @@ function drawPlayer(time){
         targetW = Math.round(65 * sc * animScale);
         targetH = Math.round(110 * sc * animScale);
       } else if(anim==='kick_air'){
-        targetW = Math.round(130 * sc * animScale);
-        targetH = Math.round(130 * sc * animScale);
+        targetW = Math.round(90 * sc * animScale);
+        targetH = Math.round(110 * sc * animScale); // FIX 0.7 - era 130x130 gigante
         totalFrames=cfg.frames||1;
         sw=Math.floor(sheetW/totalFrames);
         sh=sheetH;
@@ -642,8 +642,8 @@ function drawPlayer(time){
           }
         }
       } else if(anim==='punch_air'){
-        targetW = Math.round(110 * sc * animScale);
-        targetH = Math.round(125 * sc * animScale);
+        targetW = Math.round(90 * sc * animScale);
+        targetH = Math.round(110 * sc * animScale); // FIX 0.7 - era 110x125
         totalFrames=cfg.frames||1;
         sw=Math.floor(sheetW/totalFrames);
         sh=sheetH;
