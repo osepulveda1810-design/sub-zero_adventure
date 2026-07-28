@@ -1,17 +1,123 @@
 {
-  "background_color": "#ffffff",
-  "dir": "auto",
+  "name": "Sub-Zero's Adventures",
+  "short_name": "Sub-Zero",
+  "description": "Aventura de acción con Sub-Zero. Lucha contra el clan Dragon Negro, domina el hielo y derrota a Kano.",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
-  "name": "Sub-Zero's_Adventures",
-  "orientation": "landscape",
-  "scope": "/",
-  "short_name": "Sub-Zero's Adventures",
-  "start_url": "/index.html",
-  "theme_color": "#ffffff",
-  "display_override": [
-    "standalone",
-    "window-controls-overlay",
-    "fullscreen"
+  "orientation": "portrait",
+  "background_color": "#0a0e1a",
+  "theme_color": "#00e5ff",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": [
+    "games",
+    "action",
+    "adventure"
   ],
-  "lang": "es"
+  "icons": [
+    {
+      "src": "icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192x192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/icon-256x256.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512x512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Sub-Zero's Adventures"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Jugar Historia",
+      "short_name": "Historia",
+      "description": "Comenzar la historia completa",
+      "url": "./?action=play",
+      "icons": [
+        {
+          "src": "icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Niveles",
+      "short_name": "Niveles",
+      "description": "Seleccionar nivel",
+      "url": "./?action=levels",
+      "icons": [
+        {
+          "src": "icons/icon-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
 }
