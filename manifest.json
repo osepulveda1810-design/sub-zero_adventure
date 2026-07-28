@@ -83,41 +83,19 @@
       "purpose": "maskable"
     }
   ],
-  "screenshots": [
-    {
-      "src": "icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Sub-Zero's Adventures"
-    }
-  ],
   "shortcuts": [
     {
-      "name": "Jugar Historia",
-      "short_name": "Historia",
-      "description": "Comenzar la historia completa",
-      "url": "./?action=play",
+      "name": "Jugar",
+      "short_name": "Jugar",
+      "description": "Comenzar historia",
+      "url": "./",
       "icons": [
         {
           "src": "icons/icon-192x192.png",
-          "sizes": "192x192"
-        }
-      ]
-    },
-    {
-      "name": "Niveles",
-      "short_name": "Niveles",
-      "description": "Seleccionar nivel",
-      "url": "./?action=levels",
-      "icons": [
-        {
-          "src": "icons/icon-192x192.png",
-          "sizes": "192x192"
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     }
-  ],
-  "prefer_related_applications": false,
-  "related_applications": []
+  ]
 }
