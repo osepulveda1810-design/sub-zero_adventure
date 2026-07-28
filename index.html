@@ -308,7 +308,53 @@ function analyzeSpriteOffsets(key){
   console.log('Offsets '+key+':',offsets);
 }
 
+
+// ===== SISTEMA SPRITES ENEMIGOS - THUG NIVEL 1 - FIX v30 =====
+const ENEMY_SPRITE_BASE = "assets/sprites/enemies/";
+const ENEMY_SPRITE_CONFIG = {
+  thug: {
+    idle: { file: "thug/idle.png", frames: 1, speed: 140, scale: 0.88 },
+    walk: { file: "thug/walk.png", frames: 4, speed: 160, scale: 0.88 },
+    attack: { file: "thug/attack.png", frames: 3, speed: 100, scale: 0.88 },
+    hit: { file: "thug/hit.png", frames: 1, speed: 200, scale: 0.88 },
+    dead: { file: "thug/dead.png", frames: 1, speed: 200, scale: 0.88 },
+    frozen: { file: "thug/frozen.png", frames: 1, speed: 200, scale: 1.0 }
+  }
+};
+const enemySprites = {};
+const enemySpriteStatus = {};
+let enemiesSpritesReady = false;
+
+function initEnemySprites(){
+  console.log("Cargando sprites enemigos desde", ENEMY_SPRITE_BASE);
+  Object.keys(ENEMY_SPRITE_CONFIG).forEach(function(enemyType){
+    enemySprites[enemyType] = {};
+    var anims = ENEMY_SPRITE_CONFIG[enemyType];
+    Object.keys(anims).forEach(function(anim){
+      var cfg = anims[anim];
+      var key = enemyType+"_"+anim;
+      enemySpriteStatus[key] = "loading";
+      var img = new Image();
+      img.onload = (function(k){ return function(){ enemySpriteStatus[k]="ok"; console.log("Enemy sprite OK:",k, this.src); }; })(key);
+      img.onerror = (function(k){ return function(){ enemySpriteStatus[k]="fail"; console.error("Enemy sprite FAIL:",k, this.src); }; })(key);
+      img.src = ENEMY_SPRITE_BASE + cfg.file;
+      enemySprites[enemyType][anim] = img;
+    });
+  });
+  enemiesSpritesReady = true; setTimeout(function(){ console.log("enemiesSpritesReady = true", enemySpriteStatus); }, 500);
+}
+
+function getEnemyAnim(e){
+  if(e.dead) return 'dead';
+  if(e.frozen>0) return 'frozen';
+  if(e.hitTimer && e.hitTimer>0) return 'hit';
+  if(e.isAttacking) return 'attack';
+  if(Math.abs(e.vx||0)>0.1) return 'walk';
+  return 'idle';
+}
+
 function analyzeAllSprites(){
+
   Object.keys(SPRITE_CONFIG).forEach(function(key){
     if(spriteStatus[key]==='ok') analyzeSpriteOffsets(key);
   });
@@ -338,7 +384,7 @@ function updateSpriteUI(){ updateScaleUI();
   }catch(e){}
 }
 
-initSprites();
+initSprites(); initEnemySprites();
 
 // LEVELS y ENEMIGOS de v1.35
 const LEVELS = [
@@ -429,7 +475,7 @@ function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) retur
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
   var sy = attachedIce ? attachedIce.y : playerLaneY-28;
-  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*7.5,vy:0,type:'ice',life:3000});
+  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*5.8,vy:0,type:'ice',life:4000});
   attachedIce=null;
   player.isChargingIce=false;
   player.isIceLoaded=false;
@@ -474,7 +520,7 @@ function setupCanvas(){
 function spawnText(x,y,t,c){ floatingTexts.push({x:x,y:y,text:t,color:c||'#fff',timer:0,life:800,vy:-1.2}); }
 function createEnemy(type,x,laneY){
   var cfg=ENEMY_CONFIGS[type]; if(!cfg) return null;
-  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0};
+  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0, anim:'idle', frame:0, frameTime:0, facingRight:false, hitTimer:0, isAttacking:false, vx:0};
 }
 function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
@@ -637,8 +683,8 @@ function drawPlayer(time){
           player.frame=0;
           if(!player.kickAirHit){
             player.kickAirHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=14; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK AIR 30','#7ef0ff'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=12; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK AIR BOSS 28','#00e5ff'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK AIR 30','#7ef0ff'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK AIR BOSS 28','#00e5ff'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='punch_air'){
@@ -652,8 +698,8 @@ function drawPlayer(time){
           player.frame=0;
           if(!player.punchAirHit){
             player.punchAirHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=12; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'COMBO AIR 20','#4ecca3'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=10; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'COMBO AIR BOSS 18','#4ecca3'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'COMBO AIR 20','#4ecca3'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'COMBO AIR BOSS 18','#4ecca3'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='jump'){
@@ -714,8 +760,8 @@ function drawPlayer(time){
             player.punchTimer=0;
           } else if(player.frame>=2 && !player.attackHit){
             player.attackHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=12; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=10; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'PUM BOSS 12','#ffcc00'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'PUM BOSS 12','#ffcc00'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='kick'){
@@ -737,8 +783,8 @@ function drawPlayer(time){
             player.kickTimer=0;
           } else if(player.frame>=1 && !player.kickHit){
             player.kickHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=14; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=12; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK BOSS 22','#ff7700'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK BOSS 22','#ff7700'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='jump'){
@@ -980,18 +1026,36 @@ function loop(time){
       var hit=false;
       for(var ei=0;ei<enemies.length;ei++){
         var e=enemies[ei]; if(e.dead) continue;
-        if(Math.abs(p.y-e.laneY)<50 && Math.abs(p.x-e.x)<60){ e.frozen=3500; e.health-=10; spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff'); hit=true; if(e.health<=0){ e.dead=true; enemiesDefeated++; score+=100; } break; }
+        // HITBOX GRANDE PARA QUE SEA FACIL CONGELAR - v2.30
+        if(Math.abs(p.y-e.laneY)<95 && Math.abs(p.x-e.x)<145){
+          e.frozen=5000; e.health-=10; e.hitTimer=380; e.deadTimer=0;
+          spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
+          hit=true;
+          if(e.health<=0){ e.dead=true; e.deadTimer=0; enemiesDefeated++; score+=100; }
+          // No break - congela a varios a la vez (efecto area)
+        }
       }
-      if(!hit && boss && !boss.dead){ if(Math.abs(p.y-boss.laneY)<60 && Math.abs(p.x-boss.x)<70){ boss.frozen=2500; boss.health-=8; hit=true; if(boss.health<=0){ boss.dead=true; score+=500; } } }
+      if(boss && !boss.dead){
+        if(Math.abs(p.y-boss.laneY)<90 && Math.abs(p.x-boss.x)<160){
+          boss.frozen=4000; boss.health-=8; hit=true;
+          if(boss.health<=0){ boss.dead=true; score+=500; }
+        }
+      }
       if(hit){ projectiles.splice(i,1); continue; }
       if(p.x<camera.x-100 || p.x>camera.x+canvas.width+100) projectiles.splice(i,1);
     }
     
     for(var ei=0;ei<enemies.length;ei++){
-      var en=enemies[ei]; if(en.frozen>0){ en.frozen-=16; continue; } if(en.dead) continue;
+      var en=enemies[ei]; if(en.dead) continue;
+      if(en.frozen>0){ en.frozen-=16; en.vx=0; en.isAttacking=false; en.hitTimer=Math.max(0,(en.hitTimer||0)-16); continue; }
       var dx=player.x-en.x; var dy=playerLaneY-en.laneY; var d=Math.sqrt(dx*dx+dy*dy);
+      var prevX=en.x;
       if(d>50){ en.x+=(dx/d)*en.speed*0.8; en.laneY+=(dy/d)*en.speed*0.4; }
-      if(Math.abs(dx)<44 && Math.abs(dy)<30){ player.health-=0.12; }
+      en.vx = en.x - prevX;
+      en.facingRight = dx>0;
+      en.hitTimer = Math.max(0,(en.hitTimer||0)-16);
+      en.isAttacking = (Math.abs(dx)<50 && Math.abs(dy)<35);
+      if(Math.abs(dx)<44 && Math.abs(dy)<30){ player.health-=0.12; en.isAttacking=true; }
     }
     if(boss && !boss.dead && boss.frozen<=0){
       var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
@@ -1013,10 +1077,74 @@ function loop(time){
     var prog=camera.x/Math.max(1,camera.worldWidth-canvas.width); ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56,4); ctx.fillStyle='#7ef0ff'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56*prog,4);
     
     for(var ei=0;ei<enemies.length;ei++){
-      var e=enemies[ei]; if(e.dead) continue;
+      var e=enemies[ei];
+      if(e.dead && (e.deadTimer||0)>900) continue; // deja ver anim dead 900ms
       var ex=Math.round(e.x-camera.x); if(ex<-80||ex>canvas.width+80) continue;
-      ctx.fillStyle=e.frozen>0?'#7ef0ff':e.color; ctx.fillRect(ex, e.laneY-40, e.width, e.height);
-      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, e.width, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, e.width*(e.health/e.maxHealth), 3);
+      var ey = e.laneY;
+      // THUG CON SPRITE - INTEGRADO FROZEN.PNG v2.31 FINAL
+      if(e.type==='thug' && enemySprites.thug){
+        var eAnim = getEnemyAnim(e); // dead > frozen > hit > attack > walk > idle
+        var eCfg = (ENEMY_SPRITE_CONFIG.thug[eAnim]||ENEMY_SPRITE_CONFIG.thug.idle);
+        var eSprite = enemySprites.thug[eAnim] || enemySprites.thug.idle;
+        var statusKey = 'thug_'+eAnim;
+        var useESprite = eSprite && eSprite.complete && eSprite.naturalWidth>10 && (enemySpriteStatus[statusKey]==='ok' || enemySpriteStatus[statusKey]==='loading');
+        if(useESprite){
+          try{
+            var totalFrames = eCfg.frames||1;
+            var sheetW = eSprite.naturalWidth;
+            var sheetH = eSprite.naturalHeight;
+            var sw = Math.floor(sheetW/totalFrames);
+            var sh = sheetH;
+            var sx = Math.floor((e.frame||0)*sw);
+            // NO animar si está congelado o muerto
+            if(e.frozen<=0 && !e.dead){
+              e.frameTime = (e.frameTime||0)+16;
+              if(e.frameTime > eCfg.speed){ e.frame = ((e.frame||0)+1)%totalFrames; e.frameTime=0; }
+            } else if(e.frozen>0){
+              // Congelado: siempre frame 0 del frozen.png
+              e.frame = 0;
+            }
+            var depthE = (laneBottom-ey)/Math.max(1,laneBottom-laneTop);
+            var scE = (1-depthE*0.12)*PLAYER_SCALE*1.0;
+            var aspect = sw / Math.max(1,sh);
+            var baseH = 110 * scE * (eCfg.scale||1.0);
+            var baseW = baseH * aspect;
+            if(baseW > 140*scE){ baseW = 140*scE; baseH = baseW / Math.max(0.1,aspect); }
+            var targetW = Math.round(baseW);
+            var targetH = Math.round(baseH);
+            var drawX = ex - Math.round(targetW/2) + Math.round(e.width/2);
+            var drawY = Math.round(ey - targetH + 6);
+            ctx.save();
+            ctx.imageSmoothingEnabled=true;
+            ctx.imageSmoothingQuality='high';
+            if(e.frozen>0 && eAnim!=='frozen'){
+              ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=15;
+            }
+            // Sprites miran a DERECHA original
+            if(!e.facingRight){
+              ctx.translate(drawX+targetW/2, drawY+targetH/2);
+              ctx.scale(-1,1);
+              ctx.drawImage(eSprite, sx, 0, sw, sh, -targetW/2, -targetH/2, targetW, targetH);
+            } else {
+              ctx.drawImage(eSprite, sx, 0, sw, sh, drawX, drawY, targetW, targetH);
+            }
+            ctx.restore();
+            // Si es frozen.png con transparencia, NO dibujar bloque extra, solo el sprite ya trae hielo
+            // Si no tiene frozen.png (fallback), dibujar tinte
+            if(e.frozen>0 && eAnim!=='frozen'){
+              ctx.save(); ctx.globalAlpha=0.45; ctx.fillStyle='#7ef0ff';
+              if(!e.facingRight){ ctx.translate(drawX+targetW/2, drawY+targetH/2); ctx.scale(-1,1); ctx.fillRect(-targetW/2, -targetH/2, targetW, targetH); }
+              else { ctx.fillRect(drawX, drawY, targetW, targetH); }
+              ctx.restore();
+            }
+            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, ey-46, e.width, 3);
+            ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, ey-46, e.width*(e.health/e.maxHealth), 3);
+            continue;
+          }catch(err){ console.log('thug draw err',err); }
+        }
+      }
+      ctx.fillStyle=e.frozen>0?'#7ef0ff':e.color; ctx.fillRect(ex, ey-40, e.width, e.height);
+      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, ey-46, e.width, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, ey-46, e.width*(e.health/e.maxHealth), 3);
     }
     if(boss && !boss.dead){
       var bx=Math.round(boss.x-camera.x);
@@ -1064,6 +1192,7 @@ function loop(time){
     
     ctx.fillStyle='#7ef0ff'; ctx.font='bold 12px monospace'; ctx.fillText('NIVEL '+(currentLevel+1)+' - '+lvl.name, 14, 26);
     ctx.fillStyle='rgba(126,240,255,0.5)'; ctx.font='10px monospace'; ctx.fillText('Sprites: '+(Object.values(spriteStatus).filter(function(s){return s==='ok'}).length)+'/'+Object.keys(spriteStatus).length+' OK', 14, 42);
+    try{ var eOk = Object.values(enemySpriteStatus).filter(function(s){return s==='ok'}).length; var eTotal = Object.keys(enemySpriteStatus).length; ctx.fillStyle='#facc15'; ctx.fillText('Thug: '+eOk+'/'+eTotal+' '+JSON.stringify(enemySpriteStatus), 14, 56); }catch(e){}
     
     try{
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
@@ -1186,8 +1315,8 @@ LEVELS.forEach(function(lvl,i){
   grid.appendChild(b);
 });
 
-window.addEventListener('resize',function(){ if(currentState==='PLAYING'){ try{ setupCanvas(); }catch(e){} } });
-try{ setupCanvas(); }catch(e){}
+window.addEventListener('resize',function(){ if(currentState==='PLAYING'){ try{ setupCanvas(); initEnemySprites(); }catch(e){} } });
+try{ setupCanvas(); initEnemySprites(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
