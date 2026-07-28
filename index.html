@@ -224,8 +224,8 @@ const SPRITE_CONFIG = {
   kick: { file: "kick.png", frames: 4, speed: 75, scale: 1.05, anchorY: 42, orientation: "horizontal", fallbackColor: "#7ef0ff", desc: "Patada 4F" },
   ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.6, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Carga hielo - SCALE 0.6 FINAL" },
   ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.75, anchorY: 38, fallbackColor: "#7ef0ff", desc: "Disparo hielo - SCALE 0.75" },
-  kick_air: { file: "kick_air.png", frames: 1, speed: 300, scale: 0.7, anchorY: 45, fallbackColor: "#7ef0ff", desc: "Patada aire 1F" },
-  punch_air: { file: "punch_air.png", frames: 1, speed: 300, scale: 0.7, anchorY: 45, fallbackColor: "#4ecca3", desc: "Combo aire 1F" }
+  kick_air: { file: "kick_air.png", frames: 1, speed: 300, scale: 1.35, anchorY: 45, fallbackColor: "#7ef0ff", desc: "Patada aire 1F" },
+  punch_air: { file: "punch_air.png", frames: 1, speed: 300, scale: 1.35, anchorY: 45, fallbackColor: "#4ecca3", desc: "Combo aire 1F" }
 };
 const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
@@ -1252,7 +1252,7 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
 // PWA Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
+    navigator.serviceWorker.register('./service-worker.js')
       .then(reg => console.log('SW registrado:', reg.scope))
       .catch(err => console.log('SW error:', err));
   });
