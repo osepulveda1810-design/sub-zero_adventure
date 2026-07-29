@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.35-FIX-DEBUG - Fix Debug</title>
+<title>Sub-Zero's v2.36-NO-DAMAGE-TEXT - Clean</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00e5ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -208,7 +208,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION = '2.35-FIX-DEBUG';
+const GAME_VERSION = '2.36-NO-DAMAGE-TEXT';
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -707,8 +707,8 @@ function drawPlayer(time){
           player.frame=0;
           if(!player.kickAirHit){
             player.kickAirHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK AIR 30','#7ef0ff'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK AIR BOSS 28','#00e5ff'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='punch_air'){
@@ -722,8 +722,8 @@ function drawPlayer(time){
           player.frame=0;
           if(!player.punchAirHit){
             player.punchAirHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'COMBO AIR 20','#4ecca3'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'COMBO AIR BOSS 18','#4ecca3'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='jump'){
@@ -784,8 +784,8 @@ function drawPlayer(time){
             player.punchTimer=0;
           } else if(player.frame>=2 && !player.attackHit){
             player.attackHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'PUM BOSS 12','#ffcc00'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='kick'){
@@ -807,8 +807,8 @@ function drawPlayer(time){
             player.kickTimer=0;
           } else if(player.frame>=1 && !player.kickHit){
             player.kickHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15'); if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK BOSS 22','#ff7700'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='jump'){
@@ -1347,7 +1347,7 @@ try{ setupCanvas(); initEnemySprites(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Fix Debug"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Clean"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
