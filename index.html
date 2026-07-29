@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.36-NO-DAMAGE-TEXT - Clean</title>
+<title>Sub-Zero's v2.37-DEAD-SMALL - Dead Fix</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00e5ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -208,7 +208,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION = '2.36-NO-DAMAGE-TEXT';
+const GAME_VERSION = '2.37-DEAD-SMALL';
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -317,7 +317,7 @@ const ENEMY_SPRITE_CONFIG = {
     walk: { file: "thug/walk.png", frames: 4, speed: 160, scale: 0.88 },
     attack: { file: "thug/attack.png", frames: 3, speed: 100, scale: 0.88 },
     hit: { file: "thug/hit.png", frames: 1, speed: 200, scale: 0.88 },
-    dead: { file: "thug/dead.png", frames: 1, speed: 200, scale: 0.88 },
+    dead: { file: "thug/dead.png", frames: 1, speed: 200, scale: 0.70 },
     frozen: { file: "thug/frozen.png", frames: 1, speed: 200, scale: 1.0 }
   },
   thug_gun: {
@@ -325,7 +325,7 @@ const ENEMY_SPRITE_CONFIG = {
     walk: { file: "thug_gun/walk.png", frames: 4, speed: 160, scale: 0.88 },
     attack: { file: "thug_gun/attack.png", frames: 3, speed: 100, scale: 0.88 },
     hit: { file: "thug_gun/hit.png", frames: 1, speed: 200, scale: 0.88 },
-    dead: { file: "thug_gun/dead.png", frames: 1, speed: 200, scale: 0.88 },
+    dead: { file: "thug_gun/dead.png", frames: 1, speed: 200, scale: 0.70 },
     frozen: { file: "thug_gun/frozen.png", frames: 1, speed: 200, scale: 1.0 }
   },
   ninja_renegade: {
@@ -333,7 +333,7 @@ const ENEMY_SPRITE_CONFIG = {
     walk: { file: "ninja_renegade/walk.png", frames: 4, speed: 160, scale: 0.85 },
     attack: { file: "ninja_renegade/attack.png", frames: 3, speed: 100, scale: 0.85 },
     hit: { file: "ninja_renegade/hit.png", frames: 1, speed: 200, scale: 0.85 },
-    dead: { file: "ninja_renegade/dead.png", frames: 1, speed: 200, scale: 0.85 },
+    dead: { file: "ninja_renegade/dead.png", frames: 1, speed: 200, scale: 0.68 },
     frozen: { file: "ninja_renegade/frozen.png", frames: 1, speed: 200, scale: 0.95 }
   },
   tarkatan: {
@@ -341,7 +341,7 @@ const ENEMY_SPRITE_CONFIG = {
     walk: { file: "tarkatan/walk.png", frames: 4, speed: 160, scale: 0.9 },
     attack: { file: "tarkatan/attack.png", frames: 3, speed: 100, scale: 0.9 },
     hit: { file: "tarkatan/hit.png", frames: 1, speed: 200, scale: 0.9 },
-    dead: { file: "tarkatan/dead.png", frames: 1, speed: 200, scale: 0.9 },
+    dead: { file: "tarkatan/dead.png", frames: 1, speed: 200, scale: 0.72 },
     frozen: { file: "tarkatan/frozen.png", frames: 1, speed: 200, scale: 1.05 }
   }
 };
@@ -1347,7 +1347,7 @@ try{ setupCanvas(); initEnemySprites(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Clean"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Dead Fix"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
