@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.37-DEAD-SMALL - Dead Fix</title>
+<title>Sub-Zero's v2.40-FIXED-MENU</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#00e5ff">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -103,7 +103,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge" id="version-badge">v2.13</div>
+<div class="badge" id="version-badge">v2.40-FIXED-MENU</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">204</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -208,7 +208,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION = '2.37-DEAD-SMALL';
+const GAME_VERSION = '2.40-FIXED-MENU';
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -231,6 +231,13 @@ const SPRITE_BASE = "assets/sprites/player/";
 const playerSprites = {};
 const spriteStatus = {};
 let spritesReady = false;
+
+// Ice projectile sprite - v2.38 - blast solo para lanzamiento, esfera para carga
+const iceProjectileImg = new Image();
+iceProjectileImg.src = "assets/sprites/effects/ice_blast.png";
+let iceProjectileReady = false;
+iceProjectileImg.onload = function(){ iceProjectileReady = true; console.log("Ice projectile OK"); };
+iceProjectileImg.onerror = function(){ console.log("Ice projectile FAIL"); };
 
 function initSprites(){
   var keys = Object.keys(SPRITE_CONFIG);
@@ -1043,26 +1050,28 @@ function loop(time){
 
     if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount && getAliveCount()===0){ spawnBoss(); }
     
-    // Projectiles
+    // Projectiles - FIX v2.40 no blue on dead, blast launch
     for(var i=projectiles.length-1;i>=0;i--){
       var p=projectiles[i]; p.x+=p.vx; p.life-=16;
       if(p.life<=0){ projectiles.splice(i,1); continue; }
       var hit=false;
       for(var ei=0;ei<enemies.length;ei++){
         var e=enemies[ei]; if(e.dead) continue;
-        // HITBOX GRANDE PARA QUE SEA FACIL CONGELAR - v2.30
         if(Math.abs(p.y-e.laneY)<95 && Math.abs(p.x-e.x)<145){
-          e.frozen=5000; e.health-=10; e.hitTimer=380; e.deadTimer=0;
-          spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
+          e.health-=10; e.hitTimer=380; e.deadTimer=0;
           hit=true;
-          if(e.health<=0){ e.dead=true; e.deadTimer=0; enemiesDefeated++; score+=100; }
-          // No break - congela a varios a la vez (efecto area)
+          if(e.health<=0){ 
+            e.dead=true; e.deadTimer=0; e.frozen=0; enemiesDefeated++; score+=100; 
+          } else {
+            e.frozen=5000;
+            spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
+          }
         }
       }
       if(boss && !boss.dead){
         if(Math.abs(p.y-boss.laneY)<90 && Math.abs(p.x-boss.x)<160){
-          boss.frozen=4000; boss.health-=8; hit=true;
-          if(boss.health<=0){ boss.dead=true; score+=500; }
+          boss.health-=8; hit=true;
+          if(boss.health<=0){ boss.dead=true; boss.frozen=0; score+=500; } else { boss.frozen=4000; }
         }
       }
       if(hit){ projectiles.splice(i,1); continue; }
@@ -1145,7 +1154,7 @@ function loop(time){
             ctx.save();
             ctx.imageSmoothingEnabled=true;
             ctx.imageSmoothingQuality='high';
-            if(e.frozen>0 && eAnim!=='frozen'){
+            if(!e.dead && e.frozen>0 && eAnim!=='frozen' && eAnim!=='dead'){
               ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=15;
             }
             // Sprites miran a DERECHA original
@@ -1157,9 +1166,9 @@ function loop(time){
               ctx.drawImage(eSprite, sx, 0, sw, sh, drawX, drawY, targetW, targetH);
             }
             ctx.restore();
-            // Si es frozen.png con transparencia, NO dibujar bloque extra, solo el sprite ya trae hielo
-            // Si no tiene frozen.png (fallback), dibujar tinte
-            if(e.frozen>0 && eAnim!=='frozen'){
+            // FIX v2.39 - Si está muerto, nunca dibujar bloque azul encima de dead.png
+            // Si es frozen.png con transparencia, NO dibujar bloque extra
+            if(!e.dead && e.frozen>0 && eAnim!=='frozen' && eAnim!=='dead'){
               ctx.save(); ctx.globalAlpha=0.45; ctx.fillStyle='#7ef0ff';
               if(!e.facingRight){ ctx.translate(drawX+targetW/2, drawY+targetH/2); ctx.scale(-1,1); ctx.fillRect(-targetW/2, -targetH/2, targetW, targetH); }
               else { ctx.fillRect(drawX, drawY, targetW, targetH); }
@@ -1183,9 +1192,23 @@ function loop(time){
     for(var pi=0;pi<projectiles.length;pi++){
       var p=projectiles[pi]; if(p.type!=='ice') continue;
       var psx=Math.round(p.x-camera.x);
-      var grad=ctx.createRadialGradient(psx-3, p.y-3, 2, psx, p.y, 24);
-      grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
-      ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(psx,p.y,24,0,Math.PI*2); ctx.fill();
+      var psy=Math.round(p.y);
+      if(iceProjectileReady && iceProjectileImg.complete && iceProjectileImg.naturalWidth>10){
+        ctx.save();
+        var w = 90; var h = 32;
+        if(p.vx < 0){
+          ctx.translate(psx, psy);
+          ctx.scale(-1,1);
+          ctx.drawImage(iceProjectileImg, -w/2, -h/2, w, h);
+        } else {
+          ctx.drawImage(iceProjectileImg, psx - w/2, psy - h/2, w, h);
+        }
+        ctx.restore();
+      } else {
+        var grad=ctx.createRadialGradient(psx-3, psy-3, 2, psx, psy, 24);
+        grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
+        ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(psx,psy,24,0,Math.PI*2); ctx.fill();
+      }
     }
     
     drawPlayer(time);
@@ -1347,7 +1370,7 @@ try{ setupCanvas(); initEnemySprites(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Dead Fix"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Blast Launch Only"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;

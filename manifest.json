@@ -1,7 +1,7 @@
 {
   "name": "Sub-Zero's Adventures",
   "short_name": "Sub-Zero",
-  "description": "Aventura de acción con Sub-Zero v2.34-THUG_GUN. Thug y Thug Gun con frozen, hit y dead. Clan Dragon Negro.",
+  "description": "Aventura de acción con Sub-Zero. Lucha contra el clan Dragon Negro, domina el hielo y derrota a Kano.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -120,5 +120,5 @@
   ],
   "prefer_related_applications": false,
   "related_applications": [],
-  "version": "2.35-FIX-DEBUG"
+  "version": "2.39-FIX-BLUE-DEAD"
 }

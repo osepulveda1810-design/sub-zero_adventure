@@ -1,4 +1,4 @@
-const CACHE_NAME = 'subzero-v2.35-fix-debug';
+const CACHE_NAME = 'subzero-v2.40-fix-blue-dead';
 const urlsToCache = [
   './',
   './index.html',
