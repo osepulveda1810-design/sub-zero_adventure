@@ -716,11 +716,16 @@ function drawPlayer(time){
       var jumpOff=Math.round(player.jumpOffset||0);
       var drawY=Math.round(playerLaneY-targetH+10+anchorOffset+jumpOff);
 
-      // IDLE: forzar frame 0 siempre (sin animación) - ORIGINAL INTACTO
+      // IDLE: ahora animado 4 frames - FIX v2.41
       var f = player.frame||0;
       if(anim==='idle'){
-        f=0; sx=0; sy=0;
-        player.frame=0; player.frameTime=0;
+        totalFrames=cfg.frames||4;
+        if(isHorizontal){ sw=Math.floor(sheetW/totalFrames); sh=sheetH; } else { sw=sheetW; sh=Math.floor(sheetH/totalFrames); }
+        if(f<0) f=0; if(f>=totalFrames) f=0;
+        if(isHorizontal){ sx=Math.floor(f*sw); sy=0; } else { sx=0; sy=Math.floor(f*sh); }
+        if(!player.frameTime) player.frameTime=0;
+        player.frameTime+=16;
+        if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%totalFrames; player.frameTime=0; }
       } else if(anim==='punch'){
         totalFrames=4;
         sw=Math.floor(sheetW/4);
