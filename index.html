@@ -275,8 +275,10 @@ const spriteStatus = {};
 let spritesReady = false;
 
 
-var SPRITE_DEFAULTS = SPRITE_DEFAULTS || JSON.parse(JSON.stringify(SPRITE_CONFIG));
-var ENEMY_DEFAULTS = {}; try{ ENEMY_DEFAULTS = JSON.parse(JSON.stringify(ENEMY_SPRITE_CONFIG)); }catch(e){}
+var SPRITE_DEFAULTS = {};
+try { SPRITE_DEFAULTS = JSON.parse(JSON.stringify(SPRITE_CONFIG)); } catch(e) { SPRITE_DEFAULTS = {}; }
+var ENEMY_DEFAULTS = {};
+try { ENEMY_DEFAULTS = JSON.parse(JSON.stringify(typeof ENEMY_SPRITE_CONFIG !== 'undefined' ? ENEMY_SPRITE_CONFIG : {})); } catch(e) { ENEMY_DEFAULTS = {}; }
 var liveEditorOpen=false, isLocked=false, currentEditChar='player', dummyEnemy=null;
 function toggleLiveEditor(){ var el=document.getElementById('live-editor'); var btn=document.getElementById('btn-open-live'); if(!el) return; liveEditorOpen=!liveEditorOpen; if(liveEditorOpen){ el.classList.add('active'); buildLiveEditor(); if(btn) btn.textContent='✕ CERRAR'; } else { el.classList.remove('active'); if(btn) btn.textContent='🎚️ EDITOR'; } }
 function toggleLock(){ isLocked=!isLocked; var lb=document.getElementById('btn-lock'); var ov=document.getElementById('lock-overlay'); if(isLocked){ if(lb) lb.textContent='🔒'; if(ov) ov.classList.add('active'); } else { if(lb) lb.textContent='🔓'; if(ov) ov.classList.remove('active'); } }
