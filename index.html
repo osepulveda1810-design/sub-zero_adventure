@@ -22,20 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.40-FIXED-MENU</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#00e5ff">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Sub-Zero's Adventures">
-  <link rel="icon" type="image/png" sizes="72x72" href="icons/icon-72x72.png">
-  <link rel="icon" type="image/png" sizes="96x96" href="icons/icon-96x96.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512x512.png">
-  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
-  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192x192.png">
-  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512x512.png">
+<title>Sub-Zero's v2.15d - FINAL menu OK scale 0.6 0.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -99,43 +86,29 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .menu-overlay .btn-premium{pointer-events:auto !important; cursor:pointer !important; z-index:1001 !important; position:relative;}
 #menu-main, #menu-levels, #menu-story, #menu-pause, #menu-howtoplay, #menu-update{pointer-events:auto !important;}
 
-/* EDITOR v2.48 - nivel 0 + selector personajes + ancho/alto + movil optimizado */
+/* EDITOR v2.52 - MENU OK + MODO EDICION + ANCHO/ALTO */
 #live-editor{
   position:absolute; top:50px; left:50%; transform:translateX(-50%); width:96%; max-width:480px; 
-  max-height:88vh; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch;
-  background:rgba(5,10,20,0.98); backdrop-filter:blur(24px); border:1px solid rgba(167,139,250,0.45);
+  max-height:88vh; overflow-y:auto; background:rgba(5,10,20,0.98); border:1px solid rgba(167,139,250,0.45);
   border-radius:18px; padding:14px; z-index:95; display:none; pointer-events:auto;
-  box-shadow:0 0 50px rgba(0,0,0,0.9), 0 0 30px rgba(167,139,250,0.25);
-  touch-action:pan-y;
 }
 #live-editor.active{ display:block; }
-#live-editor::-webkit-scrollbar{ width:8px } #live-editor::-webkit-scrollbar-thumb{ background:rgba(167,139,250,0.5); border-radius:4px }
-.live-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.12) }
-.live-item{ background:rgba(255,255,255,0.05); border:1px solid rgba(126,240,255,0.12); border-radius:12px; padding:12px; margin-bottom:10px; position:relative }
-.live-slider-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px }
-.btn-live{ background:rgba(126,240,255,0.12); border:1.5px solid rgba(126,240,255,0.35); color:#7ef0ff; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; pointer-events:auto; text-align:center; min-height:48px; touch-action:manipulation; user-select:none; -webkit-tap-highlight-color:transparent }
-.btn-live:active{ transform:scale(0.96); background:rgba(126,240,255,0.25) }
-.btn-live-action{ background:rgba(167,139,250,0.18); border-color:#a78bfa; color:#a78bfa }
-.btn-live-punch{ background:rgba(78,204,163,0.18); border-color:#4ecca3; color:#4ecca3 }
-.btn-live-kick{ background:rgba(250,204,21,0.18); border-color:#facc15; color:#facc15 }
-.btn-live-ice{ background:rgba(126,240,255,0.18); border-color:#7ef0ff; color:#7ef0ff }
-#btn-open-live{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:86; background:linear-gradient(135deg,#a78bfa,#7ef0ff); color:#000; border:none; padding:12px 20px; border-radius:24px; font-size:11px; font-weight:900; letter-spacing:1px; cursor:pointer; display:none; pointer-events:auto; box-shadow:0 0 20px rgba(167,139,250,0.6); min-height:44px; touch-action:manipulation }
+.btn-live{ background:rgba(126,240,255,0.12); border:1.5px solid rgba(126,240,255,0.35); color:#7ef0ff; padding:10px 12px; border-radius:12px; font-size:11px; font-weight:800; cursor:pointer; min-height:48px; touch-action:manipulation }
+#btn-open-live{ position:absolute; top:8px; left:50%; transform:translateX(-50%); z-index:86; background:linear-gradient(135deg,#a78bfa,#7ef0ff); color:#000; border:none; padding:12px 20px; border-radius:24px; font-size:11px; font-weight:900; cursor:pointer; display:none; pointer-events:auto }
 #btn-open-live.visible{ display:block }
-input[type=range].live-range{ -webkit-appearance:none; height:12px; background:rgba(255,255,255,0.12); border-radius:6px; outline:none; width:100%; touch-action:pan-x; }
-input[type=range].live-range::-webkit-slider-thumb{ -webkit-appearance:none; width:32px; height:32px; border-radius:50%; background:#a78bfa; border:3px solid #fff; cursor:pointer; box-shadow:0 0 14px rgba(167,139,250,0.9); }
-input[type=range].live-range::-moz-range-thumb{ width:32px; height:32px; border-radius:50%; background:#a78bfa; border:3px solid #fff; cursor:pointer; }
-.live-lock{ position:absolute; inset:0; background:rgba(0,0,0,0.5); border-radius:12px; display:none; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(2px) }
+input[type=range].live-range{ -webkit-appearance:none; height:12px; background:rgba(255,255,255,0.12); border-radius:6px; width:100%; }
+input[type=range].live-range::-webkit-slider-thumb{ -webkit-appearance:none; width:32px; height:32px; border-radius:50%; background:#a78bfa; border:3px solid #fff; }
+#char-selector{ background:rgba(0,0,0,0.5); border:1.5px solid rgba(167,139,250,0.4); color:#a78bfa; padding:10px 12px; border-radius:12px; font-size:12px; width:100%; min-height:44px }
+.live-lock{ position:absolute; inset:0; background:rgba(0,0,0,0.5); border-radius:12px; display:none; align-items:center; justify-content:center; z-index:20 }
 .live-lock.active{ display:flex }
-#char-selector{ background:rgba(0,0,0,0.5); border:1.5px solid rgba(167,139,250,0.4); color:#a78bfa; padding:10px 12px; border-radius:12px; font-size:12px; font-weight:700; width:100%; min-height:44px }
-.live-plusminus{ display:flex; gap:6px; margin-top:4px }
-.live-plusminus button{ flex:1; min-height:36px; padding:6px; font-size:14px; font-weight:900 }
+.live-item{ background:rgba(255,255,255,0.05); border:1px solid rgba(126,240,255,0.12); border-radius:12px; padding:12px; margin-bottom:10px }
 
 </style>
 </head>
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge" id="version-badge">v2.40-FIXED-MENU</div>
+<div class="badge" id="version-badge">v2.13</div>
 <div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">204</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
@@ -146,60 +119,42 @@ input[type=range].live-range::-moz-range-thumb{ width:32px; height:32px; border-
 <div class="hud-box"><div class="label">ENEMIGOS</div><div class="value" id="hud-enemies">0</div><div style="font-size:9px;color:rgba(255,255,255,0.45)" id="hud-score">0 pts</div></div>
 </div>
 <button id="btn-open-live" onclick="toggleLiveEditor()">🎚️ EDITOR</button>
-
 <div id="live-editor">
-  <div class="live-header">
-    <div><b style="color:#a78bfa;letter-spacing:2px;font-size:14px">🎨 MODO EDICION NIVEL 0</b><div style="font-size:9px;opacity:0.6">Sin enemigos • Selector personajes • Ancho/Alto separado</div></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.12)">
+    <div><b style="color:#a78bfa;font-size:14px">🎨 MODO EDICION NIVEL 0</b><div style="font-size:9px;opacity:0.6">Sin enemigos • Ancho/Alto</div></div>
     <div style="display:flex;gap:6px">
       <button class="btn-live" id="btn-lock" onclick="toggleLock()" style="min-width:44px">🔓</button>
-      <button class="btn-live" onclick="resetLiveEditor()" style="min-width:44px">RESET</button>
-      <button class="btn-live" onclick="toggleLiveEditor()" style="background:rgba(255,100,100,0.18);border-color:#ff8a8a;color:#ff8a8a;min-width:44px">✕</button>
+      <button class="btn-live" onclick="toggleLiveEditor()" style="background:rgba(255,100,100,0.18);min-width:44px">✕</button>
     </div>
   </div>
-
-  <div style="background:rgba(167,139,250,0.08);border:1.5px solid rgba(167,139,250,0.25);border-radius:12px;padding:12px;margin-bottom:12px">
-    <label style="font-size:10px;color:#a78bfa;font-weight:800;letter-spacing:1px">👤 SELECTOR DE PERSONAJES (para futuras ediciones)</label>
+  <div style="background:rgba(167,139,250,0.08);border-radius:12px;padding:12px;margin-bottom:12px">
+    <label style="font-size:10px;color:#a78bfa;font-weight:800">👤 PERSONAJES</label>
     <select id="char-selector" onchange="changeCharacter(this.value)" style="margin-top:8px">
-      <option value="player">🥶 Sub-Zero (Player) - 9 anims</option>
-      <option value="thug">👊 Thug - Matón básico</option>
-      <option value="thug_gun">🔫 Thug Gun - Armado</option>
-      <option value="ninja_renegade">🥷 Ninja Renegado</option>
+      <option value="player">🥶 Sub-Zero</option>
+      <option value="thug">👊 Thug</option>
+      <option value="thug_gun">🔫 Thug Gun</option>
+      <option value="ninja_renegade">🥷 Ninja</option>
       <option value="tarkatan">👹 Tarkatan</option>
     </select>
-    <div style="font-size:8px;opacity:0.5;margin-top:6px">Selecciona personaje para editar sus sprites. Dummy aparece frente a ti en modo edición.</div>
   </div>
-  
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-    <div><label style="font-size:9px;color:#facc15;font-weight:800">ALTURA GLOBAL pies</label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="range" class="live-range" id="live-global-anchor" min="-30" max="150" value="31" step="1" oninput="applyGlobalAnchorLive(this.value)"><span id="live-global-anchor-val" style="font-size:11px;color:#facc15;font-weight:900;min-width:28px">31</span></div></div>
-    <div><label style="font-size:9px;color:#4ecca3;font-weight:800">TAMAÑO GLOBAL</label><div style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="range" class="live-range" id="live-global-scale" min="0.2" max="2.5" value="1.0" step="0.05" oninput="applyGlobalScaleLive(this.value)"><span id="live-global-scale-val" style="font-size:11px;color:#4ecca3;font-weight:900;min-width:28px">1.0</span></div></div>
-  </div>
-
-  <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(167,139,250,0.15);border-radius:12px;padding:12px;margin-bottom:12px;position:relative">
-    <div id="lock-overlay" class="live-lock"><div style="background:rgba(0,0,0,0.85);padding:14px 20px;border-radius:12px;text-align:center"><div style="font-size:24px">🔒</div><div style="font-size:11px;color:#fff;margin-top:6px">Bloqueado<br><span style="opacity:0.6">Toca 🔓 para editar</span></div></div></div>
-    <div style="font-size:10px;color:#a78bfa;font-weight:800;letter-spacing:1px;margin-bottom:10px">🎮 CONTROLES INTEGRADOS (no tapa botones del juego) - Optimizado móvil</div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:8px">
-      <button class="btn-live btn-live-action" onclick="moveLive('left')">◀️<br><span style="font-size:8px">IZQ</span></button>
-      <button class="btn-live btn-live-action" onclick="moveLive('right')">▶️<br><span style="font-size:8px">DER</span></button>
-      <button class="btn-live btn-live-action" onclick="moveLive('up')">🔼<br><span style="font-size:8px">UP</span></button>
-      <button class="btn-live btn-live-action" onclick="moveLive('down')">🔽<br><span style="font-size:8px">DOWN</span></button>
-    </div>
+  <div style="background:rgba(0,0,0,0.35);border-radius:12px;padding:12px;margin-bottom:12px;position:relative">
+    <div id="lock-overlay" class="live-lock"><div style="background:rgba(0,0,0,0.85);padding:14px 20px;border-radius:12px;text-align:center"><div style="font-size:24px">🔒</div><div style="font-size:11px;color:#fff">Bloqueado</div></div></div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-      <button class="btn-live btn-live-punch" onclick="tryPunch()">👊<br><span style="font-size:8px">PUÑO</span></button>
-      <button class="btn-live btn-live-kick" onclick="tryKick()">🦶<br><span style="font-size:8px">PATADA</span></button>
-      <button class="btn-live btn-live-ice" onclick="tryIce()">❄️<br><span style="font-size:8px">HIELO</span></button>
-      <button class="btn-live" onclick="tryJump()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.3)">⤴️<br><span style="font-size:8px">SALTO</span></button>
+      <button class="btn-live" onclick="moveLive('left')">◀️ IZQ</button>
+      <button class="btn-live" onclick="moveLive('right')">DER ▶️</button>
+      <button class="btn-live" onclick="tryPunch()">👊</button>
+      <button class="btn-live" onclick="tryKick()">🦶</button>
+      <button class="btn-live" onclick="tryIce()">❄️</button>
+      <button class="btn-live" onclick="tryJump()">⤴️ SALTO</button>
     </div>
   </div>
-
-  <div id="live-list" style="display:flex;flex-direction:column;gap:10px;max-height:45vh;overflow-y:auto;overscroll-behavior:contain;padding-right:2px"></div>
-
+  <div id="live-list" style="display:flex;flex-direction:column;gap:10px;max-height:45vh;overflow-y:auto"></div>
   <div style="margin-top:14px;display:flex;gap:8px">
-    <button class="btn-live" style="flex:1;background:rgba(78,204,163,0.18);border-color:#4ecca3;color:#4ecca3;padding:14px" onclick="exportLiveConfig()">📋 EXPORTAR</button>
-    <button class="btn-live" style="flex:1;padding:14px" onclick="copyLiveConfig()">📝 COPIAR</button>
+    <button class="btn-live" style="flex:1" onclick="exportLiveConfig()">📋 EXPORTAR</button>
+    <button class="btn-live" style="flex:1" onclick="copyLiveConfig()">📝 COPIAR</button>
   </div>
-  <div id="live-export" style="display:none;margin-top:10px;background:rgba(0,0,0,0.6);border:1px solid rgba(126,240,255,0.2);border-radius:10px;padding:10px;font-size:8px;font-family:monospace;white-space:pre-wrap;max-height:160px;overflow:auto;color:#7ef0ff"></div>
+  <div id="live-export" style="display:none;margin-top:10px;background:rgba(0,0,0,0.6);border-radius:10px;padding:10px;font-size:8px;font-family:monospace;white-space:pre-wrap;max-height:160px;overflow:auto;color:#7ef0ff"></div>
 </div>
-
 <div id="controls" style="display:none">
 <div class="dpad"><div></div><button id="btn-up">▲</button><div></div><button id="btn-left">◀</button><div></div><button id="btn-right">▶</button><div></div><button id="btn-down">▼</button><div></div></div>
 <div class="action-cross">
@@ -215,7 +170,7 @@ input[type=range].live-range::-moz-range-thumb{ width:32px; height:32px; border-
 <div class="ice-demo" style="margin:10px"></div>
 <div class="menu-title">Sub-Zero's</div>
 <div style="color:#7ef0ff;font-weight:700;letter-spacing:8px;font-size:14px;margin-top:4px;text-shadow:0 0 12px rgba(126,240,255,0.5)">ADVENTURES</div>
-<button class="btn-premium" id="btn-play" onclick="startLevel(1)" style="margin-top:16px;padding:13px 28px;min-width:300px;font-size:12px">▶ JUGAR HISTORIA COMPLETA</button>
+<button class="btn-premium" id="btn-play" onclick="startLevel(0)" style="margin-top:16px;padding:13px 28px;min-width:300px;font-size:12px">▶ JUGAR HISTORIA COMPLETA</button>
 <button class="btn-premium" id="btn-levels" onclick="showMenu('levels')" style="padding:13px 28px;min-width:300px;font-size:12px">NIVELES (8)</button>
 <div style="display:flex;justify-content:space-between;width:100%;max-width:640px;margin-top:auto;padding-bottom:10px;gap:10px">
 <button class="btn-premium btn-cyan" id="btn-how" onclick="showHowToPlay()" style="min-width:0;flex:1;padding:12px;font-size:12px">CÓMO JUGAR</button>
@@ -295,7 +250,7 @@ Sprites con fallback</div><button class="btn-premium" onclick="showMenu('main')"
 </div>
 </div>
 <script>
-const GAME_VERSION = '2.40-FIXED-MENU';
+const GAME_VERSION="2.15d";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -319,13 +274,6 @@ const playerSprites = {};
 const spriteStatus = {};
 let spritesReady = false;
 
-// Ice projectile sprite - v2.38 - blast solo para lanzamiento, esfera para carga
-const iceProjectileImg = new Image();
-iceProjectileImg.src = "assets/sprites/effects/ice_blast.png";
-let iceProjectileReady = false;
-iceProjectileImg.onload = function(){ iceProjectileReady = true; console.log("Ice projectile OK"); };
-iceProjectileImg.onerror = function(){ console.log("Ice projectile FAIL"); };
-
 
 var SPRITE_DEFAULTS = {};
 try { SPRITE_DEFAULTS = JSON.parse(JSON.stringify(SPRITE_CONFIG)); } catch(e) { SPRITE_DEFAULTS = {}; }
@@ -336,141 +284,23 @@ function toggleLiveEditor(){ var el=document.getElementById('live-editor'); var 
 function toggleLock(){ isLocked=!isLocked; var lb=document.getElementById('btn-lock'); var ov=document.getElementById('lock-overlay'); if(isLocked){ if(lb) lb.textContent='🔒'; if(ov) ov.classList.add('active'); } else { if(lb) lb.textContent='🔓'; if(ov) ov.classList.remove('active'); } }
 function changeCharacter(c){ currentEditChar=c; if(c==='player'){ if(dummyEnemy){ try{dummyEnemy.dead=true;}catch(e){} dummyEnemy=null; } buildLiveEditor(); return; } var x=player?player.x+140:350; var y=playerLaneY||320; if(typeof createEnemy==='function'){ if(dummyEnemy) try{dummyEnemy.dead=true;}catch(e){} try{ dummyEnemy=createEnemy(c,x,y); if(dummyEnemy){ dummyEnemy.health=9999; dummyEnemy.isDummy=true; enemies.push(dummyEnemy); } }catch(e){} } buildLiveEditor(); }
 function buildLiveEditor(){
-  var list=document.getElementById('live-list');
-  if(!list) return;
-  list.innerHTML='';
-  var config, isEnemy=false;
-  if(currentEditChar==='player'){ config=SPRITE_CONFIG; }
-  else { config=(ENEMY_SPRITE_CONFIG && ENEMY_SPRITE_CONFIG[currentEditChar])? ENEMY_SPRITE_CONFIG[currentEditChar] : null; isEnemy=true; if(!config) { list.innerHTML='<div style="padding:10px;text-align:center;opacity:0.5">No hay sprites para '+currentEditChar+'</div>'; return; } }
-  Object.keys(config).forEach(function(k){
-    var cfg=config[k];
-    var div=document.createElement('div');
-    div.className='live-item';
-    var sx = (cfg.scaleX!=null? cfg.scaleX : (cfg.width!=null? cfg.width : cfg.scale||1));
-    var sy = (cfg.scaleY!=null? cfg.scaleY : (cfg.height!=null? cfg.height : cfg.scale||1));
-    var ay = cfg.anchorY||0;
-    div.innerHTML=`
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <b style="color:#7ef0ff;font-size:11px;letter-spacing:1px">${k.toUpperCase()}</b>
-        <span style="font-size:9px;opacity:0.5">${cfg.file||''} • ${cfg.frames||1}F</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:8px;color:#4ecca3;font-weight:800">↔️ ANCHO</span><span id="live-val-${k}-w" style="font-size:11px;color:#4ecca3;font-weight:900">${sx.toFixed(2)}</span></div>
-          <input type="range" class="live-range" min="0.2" max="2.5" step="0.05" value="${sx}" oninput="onLiveWH('${k}','w',this.value)">
-          <div style="display:flex;gap:4px;margin-top:4px"><button class="btn-live" style="flex:1;min-height:36px;padding:4px" onclick="adjWH('${k}','w',-0.1)">-</button><button class="btn-live" style="flex:1;min-height:36px;padding:4px" onclick="adjWH('${k}','w',0.1)">+</button></div>
-          <div style="font-size:7px;opacity:0.4;margin-top:2px">0.2 flaco • 2.5 gordito</div>
-        </div>
-        <div>
-          <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:8px;color:#a78bfa;font-weight:800">↕️ ALTO</span><span id="live-val-${k}-h" style="font-size:11px;color:#a78bfa;font-weight:900">${sy.toFixed(2)}</span></div>
-          <input type="range" class="live-range" min="0.2" max="2.5" step="0.05" value="${sy}" oninput="onLiveWH('${k}','h',this.value)">
-          <div style="display:flex;gap:4px;margin-top:4px"><button class="btn-live" style="flex:1;min-height:36px;padding:4px" onclick="adjWH('${k}','h',-0.1)">-</button><button class="btn-live" style="flex:1;min-height:36px;padding:4px" onclick="adjWH('${k}','h',0.1)">+</button></div>
-          <div style="font-size:7px;opacity:0.4;margin-top:2px">0.2 bajito • 2.5 alto</div>
-        </div>
-      </div>
-      <div style="margin-top:8px">
-        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:8px;color:#facc15;font-weight:800">📍 ALTURA PIES anchorY</span><span id="live-val-${k}-y" style="font-size:11px;color:#facc15;font-weight:900">${ay}</span></div>
-        <input type="range" class="live-range" min="-30" max="150" step="1" value="${ay}" oninput="onLiveY('${k}',this.value)">
-      </div>
-    `;
+  var list=document.getElementById('live-list'); if(!list) return; list.innerHTML='';
+  var cfgSet = currentEditChar==='player'? SPRITE_CONFIG : ENEMY_SPRITE_CONFIG[currentEditChar];
+  if(!cfgSet) return;
+  Object.keys(cfgSet).forEach(function(k){
+    var cfg=cfgSet[k]; var div=document.createElement('div'); div.className='live-item';
+    var sx=cfg.scaleX||cfg.scale||1, sy=cfg.scaleY||cfg.scale||1, ay=cfg.anchorY||0;
+    div.innerHTML=`<div style="display:flex;justify-content:space-between"><b style="color:#7ef0ff;font-size:11px">${k.toUpperCase()}</b><span style="font-size:9px;opacity:0.5">${cfg.file||''}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px"><div><div style="display:flex;justify-content:space-between"><span style="font-size:8px;color:#4ecca3">ANCHO</span><span id="live-val-${k}-w" style="font-size:11px;color:#4ecca3">${sx.toFixed(2)}</span></div><input type="range" class="live-range" min="0.2" max="2.5" step="0.05" value="${sx}" oninput="onLiveWH('${k}','w',this.value)"></div><div><div style="display:flex;justify-content:space-between"><span style="font-size:8px;color:#a78bfa">ALTO</span><span id="live-val-${k}-h" style="font-size:11px;color:#a78bfa">${sy.toFixed(2)}</span></div><input type="range" class="live-range" min="0.2" max="2.5" step="0.05" value="${sy}" oninput="onLiveWH('${k}','h',this.value)"></div></div><div style="margin-top:8px"><div style="display:flex;justify-content:space-between"><span style="font-size:8px;color:#facc15">ALTURA</span><span id="live-val-${k}-y" style="font-size:11px;color:#facc15">${ay}</span></div><input type="range" class="live-range" min="-30" max="150" step="1" value="${ay}" oninput="onLiveY('${k}',this.value)"></div>`;
     list.appendChild(div);
   });
 }
-function onLiveWH(key, wh, value){
-  if(isLocked) return;
-  var v=parseFloat(value);
-  var cfg = currentEditChar==='player'? SPRITE_CONFIG[key] : (ENEMY_SPRITE_CONFIG[currentEditChar]? ENEMY_SPRITE_CONFIG[currentEditChar][key] : null);
-  if(!cfg) return;
-  if(wh==='w'){ cfg.scaleX=v; cfg.width=null; } else { cfg.scaleY=v; cfg.height=null; }
-  var el=document.getElementById('live-val-'+key+'-'+wh);
-  if(el) el.textContent=v.toFixed(2);
-}
-function onLiveY(key, value){
-  if(isLocked) return;
-  var v=parseInt(value);
-  var cfg = currentEditChar==='player'? SPRITE_CONFIG[key] : (ENEMY_SPRITE_CONFIG[currentEditChar]? ENEMY_SPRITE_CONFIG[currentEditChar][key] : null);
-  if(!cfg) return;
-  cfg.anchorY=v;
-  var el=document.getElementById('live-val-'+key+'-y');
-  if(el) el.textContent=v;
-}
-function adjWH(key, wh, delta){
-  if(isLocked) return;
-  var cfg = currentEditChar==='player'? SPRITE_CONFIG[key] : ENEMY_SPRITE_CONFIG[currentEditChar][key];
-  if(!cfg) return;
-  var cur = wh==='w'? (cfg.scaleX!=null? cfg.scaleX : cfg.scale||1) : (cfg.scaleY!=null? cfg.scaleY : cfg.scale||1);
-  var nv = Math.max(0.2, Math.min(2.5, Math.round((cur+delta)*100)/100));
-  if(wh==='w') cfg.scaleX=nv; else cfg.scaleY=nv;
-  buildLiveEditor();
-}
-function applyGlobalAnchorLive(val){
-  if(isLocked) return;
-  var v=parseInt(val);
-  var a=document.getElementById('live-global-anchor-val'); if(a) a.textContent=v;
-  Object.keys(SPRITE_CONFIG).forEach(function(k){ SPRITE_CONFIG[k].anchorY=v; });
-  buildLiveEditor();
-}
-function applyGlobalScaleLive(val){
-  if(isLocked) return;
-  var v=parseFloat(val);
-  var a=document.getElementById('live-global-scale-val'); if(a) a.textContent=v.toFixed(2);
-  Object.keys(SPRITE_CONFIG).forEach(function(k){
-    var base=(SPRITE_DEFAULTS[k] && SPRITE_DEFAULTS[k].scale) || 1.0;
-    var ns=Math.round(base * v * 100)/100;
-    SPRITE_CONFIG[k].scale=ns; SPRITE_CONFIG[k].scaleX=ns; SPRITE_CONFIG[k].scaleY=ns;
-  });
-  buildLiveEditor();
-}
-function resetLiveEditor(){
-  if(currentEditChar==='player'){
-    Object.keys(SPRITE_DEFAULTS).forEach(function(k){ if(SPRITE_CONFIG[k]){ SPRITE_CONFIG[k].scale=SPRITE_DEFAULTS[k].scale; SPRITE_CONFIG[k].scaleX=SPRITE_DEFAULTS[k].scale; SPRITE_CONFIG[k].scaleY=SPRITE_DEFAULTS[k].scale; SPRITE_CONFIG[k].anchorY=SPRITE_DEFAULTS[k].anchorY; } });
-  } else {
-    var def=ENEMY_DEFAULTS[currentEditChar];
-    if(def){ Object.keys(def).forEach(function(k){ if(ENEMY_SPRITE_CONFIG[currentEditChar] && ENEMY_SPRITE_CONFIG[currentEditChar][k]){ ENEMY_SPRITE_CONFIG[currentEditChar][k].scale=def[k].scale; ENEMY_SPRITE_CONFIG[currentEditChar][k].scaleX=def[k].scale; ENEMY_SPRITE_CONFIG[currentEditChar][k].scaleY=def[k].scale; } }); }
-  }
-  buildLiveEditor();
-}
-function moveLive(dir){
-  if(isLocked) return;
-  if(typeof keys==='undefined') return;
-  if(dir==='left'){ keys.left=true; setTimeout(()=>{keys.left=false;}, 400); if(typeof player!=='undefined') player.facingRight=false; }
-  if(dir==='right'){ keys.right=true; setTimeout(()=>{keys.right=false;}, 400); if(typeof player!=='undefined') player.facingRight=true; }
-  if(dir==='up'){ keys.up=true; setTimeout(()=>{keys.up=false;}, 200); }
-  if(dir==='down'){ keys.down=true; setTimeout(()=>{keys.down=false;}, 200); }
-}
-function setLiveAnim(anim){ if(isLocked) return; if(typeof player!=='undefined'){ player.anim=anim; player.frame=0; player.frameTime=0; } }
-function exportLiveConfig(){
-  var out="";
-  if(currentEditChar==='player'){
-    out+="const SPRITE_CONFIG = {
-  idle: { file: "idle.png", frames: 4, speed: 120, scale: 1, scaleX: 1, scaleY: 1, anchorY: 31, fallbackColor: "#00e5ff", desc: "Idle 4F realista - FIX suelo" },
-  walk: { file: "walk.png", frames: 4, speed: 140, scale: 1.3, scaleX: 1.75, scaleY: 1.3, anchorY: 46, fallbackColor: "#7ef0ff", desc: "Walk 4F realista - FIX suelo" },
-  jump: { file: "jump.png", frames: 3, speed: 120, scale: 0.9, scaleX: 0.9, scaleY: 0.9, anchorY: 29, fallbackColor: "#a0e6ff", desc: "Salto 3F realista" },
-  punch: { file: "punch.png", frames: 4, speed: 70, scale: 1.15, scaleX: 1.15, scaleY: 1.15, anchorY: 45, fallbackColor: "#4ecca3", desc: "Puño 4F realista" },
-  kick: { file: "kick.png", frames: 4, speed: 80, scale: 1.2, scaleX: 1.2, scaleY: 1.2, anchorY: 62, fallbackColor: "#7ef0ff", desc: "Patada 4F realista" },
-  ice_charge: { file: "ice_charge.png", frames: 1, speed: 200, scale: 0.55, scaleX: 0.55, scaleY: 0.55, anchorY: 32, fallbackColor: "#7ef0ff", desc: "Carga hielo realista" },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 200, scale: 0.75, scaleX: 0.75, scaleY: 0.75, anchorY: 31, fallbackColor: "#7ef0ff", desc: "Disparo hielo realista" },
-  kick_air: { file: "kick_air.png", frames: 1, speed: 300, scale: 0.85, scaleX: 0.85, scaleY: 0.85, anchorY: 14, fallbackColor: "#7ef0ff", desc: "Patada aire realista" },
-  punch_air: { file: "punch_air.png", frames: 1, speed: 300, scale: 0.7, scaleX: 0.7, scaleY: 0.7, anchorY: 27, fallbackColor: "#4ecca3", desc: "Combo aire realista" },
-};";
-  } else {
-    out+=`// ${currentEditChar} config\n`+JSON.stringify(ENEMY_SPRITE_CONFIG[currentEditChar], null, 2);
-  }
-  var area=document.getElementById('live-export');
-  if(area){ area.style.display="block"; area.textContent=out; }
-}
-function copyLiveConfig(){ exportLiveConfig(); var area=document.getElementById('live-export'); var t=area?area.textContent:""; if(navigator.clipboard&&t) navigator.clipboard.writeText(t).then(()=>alert('✅ Copiado!')); }
-function updateLiveButtonVisibility(){
-  var btn=document.getElementById('btn-open-live');
-  if(!btn) return;
-  try{
-    if(typeof currentState!=='undefined' && currentState==='PLAYING'){
-      btn.classList.add('visible');
-      if(LEVELS[currentLevel] && LEVELS[currentLevel].isEditor && !liveEditorOpen){ setTimeout(()=>{ if(!liveEditorOpen) toggleLiveEditor(); }, 700); }
-    } else { btn.classList.remove('visible'); }
-  }catch(e){}
-}
-setInterval(updateLiveButtonVisibility, 600);
+function onLiveWH(k,wh,v){ if(isLocked) return; var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; if(!cfg) return; v=parseFloat(v); if(wh==='w') cfg.scaleX=v; else cfg.scaleY=v; var el=document.getElementById('live-val-'+k+'-'+wh); if(el) el.textContent=v.toFixed(2); }
+function onLiveY(k,v){ if(isLocked) return; var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; if(!cfg) return; cfg.anchorY=parseInt(v); var el=document.getElementById('live-val-'+k+'-y'); if(el) el.textContent=v; }
+function moveLive(d){ if(isLocked) return; if(d==='left'){ keys.left=true; setTimeout(()=>keys.left=false,400); player.facingRight=false; } if(d==='right'){ keys.right=true; setTimeout(()=>keys.right=false,400); player.facingRight=true; } }
+function exportLiveConfig(){ var out="const SPRITE_CONFIG = {\n"; Object.keys(SPRITE_CONFIG).forEach(function(k){ var c=SPRITE_CONFIG[k]; out+=`  ${k}: { file: "${c.file}", frames: ${c.frames}, speed: ${c.speed}, scale: ${c.scale}, scaleX: ${c.scaleX||c.scale}, scaleY: ${c.scaleY||c.scale}, anchorY: ${c.anchorY} },\n`; }); out+="};"; var a=document.getElementById('live-export'); if(a){ a.style.display="block"; a.textContent=out; } }
+function copyLiveConfig(){ exportLiveConfig(); var a=document.getElementById('live-export'); if(navigator.clipboard) navigator.clipboard.writeText(a.textContent).then(()=>alert('Copiado')); }
+function updateLiveButtonVisibility(){ var b=document.getElementById('btn-open-live'); if(!b) return; if(currentState==='PLAYING'){ b.classList.add('visible'); if(LEVELS[currentLevel] && LEVELS[currentLevel].isEditor && !liveEditorOpen) setTimeout(()=>{ if(!liveEditorOpen) toggleLiveEditor(); },700); } else b.classList.remove('visible'); }
+setInterval(updateLiveButtonVisibility,600);
 
 
 function initSprites(){
@@ -549,77 +379,7 @@ function analyzeSpriteOffsets(key){
   console.log('Offsets '+key+':',offsets);
 }
 
-
-// ===== SISTEMA SPRITES ENEMIGOS - THUG NIVEL 1 - FIX v30 =====
-const ENEMY_SPRITE_BASE = "assets/sprites/enemies/";
-const ENEMY_SPRITE_CONFIG = {
-  thug: {
-    idle: { file: "thug/idle.png", frames: 1, speed: 140, scale: 0.88 },
-    walk: { file: "thug/walk.png", frames: 4, speed: 160, scale: 0.88 },
-    attack: { file: "thug/attack.png", frames: 3, speed: 100, scale: 0.88 },
-    hit: { file: "thug/hit.png", frames: 1, speed: 200, scale: 0.88 },
-    dead: { file: "thug/dead.png", frames: 1, speed: 200, scale: 0.70 },
-    frozen: { file: "thug/frozen.png", frames: 1, speed: 200, scale: 1.0 }
-  },
-  thug_gun: {
-    idle: { file: "thug_gun/idle.png", frames: 1, speed: 140, scale: 0.88 },
-    walk: { file: "thug_gun/walk.png", frames: 4, speed: 160, scale: 0.88 },
-    attack: { file: "thug_gun/attack.png", frames: 3, speed: 100, scale: 0.88 },
-    hit: { file: "thug_gun/hit.png", frames: 1, speed: 200, scale: 0.88 },
-    dead: { file: "thug_gun/dead.png", frames: 1, speed: 200, scale: 0.70 },
-    frozen: { file: "thug_gun/frozen.png", frames: 1, speed: 200, scale: 1.0 }
-  },
-  ninja_renegade: {
-    idle: { file: "ninja_renegade/idle.png", frames: 1, speed: 140, scale: 0.85 },
-    walk: { file: "ninja_renegade/walk.png", frames: 4, speed: 160, scale: 0.85 },
-    attack: { file: "ninja_renegade/attack.png", frames: 3, speed: 100, scale: 0.85 },
-    hit: { file: "ninja_renegade/hit.png", frames: 1, speed: 200, scale: 0.85 },
-    dead: { file: "ninja_renegade/dead.png", frames: 1, speed: 200, scale: 0.68 },
-    frozen: { file: "ninja_renegade/frozen.png", frames: 1, speed: 200, scale: 0.95 }
-  },
-  tarkatan: {
-    idle: { file: "tarkatan/idle.png", frames: 1, speed: 140, scale: 0.9 },
-    walk: { file: "tarkatan/walk.png", frames: 4, speed: 160, scale: 0.9 },
-    attack: { file: "tarkatan/attack.png", frames: 3, speed: 100, scale: 0.9 },
-    hit: { file: "tarkatan/hit.png", frames: 1, speed: 200, scale: 0.9 },
-    dead: { file: "tarkatan/dead.png", frames: 1, speed: 200, scale: 0.72 },
-    frozen: { file: "tarkatan/frozen.png", frames: 1, speed: 200, scale: 1.05 }
-  }
-};
-const enemySprites = {};
-const enemySpriteStatus = {};
-let enemiesSpritesReady = false;
-
-function initEnemySprites(){
-  console.log("Cargando sprites enemigos desde", ENEMY_SPRITE_BASE);
-  Object.keys(ENEMY_SPRITE_CONFIG).forEach(function(enemyType){
-    enemySprites[enemyType] = {};
-    var anims = ENEMY_SPRITE_CONFIG[enemyType];
-    Object.keys(anims).forEach(function(anim){
-      var cfg = anims[anim];
-      var key = enemyType+"_"+anim;
-      enemySpriteStatus[key] = "loading";
-      var img = new Image();
-      img.onload = (function(k){ return function(){ enemySpriteStatus[k]="ok"; console.log("Enemy sprite OK:",k, this.src); }; })(key);
-      img.onerror = (function(k){ return function(){ enemySpriteStatus[k]="fail"; console.error("Enemy sprite FAIL:",k, this.src); }; })(key);
-      img.src = ENEMY_SPRITE_BASE + cfg.file;
-      enemySprites[enemyType][anim] = img;
-    });
-  });
-  enemiesSpritesReady = true; setTimeout(function(){ console.log("enemiesSpritesReady = true", enemySpriteStatus); }, 500);
-}
-
-function getEnemyAnim(e){
-  if(e.dead) return 'dead';
-  if(e.frozen>0) return 'frozen';
-  if(e.hitTimer && e.hitTimer>0) return 'hit';
-  if(e.isAttacking) return 'attack';
-  if(Math.abs(e.vx||0)>0.1) return 'walk';
-  return 'idle';
-}
-
 function analyzeAllSprites(){
-
   Object.keys(SPRITE_CONFIG).forEach(function(key){
     if(spriteStatus[key]==='ok') analyzeSpriteOffsets(key);
   });
@@ -649,11 +409,11 @@ function updateSpriteUI(){ updateScaleUI();
   }catch(e){}
 }
 
-initSprites(); initEnemySprites();
+initSprites();
 
 // LEVELS y ENEMIGOS de v1.35
 const LEVELS = [
-    { id: 0, name: "🎨 MODO EDICION", subtitle: "Laboratorio sin enemigos", boss: "Ninguno", bossTitle: "Modo Seguro", story: "Dojo privado para probar sprites sin enemigos. Incluye selector de personajes para futuras ediciones.", bgColor: [12, 14, 28], groundColor: [35, 40, 55], enemyTypes: [], enemyCount: 0, isEditor: true },
+    { id: 0, name: "🎨 MODO EDICION", subtitle: "Laboratorio sin enemigos", boss: "Ninguno", bossTitle: "Modo Seguro", story: "Dojo privado para probar sprites sin enemigos.", bgColor: [12, 14, 28], groundColor: [35, 40, 55], enemyTypes: [], enemyCount: 0, isEditor: true },
     { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug','thug_gun','ninja_renegade'], enemyCount: 12 },
     { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic','technician','sektor_miniboss'], enemyCount: 13 },
     { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade','tarkatan','priest_quan'], enemyCount: 14 },
@@ -701,7 +461,7 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, isKickAir:false, kickAirTimer:0, kickAirHit:false, isPunchAir:false, punchAirTimer:0, punchAirHit:false};
+let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0};
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
@@ -719,29 +479,13 @@ const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext(
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
-function tryKick(){ 
-  if(player.isChargingIce || player.isIceLoaded || player.isShootingIce) return;
-  if(player.isPunching || player.isKicking || player.isPunchAir || player.isKickAir) return;
-  if(player.grounded){
-    player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0;
-  } else {
-    player.isKickAir=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickAirHit=false; player.kickAirTimer=0;
-  }
-}
-function tryPunch(){ 
-  if(player.isChargingIce || player.isIceLoaded || player.isShootingIce) return;
-  if(player.isPunching || player.isKicking || player.isPunchAir || player.isKickAir) return;
-  if(player.grounded){
-    player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0;
-  } else {
-    player.isPunchAir=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.punchAirHit=false; player.punchAirTimer=0;
-  }
-}
+function tryKick(){ if(!player.grounded) return; if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
+function tryPunch(){ if(!player.grounded) return; if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
 function tryJump(){ if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
   var sy = attachedIce ? attachedIce.y : playerLaneY-28;
-  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*5.8,vy:0,type:'ice',life:4000});
+  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*7.5,vy:0,type:'ice',life:3000});
   attachedIce=null;
   player.isChargingIce=false;
   player.isIceLoaded=false;
@@ -786,7 +530,7 @@ function setupCanvas(){
 function spawnText(x,y,t,c){ floatingTexts.push({x:x,y:y,text:t,color:c||'#fff',timer:0,life:800,vy:-1.2}); }
 function createEnemy(type,x,laneY){
   var cfg=ENEMY_CONFIGS[type]; if(!cfg) return null;
-  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0, anim:'idle', frame:0, frameTime:0, facingRight:false, hitTimer:0, isAttacking:false, vx:0};
+  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0};
 }
 function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
@@ -885,8 +629,6 @@ function drawPlayer(time){
   var anim=player.anim||'idle';
   if(player.isShootingIce) anim='ice_shoot';
   else if(player.isChargingIce || player.isIceLoaded) anim='ice_charge';
-  else if(player.isPunchAir) anim='punch_air';
-  else if(player.isKickAir) anim='kick_air';
   else if(player.isPunching) anim='punch';
   else if(player.isKicking) anim='kick';
   else if(!player.grounded) anim='jump';
@@ -942,50 +684,20 @@ function drawPlayer(time){
       } else if(anim==='walk'){
         targetW = Math.round(65 * sc * scaleX);
         targetH = Math.round(110 * sc * scaleY);
-      } else if(anim==='kick_air'){
-        targetW = Math.round(110 * sc * scaleY);
-        targetH = Math.round(120 * sc * scaleY); // FIX FINAL - 0.95 igual que idle/walk
-        totalFrames=cfg.frames||1;
-        sw=Math.floor(sheetW/totalFrames);
-        sh=sheetH;
-        sx=0; sy=0;
-        if(totalFrames<=1){
-          player.frame=0;
-          if(!player.kickAirHit){
-            player.kickAirHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=30; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=25; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=28; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
-          }
-        }
-      } else if(anim==='punch_air'){
-        targetW = Math.round(110 * sc * scaleY);
-        targetH = Math.round(120 * sc * scaleY); // FIX FINAL - 0.95 igual que idle/walk
-        totalFrames=cfg.frames||1;
-        sw=Math.floor(sheetW/totalFrames);
-        sh=sheetH;
-        sx=0; sy=0;
-        if(totalFrames<=1){
-          player.frame=0;
-          if(!player.punchAirHit){
-            player.punchAirHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=20; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=18; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
-          }
-        }
       } else if(anim==='jump'){
         targetW = Math.round(105 * sc * scaleX);
         targetH = Math.round(125 * sc * scaleY);
       } else if(anim==='punch'){
-        targetW = Math.round(110 * sc * scaleY);
+        targetW = Math.round(110 * sc * scaleX);
         targetH = Math.round(125 * sc * scaleY);
       } else if(anim==='kick'){
-        targetW = Math.round(130 * sc * scaleY);
+        targetW = Math.round(130 * sc * scaleX);
         targetH = Math.round(130 * sc * scaleY);
       } else if(anim==='ice' || anim==='ice_charge'){
         targetW = Math.round(170 * sc * scaleX); // <-- ENSANCHADO: era 120, ahora 170 para hacerlo mas ancho
         targetH = Math.round(130 * sc * scaleY);
       } else if(anim==='ice_shot' || anim==='ice_shoot'){
-        targetW = Math.round(125 * sc * scaleY);
+        targetW = Math.round(125 * sc * scaleX);
         targetH = Math.round(130 * sc * scaleY);
       } else {
         var baseW=baseDrawWidth*animScale;
@@ -1006,7 +718,7 @@ function drawPlayer(time){
       var jumpOff=Math.round(player.jumpOffset||0);
       var drawY=Math.round(playerLaneY-targetH+10+anchorOffset+jumpOff);
 
-      // IDLE: ahora animado 4 frames - FIX v2.43
+      // IDLE: ahora animado 4 frames - FIX v2.41
       var f = player.frame||0;
       if(anim==='idle'){
         totalFrames=cfg.frames||4;
@@ -1035,8 +747,8 @@ function drawPlayer(time){
             player.punchTimer=0;
           } else if(player.frame>=2 && !player.attackHit){
             player.attackHit=true;
-            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=380; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=300; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __cands=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFront=(player.facingRight && __dx>5 && __dx<110) || (!player.facingRight && __dx<-5 && __dx>-110); if(__inFront && __dy<60) __cands.push({en:__en, dist:Math.abs(__dx)+__dy}); } __cands.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __cands.length); __ci++){ var en=__cands[__ci].en; en.health-=15; en.hitTimer=12; en.frozen=0; en.x += (player.facingRight?1:-1)*12; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'PUM 15','#7ef0ff'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=15; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFront=(player.facingRight && __bdx>0 && __bdx<130) || (!player.facingRight && __bdx<0 && __bdx>-130); if(__bFront && __bdy<70){ boss.health-=12; boss.hitTimer=10; boss.frozen=0; boss.x += (player.facingRight?1:-1)*6; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'PUM BOSS 12','#ffcc00'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='kick'){
@@ -1058,8 +770,8 @@ function drawPlayer(time){
             player.kickTimer=0;
           } else if(player.frame>=1 && !player.kickHit){
             player.kickHit=true;
-            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=450; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(en.health<=0){ en.dead=true; en.deadTimer=0; en.hitTimer=0; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
-            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=350; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
+            var __candsK=[]; for(var __i=0;__i<enemies.length;__i++){ var __en=enemies[__i]; if(__en.dead) continue; var __dx=__en.x-player.x; var __enY=__en.laneY||__en.y||playerLaneY; var __dy=Math.abs(__enY-playerLaneY); var __inFrontK=(player.facingRight && __dx>10 && __dx<135) || (!player.facingRight && __dx<-10 && __dx>-135); if(__inFrontK && __dy<65) __candsK.push({en:__en, dist:Math.abs(__dx)+__dy}); } __candsK.sort(function(a,b){return a.dist-b.dist;}); for(var __ci=0; __ci<Math.min(2, __candsK.length); __ci++){ var en=__candsK[__ci].en; en.health-=25; en.hitTimer=14; en.frozen=0; en.x += (player.facingRight?1:-1)*18; if(typeof spawnText==='function') spawnText(en.x, (en.laneY||en.y)-30, 'KICK 25','#facc15'); if(en.health<=0){ en.dead=true; if(typeof enemiesDefeated!=='undefined') enemiesDefeated++; if(typeof score!=='undefined') score+=20; } }
+            if(boss && !boss.dead){ var __bdx=boss.x-player.x; var __bdy=Math.abs((boss.laneY||boss.y||playerLaneY)-playerLaneY); var __bFrontK=(player.facingRight && __bdx>0 && __bdx<145) || (!player.facingRight && __bdx<0 && __bdx>-145); if(__bFrontK && __bdy<75){ boss.health-=22; boss.hitTimer=12; boss.frozen=0; boss.x += (player.facingRight?1:-1)*10; if(typeof spawnText==='function') spawnText(boss.x, (boss.laneY||boss.y)-40, 'KICK BOSS 22','#ff7700'); if(boss.health<=0){ boss.dead=true; if(typeof score!=='undefined') score+=500; } } }
           }
         }
       } else if(anim==='jump'){
@@ -1113,18 +825,9 @@ function drawPlayer(time){
     }catch(e){ console.log('sprite draw error',e); }
   }
 
-  // Si jump también falló, usa idle
-  if(!useSprite && anim==='jump'){
-    var idleSprite=playerSprites['idle'];
-    var idleStatus=spriteStatus['idle'];
-    if(idleSprite && idleSprite.complete && idleSprite.naturalWidth>10 && idleStatus==='ok'){
-      anim='idle'; sprite=idleSprite; status=idleStatus; useSprite=true;
-    }
-  }
-  var jumpOffFallback=Math.round(player.jumpOffset||0);
   var w=Math.round(baseDrawWidth*sc), h=Math.round(baseDrawHeight*sc);
   var x=Math.round(player.x-camera.x)-Math.round(w/2);
-  var y=Math.round(playerLaneY-h+10+jumpOffFallback);
+  var y=Math.round(playerLaneY-h+10);
   var grad=ctx.createLinearGradient(x,y,x,y+h);
   grad.addColorStop(0,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
   ctx.fillStyle=grad; ctx.fillRect(x,y,w,h);
@@ -1145,13 +848,10 @@ function loop(time){
       player.jumpOffset+=player.vy;
       if(player.jumpOffset>=0){
         player.jumpOffset=0; player.vy=0; player.grounded=true; player.landingTimer=180;
-        // Al aterrizar, limpiar aereos
-        player.isKickAir=false; player.isPunchAir=false;
-        player.kickAirTimer=0; player.punchAirTimer=0;
       }
     } else if(player.landingTimer>0){ player.landingTimer-=16; }
 
-    // --- PUNCH & KICK RESET FALLBACK (con AIR) ---
+    // --- PUNCH & KICK RESET FALLBACK ---
     if(player.isPunching){
       if(!player.punchTimer) player.punchTimer=0;
       player.punchTimer+=16;
@@ -1174,28 +874,6 @@ function loop(time){
         player.kickHit=false;
       }
     } else { player.kickTimer=0; }
-    if(player.isKickAir){
-      if(!player.kickAirTimer) player.kickAirTimer=0;
-      player.kickAirTimer+=16;
-      if(player.kickAirTimer>450){
-        player.isKickAir=false;
-        player.anim=player.grounded?'idle':'jump';
-        player.frame=0;
-        player.kickAirTimer=0;
-        player.kickAirHit=false;
-      }
-    } else { player.kickAirTimer=0; }
-    if(player.isPunchAir){
-      if(!player.punchAirTimer) player.punchAirTimer=0;
-      player.punchAirTimer+=16;
-      if(player.punchAirTimer>400){
-        player.isPunchAir=false;
-        player.anim=player.grounded?'idle':'jump';
-        player.frame=0;
-        player.punchAirTimer=0;
-        player.punchAirHit=false;
-      }
-    } else { player.punchAirTimer=0; }
 
     // --- ICE CHARGE LOGIC v2.10: bloquea caminata mientras carga, libera al disparar ---
     if(player.isShootingIce){
@@ -1210,8 +888,8 @@ function loop(time){
       player.iceChargeTimer+=16;
       var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
       if(attachedIce){
-        attachedIce.x=player.x+(player.facingRight?29:-29)*_sc; // FINAL X=29 espejado
-        attachedIce.y=playerLaneY - 10 + (player.jumpOffset||0); // FINAL Y=10 en manos - FIX DEFINITIVO
+        attachedIce.x=player.x+(player.facingRight?29:-29)*_sc; // FINAL 29 espejado
+        attachedIce.y=playerLaneY-62*_sc + (player.jumpOffset||0); // v2.14 FIX: esfera SOBRE sprite, respeta scale 0.7 y ancho 170
         attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
       }
       if(player.iceChargeTimer>=ICE_CHARGE_TIME){
@@ -1247,8 +925,6 @@ function loop(time){
     }
     if(player.isShootingIce){ player.anim='ice_shoot'; }
     else if(player.isChargingIce || player.isIceLoaded){ player.anim='ice_charge'; }
-    else if(player.isPunchAir){ player.anim='punch_air'; }
-    else if(player.isKickAir){ player.anim='kick_air'; }
     else if(player.isPunching){ player.anim='punch'; }
     else if(player.isKicking){ player.anim='kick'; }
     else if(!player.grounded){ player.anim='jump'; }
@@ -1294,51 +970,30 @@ function loop(time){
 
     if(!bossSpawned && enemiesDefeated>=LEVELS[currentLevel].enemyCount && getAliveCount()===0){ spawnBoss(); }
     
-    // Projectiles - FIX v2.40 no blue on dead, blast launch
+    // Projectiles
     for(var i=projectiles.length-1;i>=0;i--){
       var p=projectiles[i]; p.x+=p.vx; p.life-=16;
       if(p.life<=0){ projectiles.splice(i,1); continue; }
       var hit=false;
       for(var ei=0;ei<enemies.length;ei++){
         var e=enemies[ei]; if(e.dead) continue;
-        if(Math.abs(p.y-e.laneY)<95 && Math.abs(p.x-e.x)<145){
-          e.health-=10; e.hitTimer=380; e.deadTimer=0;
-          hit=true;
-          if(e.health<=0){ 
-            e.dead=true; e.deadTimer=0; e.frozen=0; enemiesDefeated++; score+=100; 
-          } else {
-            e.frozen=5000;
-            spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
-          }
-        }
+        if(Math.abs(p.y-e.laneY)<50 && Math.abs(p.x-e.x)<60){ e.frozen=3500; e.health-=10; spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff'); hit=true; if(e.health<=0){ e.dead=true; enemiesDefeated++; score+=100; } break; }
       }
-      if(boss && !boss.dead){
-        if(Math.abs(p.y-boss.laneY)<90 && Math.abs(p.x-boss.x)<160){
-          boss.health-=8; hit=true;
-          if(boss.health<=0){ boss.dead=true; boss.frozen=0; score+=500; } else { boss.frozen=4000; }
-        }
-      }
+      if(!hit && boss && !boss.dead){ if(Math.abs(p.y-boss.laneY)<60 && Math.abs(p.x-boss.x)<70){ boss.frozen=2500; boss.health-=8; hit=true; if(boss.health<=0){ boss.dead=true; score+=500; } } }
       if(hit){ projectiles.splice(i,1); continue; }
       if(p.x<camera.x-100 || p.x>camera.x+canvas.width+100) projectiles.splice(i,1);
     }
     
     for(var ei=0;ei<enemies.length;ei++){
-      var en=enemies[ei]; if(en.dead) continue;
-      if(en.frozen>0){ en.frozen-=16; en.vx=0; en.isAttacking=false; en.hitTimer=Math.max(0,(en.hitTimer||0)-16); continue; }
+      var en=enemies[ei]; if(en.frozen>0){ en.frozen-=16; continue; } if(en.dead) continue;
       var dx=player.x-en.x; var dy=playerLaneY-en.laneY; var d=Math.sqrt(dx*dx+dy*dy);
-      var prevX=en.x;
       if(d>50){ en.x+=(dx/d)*en.speed*0.8; en.laneY+=(dy/d)*en.speed*0.4; }
-      en.vx = en.x - prevX;
-      en.facingRight = dx>0;
-      en.hitTimer = Math.max(0,(en.hitTimer||0)-16);
-      en.isAttacking = (Math.abs(dx)<50 && Math.abs(dy)<35);
-      if(Math.abs(dx)<44 && Math.abs(dy)<30){ player.health-=0.12; en.isAttacking=true; }
+      if(Math.abs(dx)<44 && Math.abs(dy)<30){ player.health-=0.12; }
     }
     if(boss && !boss.dead && boss.frozen<=0){
       var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
       if(d>70){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; }
-      var airOffset = Math.abs(player.jumpOffset||0);
-      if(airOffset>30){} else { if(Math.abs(dx)<60 && Math.abs(dy)<40){ player.health-=0.25; } }
+      if(Math.abs(dx)<60 && Math.abs(dy)<40){ player.health-=0.25; }
     }
     if(boss && boss.frozen>0) boss.frozen-=16;
     
@@ -1354,78 +1009,10 @@ function loop(time){
     var prog=camera.x/Math.max(1,camera.worldWidth-canvas.width); ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56,4); ctx.fillStyle='#7ef0ff'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56*prog,4);
     
     for(var ei=0;ei<enemies.length;ei++){
-      var e=enemies[ei];
-      if(e.dead && (e.deadTimer||0)>900) continue; // deja ver anim dead 900ms
+      var e=enemies[ei]; if(e.dead) continue;
       var ex=Math.round(e.x-camera.x); if(ex<-80||ex>canvas.width+80) continue;
-      var ey = e.laneY;
-      // SPRITES ENEMIGOS GENERICO - v2.33 - soporta thug, thug_gun, ninja, etc
-      if(enemySprites[e.type]){
-        var eAnim = getEnemyAnim(e); // dead > frozen > hit > attack > walk > idle
-        var eCfg = (ENEMY_SPRITE_CONFIG[e.type][eAnim]||ENEMY_SPRITE_CONFIG[e.type].idle);
-        var eSprite = enemySprites[e.type][eAnim] || enemySprites[e.type].idle;
-        var statusKey = e.type+'_'+eAnim;
-        var useESprite = eSprite && eSprite.complete && eSprite.naturalWidth>10 && (enemySpriteStatus[statusKey]==='ok' || enemySpriteStatus[statusKey]==='loading');
-        if(useESprite){
-          try{
-            var totalFrames = eCfg.frames||1;
-            // FIX v2.35 - Reset frame al cambiar de anim para evitar desaparicion
-            if(e._lastAnim !== eAnim){ e.frame=0; e.frameTime=0; e._lastAnim=eAnim; }
-            // Clamp frame dentro del rango de la anim actual
-            if((e.frame||0) >= totalFrames) e.frame=0;
-            var sheetW = eSprite.naturalWidth;
-            var sheetH = eSprite.naturalHeight;
-            var sw = Math.floor(sheetW/totalFrames);
-            var sh = sheetH;
-            var sx = Math.floor((e.frame||0)*sw);
-            // NO animar si está congelado o muerto
-            if(e.frozen<=0 && !e.dead){
-              e.frameTime = (e.frameTime||0)+16;
-              if(e.frameTime > eCfg.speed){ e.frame = ((e.frame||0)+1)%totalFrames; e.frameTime=0; }
-            } else if(e.frozen>0){
-              // Congelado: siempre frame 0 del frozen.png
-              e.frame = 0;
-            }
-            var depthE = (laneBottom-ey)/Math.max(1,laneBottom-laneTop);
-            var scE = (1-depthE*0.12)*PLAYER_SCALE*1.0;
-            var aspect = sw / Math.max(1,sh);
-            var baseH = 110 * scE * (eCfg.scale||1.0);
-            var baseW = baseH * aspect;
-            if(baseW > 140*scE){ baseW = 140*scE; baseH = baseW / Math.max(0.1,aspect); }
-            var targetW = Math.round(baseW);
-            var targetH = Math.round(baseH);
-            var drawX = ex - Math.round(targetW/2) + Math.round(e.width/2);
-            var drawY = Math.round(ey - targetH + 6);
-            ctx.save();
-            ctx.imageSmoothingEnabled=true;
-            ctx.imageSmoothingQuality='high';
-            if(!e.dead && e.frozen>0 && eAnim!=='frozen' && eAnim!=='dead'){
-              ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=15;
-            }
-            // Sprites miran a DERECHA original
-            if(!e.facingRight){
-              ctx.translate(drawX+targetW/2, drawY+targetH/2);
-              ctx.scale(-1,1);
-              ctx.drawImage(eSprite, sx, 0, sw, sh, -targetW/2, -targetH/2, targetW, targetH);
-            } else {
-              ctx.drawImage(eSprite, sx, 0, sw, sh, drawX, drawY, targetW, targetH);
-            }
-            ctx.restore();
-            // FIX v2.39 - Si está muerto, nunca dibujar bloque azul encima de dead.png
-            // Si es frozen.png con transparencia, NO dibujar bloque extra
-            if(!e.dead && e.frozen>0 && eAnim!=='frozen' && eAnim!=='dead'){
-              ctx.save(); ctx.globalAlpha=0.45; ctx.fillStyle='#7ef0ff';
-              if(!e.facingRight){ ctx.translate(drawX+targetW/2, drawY+targetH/2); ctx.scale(-1,1); ctx.fillRect(-targetW/2, -targetH/2, targetW, targetH); }
-              else { ctx.fillRect(drawX, drawY, targetW, targetH); }
-              ctx.restore();
-            }
-            ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, ey-46, e.width, 3);
-            ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, ey-46, e.width*(e.health/e.maxHealth), 3);
-            continue;
-          }catch(err){ console.log(e.type+' draw err',err); }
-        }
-      }
-      ctx.fillStyle=e.frozen>0?'#7ef0ff':e.color; ctx.fillRect(ex, ey-40, e.width, e.height);
-      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, ey-46, e.width, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, ey-46, e.width*(e.health/e.maxHealth), 3);
+      ctx.fillStyle=e.frozen>0?'#7ef0ff':e.color; ctx.fillRect(ex, e.laneY-40, e.width, e.height);
+      ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, e.width, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, e.width*(e.health/e.maxHealth), 3);
     }
     if(boss && !boss.dead){
       var bx=Math.round(boss.x-camera.x);
@@ -1436,23 +1023,9 @@ function loop(time){
     for(var pi=0;pi<projectiles.length;pi++){
       var p=projectiles[pi]; if(p.type!=='ice') continue;
       var psx=Math.round(p.x-camera.x);
-      var psy=Math.round(p.y);
-      if(iceProjectileReady && iceProjectileImg.complete && iceProjectileImg.naturalWidth>10){
-        ctx.save();
-        var w = 90; var h = 32;
-        if(p.vx < 0){
-          ctx.translate(psx, psy);
-          ctx.scale(-1,1);
-          ctx.drawImage(iceProjectileImg, -w/2, -h/2, w, h);
-        } else {
-          ctx.drawImage(iceProjectileImg, psx - w/2, psy - h/2, w, h);
-        }
-        ctx.restore();
-      } else {
-        var grad=ctx.createRadialGradient(psx-3, psy-3, 2, psx, psy, 24);
-        grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
-        ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(psx,psy,24,0,Math.PI*2); ctx.fill();
-      }
+      var grad=ctx.createRadialGradient(psx-3, p.y-3, 2, psx, p.y, 24);
+      grad.addColorStop(0,'#fff'); grad.addColorStop(0.4,'#7ef0ff'); grad.addColorStop(1,'#0e7490');
+      ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(psx,p.y,24,0,Math.PI*2); ctx.fill();
     }
     
     drawPlayer(time);
@@ -1486,7 +1059,7 @@ function loop(time){
     }
     
     ctx.fillStyle='#7ef0ff'; ctx.font='bold 12px monospace'; ctx.fillText('NIVEL '+(currentLevel+1)+' - '+lvl.name, 14, 26);
-    // Debug removido v2.35 - sin letras amarillas
+    ctx.fillStyle='rgba(126,240,255,0.5)'; ctx.font='10px monospace'; ctx.fillText('Sprites: '+(Object.values(spriteStatus).filter(function(s){return s==='ok'}).length)+'/'+Object.keys(spriteStatus).length+' OK', 14, 42);
     
     try{
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
@@ -1575,8 +1148,6 @@ if(bk){
   bk.addEventListener('mousedown', doKick);
   bk.addEventListener('click', doKick);
 }
-var btnSpecial=document.getElementById('btn-special');
-if(btnSpecial){ var doSpecial=function(e){ if(e){ e.preventDefault(); e.stopPropagation(); } tryPunch(); }; btnSpecial.addEventListener('touchstart', doSpecial, {passive:false}); btnSpecial.addEventListener('mousedown', doSpecial); btnSpecial.addEventListener('click', doSpecial); btnSpecial.style.opacity='1'; btnSpecial.style.pointerEvents='auto'; }
 var bj=document.getElementById('btn-jump');
 function handleJump(e){ e.preventDefault(); tryJump(); }
 bj.addEventListener('touchstart', handleJump, {passive:false});
@@ -1609,12 +1180,12 @@ LEVELS.forEach(function(lvl,i){
   grid.appendChild(b);
 });
 
-window.addEventListener('resize',function(){ if(currentState==='PLAYING'){ try{ setupCanvas(); initEnemySprites(); }catch(e){} } });
-try{ setupCanvas(); initEnemySprites(); }catch(e){}
+window.addEventListener('resize',function(){ if(currentState==='PLAYING'){ try{ setupCanvas(); }catch(e){} } });
+try{ setupCanvas(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - Blast Launch Only"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite FIX + scale 0.7"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
@@ -1659,7 +1230,7 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
   // Fix explicito para botones principales por si onclick inline falla
   document.addEventListener('DOMContentLoaded', function(){
     var bp=document.getElementById('btn-play');
-    if(bp) bp.addEventListener('click', function(){ startLevel(1); });
+    if(bp) bp.addEventListener('click', function(){ startLevel(0); });
     var bl=document.getElementById('btn-levels');
     if(bl) bl.addEventListener('click', function(){ showMenu('levels'); });
     var bh=document.getElementById('btn-how');
@@ -1669,17 +1240,6 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
   });
 })();
 
-</script>
-
-<script>
-// PWA Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./service-worker.js')
-      .then(reg => console.log('SW registrado:', reg.scope))
-      .catch(err => console.log('SW error:', err));
-  });
-}
 </script>
 </body>
 </html>
