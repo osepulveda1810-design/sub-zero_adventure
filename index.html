@@ -22,7 +22,7 @@
 </script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Sub-Zero's v2.16 - FINAL FIX menu</title>
+<title>Sub-Zero's v2.19 - FINAL menu OK scale 0.6 0.8</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;display:flex;justify-content:center;align-items:center;height:100dvh;width:100vw;overflow:hidden;font-family:'Segoe UI',Tahoma,sans-serif;color:#fff;touch-action:none;position:fixed}
@@ -108,8 +108,8 @@ input[type=range].live-range::-webkit-slider-thumb{ -webkit-appearance:none; wid
 <body>
 <div id="game-container">
 <div style="position:absolute;top:10px;right:18px;z-index:1000;display:flex;gap:8px;align-items:center">
-<div class="badge" id="version-badge">v2.16</div>
-<div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">204</span> • WALK 4F</div>
+<div class="badge" id="version-badge">v2.13</div>
+<div style="font-size:9px;color:rgba(255,255,255,0.45)">BUILD <span id="build-num">219</span> • WALK 4F</div>
 </div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas><div id="wave-arrow"><div class="arrow-icon">➡️</div><div class="arrow-text">AVANZA</div></div>
@@ -150,9 +150,14 @@ input[type=range].live-range::-webkit-slider-thumb{ -webkit-appearance:none; wid
   </div>
   <div id="live-list" style="display:flex;flex-direction:column;gap:10px;max-height:45vh;overflow-y:auto"></div>
   <div style="margin-top:14px;display:flex;gap:8px">
+    <button class="btn-live" id="btn-live-save" style="flex:1;background:linear-gradient(135deg,#4ecca3,#7ef0ff);color:#000;font-weight:900">💾 GUARDAR</button>
+    <button class="btn-live" id="btn-live-reset" style="flex:1;background:rgba(255,100,100,0.15);border-color:rgba(255,100,100,0.3);color:#ff8a8a">🗑️ RESET</button>
+  </div>
+  <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
     <button class="btn-live" id="btn-live-export" style="flex:1">📋 EXPORTAR</button>
     <button class="btn-live" id="btn-live-copy" style="flex:1">📝 COPIAR</button>
   </div>
+  <div id="sprite-save-feedback" style="margin-top:8px;font-size:10px;color:#4ecca3;height:16px;opacity:0;transition:opacity 0.3s;text-align:center">✔ Guardado</div>
   <div id="live-export" style="display:none;margin-top:10px;background:rgba(0,0,0,0.6);border-radius:10px;padding:10px;font-size:8px;font-family:monospace;white-space:pre-wrap;max-height:160px;overflow:auto;color:#7ef0ff"></div>
 </div>
 <div id="controls" style="display:none">
@@ -250,6 +255,6 @@ Sprites con fallback</div><button class="btn-premium">VOLVER</button></div></div
 </div>
 </div>
 
-<script src="game.js?v=2.16"></script>
+<script src="game.js?v=2.19"></script>
 </body>
 </html>
