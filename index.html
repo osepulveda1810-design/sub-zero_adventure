@@ -18,7 +18,7 @@
     return origAdd.call(this, type, listener, options);
   };
 })();
-</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"><title>Sub-Zero's v2.72 - SHARD + SHATTER + TRAIL</title>
+</script><script>window.Intl=window.Intl||{};Intl.t=function(s){return(Intl._locale&&Intl._locale[s])||s;};</script><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"><title>Sub-Zero's v2.76 - REBUILD LIMPIO + TU CONFIG</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;position:fixed;inset:0;display:flex;justify-content:center;align-items:center}
@@ -46,7 +46,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 #editor-char-select{width:100%;margin-top:6px;background:rgba(0,0,0,0.6);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700}
 </style></head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.69 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 272</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.76 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 276</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="wave-arrow"><div style="font-size:48px;color:#facc15">➡️</div><div id="wave-arrow-text" style="background:rgba(0,0,0,0.7);border:1px solid #facc15;color:#facc15;padding:6px 14px;border-radius:20px;font-weight:900;font-size:12px">AVANZA</div></div>
@@ -59,12 +59,12 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <button class="ps-btn" id="btn-kick"><span class="symbol"></span></button>
 <button class="ps-btn" id="btn-jump"><span class="symbol"></span></button>
 </div></div>
-<div id="menu-main" class="menu-overlay"><div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(0)">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-update" style="min-width:120px" onclick="showMenu('update')">INFO</button></div></div>
+<div id="menu-main" class="menu-overlay"><div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-update" style="min-width:120px" onclick="showMenu('update')">INFO</button></div></div>
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#7ef0ff">NIVELES</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;max-width:720px;width:100%"></div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div>
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.69 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.76 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
 </div>
 <div id="live-editor" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v2.54</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
@@ -79,7 +79,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="2.72";
+const GAME_VERSION="2.76";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -88,21 +88,23 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 // Sistema de sprites - carga desde archivos externos
 
 const SPRITE_CONFIG = {
-  idle: { file: "idle.png", frames: 4, speed: 180, scale: 1, scaleX: 1.00, scaleY: 1.00, anchorX: 0, anchorY: 31, fallbackColor: "#00e5ff", desc: "Idle" },
-  walk: { file: "walk.png", frames: 4, speed: 198, scale: 1.3, scaleX: 1.05, scaleY: 1.30, anchorX: 0, anchorY: 46, fallbackColor: "#7ef0ff", desc: "Walk" },
-  punch: { file: "punch.png", frames: 4, speed: 99, scale: 1.15, scaleX: 1.30, scaleY: 1.30, anchorX: 21, anchorY: 45, fallbackColor: "#4ecca3", desc: "Punch" },
-  kick: { file: "kick.png", frames: 4, speed: 117, scale: 1.2, scaleX: 1.30, scaleY: 1.45, anchorX: 9, anchorY: 54, fallbackColor: "#7ef0ff", desc: "Kick" },
-  jump: { file: "jump.png", frames: 3, speed: 162, scale: 0.9, scaleX: 0.90, scaleY: 1.20, anchorX: 0, anchorY: 29, fallbackColor: "#a0e6ff", desc: "Jump" },
-  ice_charge: { file: "ice_charge.png", frames: 1, speed: 270, scale: 0.55, scaleX: 0.70, scaleY: 0.95, anchorX: 0, anchorY: 32, fallbackColor: "#7ef0ff", desc: "Ice charge" },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 270, scale: 0.75, scaleX: 0.85, scaleY: 1.00, anchorX: 0, anchorY: 31, fallbackColor: "#7ef0ff", desc: "Ice shoot" },
-  punch_air: { file: "punch_air.png", frames: 1, speed: 315, scale: 0.7, scaleX: 0.75, scaleY: 0.75, anchorX: 0, anchorY: 27, fallbackColor: "#4ecca3", desc: "Punch air" },
-  kick_air: { file: "kick_air.png", frames: 1, speed: 315, scale: 0.85, scaleX: 0.85, scaleY: 0.85, anchorX: 0, anchorY: 14, fallbackColor: "#7ef0ff", desc: "Kick air" },};
+  idle: { file: "idle.png", frames: 4, speed: 130, scale: 1, scaleX: 0.55, scaleY: 1, anchorX: 0, anchorY: 31 },
+  walk: { file: "walk.png", frames: 4, speed: 130, scale: 1.3, scaleX: 1.05, scaleY: 1.3, anchorX: 0, anchorY: 46 },
+  punch: { file: "punch.png", frames: 4, speed: 100, scale: 1.15, scaleX: 1.3, scaleY: 1.3, anchorX: 21, anchorY: 45 },
+  kick: { file: "kick.png", frames: 4, speed: 100, scale: 1.2, scaleX: 1.3, scaleY: 1.45, anchorX: 9, anchorY: 54 },
+  jump: { file: "jump.png", frames: 3, speed: 155, scale: 0.9, scaleX: 0.9, scaleY: 1.2, anchorX: 0, anchorY: 29 },
+  ice_charge: { file: "ice_charge.png", frames: 1, speed: 300, scale: 0.55, scaleX: 0.7, scaleY: 0.95, anchorX: 0, anchorY: 32 },
+  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 300, scale: 0.75, scaleX: 0.85, scaleY: 1, anchorX: 0, anchorY: 31 },
+  punch_air: { file: "punch_air.png", frames: 1, speed: 350, scale: 0.7, scaleX: 0.75, scaleY: 0.75, anchorX: 0, anchorY: 27 },
+  kick_air: { file: "kick_air.png", frames: 1, speed: 350, scale: 0.85, scaleX: 0.85, scaleY: 0.85, anchorX: 0, anchorY: 14 },
+};
 // v2.68 ICE ALIGN - configurado por usuario: charging 20/-28 loaded 21/-45
 const ICE_ALIGN = {
   charging: { x: 20, y: -28, scale: 1 },
   loaded: { x: 21, y: -45, scale: 1 },
   ballRadius: 13
 };
+window.ICE_SPEED = 7.5;
 
 
 const SPRITE_BASE = "assets/sprites/player/";
@@ -120,7 +122,7 @@ const ENEMY_SPRITE_CONFIG = {
   },
   thug_gun: {
     idle: { file: "idle.png", frames: 1, speed: 315, scaleX: 1.15, scaleY: 1.40, anchorX: 0, anchorY: 0 },
-    walk: { file: "walk.png", frames: 4, speed: 95, scaleX: 1.80, scaleY: 1.35, anchorX: 0, anchorY: 0 },
+    walk: { file: "walk.png", frames: 4, speed: 90, scaleX: 1.80, scaleY: 1.35, anchorX: 0, anchorY: 0 },
     punch: { file: "attack.png", frames: 3, speed: 85, scaleX: 1.45, scaleY: 1.35, anchorX: 0, anchorY: 0 },
     kick: { file: "attack.png", frames: 3, speed: 85, scaleX: 1.60, scaleY: 1.40, anchorX: 0, anchorY: 0 },
     attack: { file: "attack.png", frames: 3, speed: 85, scaleX: 1.50, scaleY: 1.35, anchorX: 0, anchorY: 0 },
@@ -638,7 +640,7 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v2.69 FIX: Flip sprite based on facing direction
+      // v2.76 FIX: Flip sprite based on facing direction
       // walk.png points RIGHT, so:
       // - facingRight=true (moving right) → draw NORMAL
       // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
