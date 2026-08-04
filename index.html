@@ -46,7 +46,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 #editor-char-select{width:100%;margin-top:6px;background:rgba(0,0,0,0.6);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700}
 </style></head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.79 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 279</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.87 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 287</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 <div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
@@ -64,7 +64,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.79 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.87 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
 </div>
 <div id="live-editor" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v2.54</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
@@ -79,7 +79,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="2.79";
+const GAME_VERSION="2.87";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -564,6 +564,100 @@ function drawIceTargeting(){
   ctx.setLineDash([]);
   ctx.restore();
 }
+
+function getIceCandidates(){
+  var list=[];
+  if(!enemies || enemies.length===0) return list;
+  var px=player.x, py=playerLaneY;
+  var dir=player.facingRight?1:-1;
+  for(var i=0;i<enemies.length;i++){
+    var e=enemies[i];
+    if(e.dead || e.frozen>0) continue;
+    var dx=e.x - px;
+    if(dir>0 && dx<10) continue;
+    if(dir<0 && dx>-10) continue;
+    if(Math.abs(dx)>620) continue;
+    if(Math.abs(e.laneY - py)>90) continue;
+    var dist=Math.abs(dx)+Math.abs(e.laneY-py)*0.6;
+    list.push({e:e, dist:dist});
+  }
+  list.sort(function(a,b){return a.dist-b.dist;});
+  return list.map(function(o){return o.e;});
+}
+function findIceTarget(){
+  var cands=getIceCandidates();
+  return cands.length>0 ? cands[0] : null;
+}
+function cycleIceTarget(dir){
+  var cands=getIceCandidates();
+  if(cands.length===0){ player.iceTarget=null; return; }
+  if(!player.iceTarget){ player.iceTarget=cands[0]; return; }
+  var idx=cands.indexOf(player.iceTarget);
+  if(idx===-1){ player.iceTarget=cands[0]; return; }
+  idx=(idx+dir+cands.length)%cands.length;
+  player.iceTarget=cands[idx];
+  if(typeof spawnText==='function') spawnText(player.iceTarget.x, player.iceTarget.laneY-50, '❄ TARGET ❄', '#7ef0ff');
+}
+function selectIceTargetAt(worldX, worldY){
+  if(!enemies) return false;
+  var best=null, bestDist=70;
+  for(var i=0;i<enemies.length;i++){
+    var e=enemies[i];
+    if(e.dead || e.frozen>0) continue;
+    var dx=e.x - worldX;
+    var dy=e.laneY - worldY;
+    var d=Math.hypot(dx,dy);
+    if(d<bestDist){ bestDist=d; best=e; }
+  }
+  if(best){
+    player.iceTarget=best;
+    if(typeof spawnText==='function') spawnText(best.x, best.laneY-50, '❄ ELEGIDO ❄', '#e0fbff');
+    return true;
+  }
+  return false;
+}
+function drawIceTargeting(){
+  if(!player.isChargingIce && !player.isIceLoaded) return;
+  var target=player.iceTarget;
+  if(!target || target.dead) return;
+  var tx=target.x - camera.x;
+  var ty=target.laneY;
+  if(tx<-50 || tx>canvas.width+50) return;
+  var t=Date.now()*0.005;
+  var bob=Math.sin(t*2)*6;
+  ctx.save();
+  ctx.translate(tx, ty-95 + bob);
+  ctx.shadowColor='rgba(126,240,255,0.9)'; ctx.shadowBlur=12;
+  ctx.fillStyle='#e0fbff';
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(-14,-18);
+  ctx.lineTo(14,-18);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.5; ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(126,240,255,0.6)';
+  ctx.lineWidth=2;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.arc(0, -30, 18+Math.sin(t)*2, 0, Math.PI*2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#7ef0ff'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+  ctx.fillText('❄ LOCK ❄',0,-52);
+  var px=player.x - camera.x;
+  var py=playerLaneY-30;
+  ctx.strokeStyle='rgba(126,240,255,0.35)';
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();
+  ctx.moveTo(px,py);
+  var midX=(px+tx)/2;
+  ctx.quadraticCurveTo(midX, py-30, tx, ty-70);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
   var sy = attachedIce ? attachedIce.y : playerLaneY-28;
@@ -860,7 +954,7 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v2.79 FIX: Flip sprite based on facing direction
+      // v2.87 FIX: Flip sprite based on facing direction
       // walk.png points RIGHT, so:
       // - facingRight=true (moving right) → draw NORMAL
       // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
@@ -883,6 +977,288 @@ function drawEnemy(e){
   ctx.fillRect(ex, e.laneY-th2, tw2, th2);
   ctx.fillStyle='white'; ctx.font='9px monospace'; ctx.fillText('MISS:'+wanted+' @ '+ENEMY_SPRITE_BASE+type+'/'+wanted+'.png', ex-20, e.laneY-th2-8);
   return true;
+}
+
+
+
+
+function drawCityBackground(lvl){
+  var w=canvas.width, h=canvas.height;
+  var time = Date.now()*0.001;
+
+  // --- CIELO NOCTURNO MAS REALISTA ---
+  var skyGrad=ctx.createLinearGradient(0,0,0,laneTop);
+  skyGrad.addColorStop(0,'#070a14');
+  skyGrad.addColorStop(0.25,'#0e152a');
+  skyGrad.addColorStop(0.6,'#18233e');
+  skyGrad.addColorStop(1,'#1f2e52');
+  ctx.fillStyle=skyGrad;
+  ctx.fillRect(0,0,w,laneTop+30);
+
+  // estrellas sutiles + resplandor ciudad
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  for(var s=0;s<40;s++){
+    var sx = (s*137.5 - camera.x*0.02) % w;
+    var sy = (s*59)%(laneTop*0.7);
+    var sz = (Math.sin(s*2.1)+1)*0.5;
+    if(sx<0) sx+=w;
+    ctx.globalAlpha=0.15+sz*0.3;
+    ctx.beginPath(); ctx.arc(sx, sy, sz*1.2,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha=1;
+  // resplandor urbano en horizonte
+  var glowGrad=ctx.createLinearGradient(0,laneTop-80,0,laneTop+10);
+  glowGrad.addColorStop(0,'rgba(255,80,80,0)');
+  glowGrad.addColorStop(0.5,'rgba(255,90,90,0.08)');
+  glowGrad.addColorStop(1,'rgba(126,160,255,0.12)');
+  ctx.fillStyle=glowGrad;
+  ctx.fillRect(0,laneTop-70,w,90);
+
+  // luna
+  ctx.save();
+  ctx.shadowColor='rgba(180,200,255,0.4)'; ctx.shadowBlur=30;
+  ctx.fillStyle='#d8e0ff';
+  ctx.beginPath(); ctx.arc(w*0.84, laneTop*0.32, 20,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='rgba(150,160,180,0.35)';
+  ctx.beginPath(); ctx.arc(w*0.84+5, laneTop*0.32+2, 5,0,Math.PI*2); ctx.fill();
+  ctx.beginPath(); ctx.arc(w*0.84-3, laneTop*0.32-4, 2.5,0,Math.PI*2); ctx.fill();
+  ctx.restore();
+
+  // --- EDIFICIOS LEJANOS (parallax 0.12) - silueta muy oscura ---
+  var p1=0.12;
+  var baseX1 = - (camera.x * p1) % 260;
+  for(var i=-1;i<w/200+4;i++){
+    var bx = baseX1 + i*200;
+    var bh = 70 + (i%4)*30 + Math.sin(i*0.8)*18;
+    var bw = 160 + (i%3)*40;
+    ctx.fillStyle='#12182a';
+    ctx.fillRect(bx, laneTop - bh, bw, bh);
+    // ventanas diminutas lejanas
+    ctx.fillStyle='rgba(255,210,120,0.12)';
+    for(var vy=10; vy<bh-15; vy+=22){
+      for(var vx=14; vx<bw-20; vx+=28){
+        if((i+vx+vy)%4===0){
+          ctx.globalAlpha=0.3+Math.sin(time*2 + i+vx)*0.2;
+          ctx.fillRect(bx+vx, laneTop - bh + vy, 3,2);
+        }
+      }
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // --- EDIFICIOS MEDIOS (parallax 0.32) - con detalle ---
+  var p2=0.32;
+  var baseX2 = - (camera.x * p2) % 300;
+  for(var j=-1;j<w/240+5;j++){
+    var bx2 = baseX2 + j*300;
+    var bh2 = 110 + (j%3)*45 + Math.cos(j*1.1)*22;
+    var bw2 = 200 + (j%2)*50;
+    // textura edificio
+    var bGrad=ctx.createLinearGradient(bx2,0,bx2+bw2,0);
+    bGrad.addColorStop(0,'#1c263f');
+    bGrad.addColorStop(0.5,'#232f4d');
+    bGrad.addColorStop(1,'#1a233a');
+    ctx.fillStyle=bGrad;
+    ctx.fillRect(bx2, laneTop - bh2, bw2, bh2);
+    // cornisa superior
+    ctx.fillStyle='rgba(0,0,0,0.35)';
+    ctx.fillRect(bx2, laneTop - bh2, bw2, 6);
+    ctx.fillStyle='rgba(255,255,255,0.06)';
+    ctx.fillRect(bx2, laneTop - bh2+6, bw2, 2);
+    // ventanas
+    for(var wy=18; wy<bh2-18; wy+=22){
+      for(var wx=16; wx<bw2-20; wx+=26){
+        var hash = (j*13 + wx + wy*2) % 10;
+        if(hash>2){
+          var flick = Math.sin(time*3 + j+wx)*0.15+0.85;
+          if(hash%3===0) ctx.fillStyle='rgba(255,235,150,'+(0.45*flick)+')';
+          else if(hash%3===1) ctx.fillStyle='rgba(180,230,255,'+(0.32*flick)+')';
+          else ctx.fillStyle='rgba(255,255,255,'+(0.18*flick)+')';
+          ctx.fillRect(bx2+wx, laneTop - bh2 + wy, 10, 7);
+          // reflejo sutil
+          ctx.fillStyle='rgba(0,0,0,0.25)';
+          ctx.fillRect(bx2+wx, laneTop - bh2 + wy+5, 10, 2);
+        }
+      }
+    }
+    // aire acondicionado / detalles
+    ctx.fillStyle='rgba(40,50,70,0.8)';
+    for(var d=0; d<3; d++){
+      ctx.fillRect(bx2+30+d*60, laneTop - bh2 + bh2*0.6, 14, 8);
+    }
+  }
+
+  // --- EDIFICIOS PRIMER PLANO IZQUIERDA/DERECHA (parallax 0.55) - con neones BLACK DRAGON ---
+  var p3=0.55;
+  var baseX3 = - (camera.x * p3) % 520;
+  for(var k=-1;k<w/400+3;k++){
+    var bx3 = baseX3 + k*520;
+    var bh3 = 160 + Math.sin(k)*20;
+    var bw3 = 260;
+    // solo cada 2
+    if(k%2!==0) continue;
+    ctx.fillStyle='#1e2a44';
+    ctx.fillRect(bx3, laneTop - bh3, bw3, bh3);
+    // letrero grande BLACK DRAGON
+    ctx.save();
+    ctx.translate(bx3+20, laneTop - bh3 + 32);
+    // placa
+    ctx.fillStyle='rgba(10,12,20,0.85)';
+    ctx.fillRect(-6,-18,bw3-40,28);
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.fillRect(-6,-18,bw3-40,2);
+    // neon rojo
+    ctx.shadowColor='#ff0033'; ctx.shadowBlur=18;
+    ctx.fillStyle='#ff1e4a';
+    ctx.font='bold 13px monospace';
+    ctx.fillText('BLACK DRAGON', 0, 0);
+    ctx.shadowColor='#ff0040'; ctx.shadowBlur=8;
+    ctx.fillStyle='#ff6b8a';
+    ctx.font='9px monospace';
+    ctx.fillText('CLUB • BAR • FIGHT', 0, 12);
+    ctx.restore();
+    // luz roja parpadeante que baña la calle
+    var flicker = 0.6 + Math.sin(time*4 + k)*0.4;
+    var redGrad=ctx.createRadialGradient(bx3+80, laneTop - bh3 + 50, 5, bx3+80, laneTop - bh3 + 50, 180);
+    redGrad.addColorStop(0,'rgba(255,20,60,'+(0.18*flicker)+')');
+    redGrad.addColorStop(1,'rgba(255,20,60,0)');
+    ctx.fillStyle=redGrad;
+    ctx.fillRect(bx3-60, laneTop - bh3, 360, 260);
+  }
+
+  // --- CALLE - AJUSTADA EXACTAMENTE A ZONA DE CAMINATA (laneTop a laneBottom) ---
+  // asfalto base - solo donde caminan
+  var streetTop = laneTop;
+  var streetH = Math.max(60, h - laneTop);
+  // degradado asfalto
+  var asphaltGrad=ctx.createLinearGradient(0,streetTop,0,h);
+  asphaltGrad.addColorStop(0,'#2a2e3f');
+  asphaltGrad.addColorStop(0.15,'#262a3a');
+  asphaltGrad.addColorStop(1,'#1e222f');
+  ctx.fillStyle=asphaltGrad;
+  ctx.fillRect(0,streetTop,w,streetH);
+
+  // textura asfalto sutil (ruido)
+  ctx.fillStyle='rgba(255,255,255,0.015)';
+  for(var n=0;n<80;n++){
+    var nx = (n*97 - camera.x*0.9) % w;
+    if(nx<0) nx+=w;
+    var ny = streetTop + (n*41)%streetH;
+    ctx.fillRect(nx, ny, 2,1);
+  }
+
+  // acera superior - borde de la calle
+  ctx.fillStyle='#3a3e52';
+  ctx.fillRect(0,streetTop,w,10);
+  ctx.fillStyle='#4a4e66';
+  ctx.fillRect(0,streetTop,w,2);
+  ctx.fillStyle='rgba(0,0,0,0.4)';
+  ctx.fillRect(0,streetTop+10,w,6);
+
+  // lineas amarillas centrales - exactamente en medio de la zona caminable
+  var midLaneY = laneTop + (laneBottom-laneTop)*0.55;
+  ctx.strokeStyle='rgba(255,220,90,0.35)';
+  ctx.lineWidth=2;
+  ctx.setLineDash([28,22]);
+  ctx.beginPath();
+  ctx.moveTo(-(camera.x*0.9 % 50), midLaneY);
+  ctx.lineTo(w+50, midLaneY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // lineas blancas laterales de carril
+  ctx.strokeStyle='rgba(255,255,255,0.12)';
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([18,18]);
+  ctx.beginPath();
+  ctx.moveTo(0, laneTop + 18);
+  ctx.lineTo(w, laneTop + 18);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(0, laneBottom - 8);
+  ctx.lineTo(w, laneBottom - 8);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // charcos realistas con reflejo de edificios y neones
+  for(var p=0;p<4;p++){
+    var puddleX = ((p*380 + p*70 - camera.x*0.85) % (w+300)) -100;
+    var puddleY = laneTop + 30 + p*38 + Math.sin(p*1.5)*12;
+    if(puddleY>laneBottom-12) puddleY = laneBottom - 14 - (p*5);
+    // charco base
+    ctx.fillStyle='rgba(30,40,70,0.45)';
+    ctx.beginPath(); ctx.ellipse(puddleX, puddleY, 52, 9, 0,0,Math.PI*2); ctx.fill();
+    // reflejo neon rojo
+    ctx.fillStyle='rgba(255,30,70,0.18)';
+    ctx.beginPath(); ctx.ellipse(puddleX-8, puddleY-1, 22, 3, 0,0,Math.PI*2); ctx.fill();
+    // reflejo ventana amarilla
+    ctx.fillStyle='rgba(255,235,150,0.14)';
+    ctx.beginPath(); ctx.ellipse(puddleX+14, puddleY+1, 16, 2.5, 0,0,Math.PI*2); ctx.fill();
+    // brillo
+    ctx.fillStyle='rgba(255,255,255,0.08)';
+    ctx.beginPath(); ctx.ellipse(puddleX+10, puddleY-2, 10, 1.5, 0,0,Math.PI*2); ctx.fill();
+  }
+
+  // farolas - luz que ilumina la zona de pelea
+  var pFarola=0.88;
+  var baseXF = - (camera.x * pFarola) % 420;
+  for(var f=-1;f<w/380+3;f++){
+    var fx = baseXF + f*420;
+    // poste delgado
+    ctx.fillStyle='#2f3448';
+    ctx.fillRect(fx, streetTop-85, 3, 85 + (laneBottom-streetTop));
+    // brazo
+    ctx.fillRect(fx-18, streetTop-85, 20, 3);
+    // lampara
+    ctx.save();
+    ctx.shadowColor='rgba(255,228,150,0.9)'; ctx.shadowBlur=24;
+    ctx.fillStyle='#ffe9a8';
+    ctx.beginPath(); ctx.arc(fx-16, streetTop-76, 8,0,Math.PI*2); ctx.fill();
+    ctx.restore();
+    // cono de luz volumetrico que cae sobre la calle (donde caminan)
+    var lightGrad=ctx.createRadialGradient(fx-16, streetTop-76, 4, fx-16, streetTop+10, 110);
+    lightGrad.addColorStop(0,'rgba(255,235,160,0.22)');
+    lightGrad.addColorStop(0.4,'rgba(255,228,150,0.08)');
+    lightGrad.addColorStop(1,'rgba(255,228,150,0)');
+    ctx.fillStyle=lightGrad;
+    ctx.beginPath(); ctx.arc(fx-16, streetTop+18, 95,0,Math.PI*2); ctx.fill();
+  }
+
+  // niebla / humo bajo pegado al suelo
+  ctx.fillStyle='rgba(170,190,255,0.045)';
+  ctx.fillRect(0, laneBottom-22, w, 22);
+  ctx.fillStyle='rgba(200,210,255,0.02)';
+  for(var m=0;m<5;m++){
+    var mx = ((m*220 - camera.x*0.6) % (w+200)) -50;
+    ctx.beginPath(); ctx.ellipse(mx, laneBottom-8, 80, 12, 0,0,Math.PI*2); ctx.fill();
+  }
+
+  // viñeteado sutil para profundidad
+  var vignette=ctx.createRadialGradient(w/2,h/2, w*0.3, w/2,h/2, w);
+  vignette.addColorStop(0,'rgba(0,0,0,0)');
+  vignette.addColorStop(1,'rgba(0,0,0,0.35)');
+  ctx.fillStyle=vignette;
+  ctx.fillRect(0,0,w,h);
+
+  // ** ELIMINADO: lineas diagonales del base **
+}
+
+
+function drawLevelBackground(lvl){
+  if(!lvl) return;
+  if(lvl.id===1){
+    drawCityBackground(lvl);
+  } else {
+    // fallback original
+    ctx.fillStyle='rgb('+lvl.groundColor[0]+','+lvl.groundColor[1]+','+lvl.groundColor[2]+')';
+    ctx.fillRect(0,laneTop,canvas.width,canvas.height-laneTop);
+    ctx.strokeStyle='rgba(126,240,255,0.05)';
+    for(var i=0;i<canvas.width;i+=90){ var sx=(i-(camera.x%90)); ctx.beginPath(); ctx.moveTo(sx,laneTop); ctx.lineTo(sx-15,canvas.height); ctx.stroke(); }
+  }
+  var prog=camera.x/Math.max(1,camera.worldWidth-canvas.width);
+  ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56,4);
+  ctx.fillStyle='#7ef0ff'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56*prog,4);
 }
 
 
@@ -1012,26 +1388,47 @@ function loop(time){
         var dmg = isPunch ? 14 : 20;
         for(var hi=0; hi<enemies.length; hi++){
           var he = enemies[hi];
-          if(he.dead || he.frozen>0) continue;
+          if(he.dead) continue;
           var dx = he.x - player.x;
           var dy = he.laneY - playerLaneY;
           if(Math.abs(dy)>rangeY) continue;
           var inFront = player.facingRight ? (dx>8 && dx<rangeX) : (dx<-8 && dx>-rangeX);
           if(inFront){
-            he.health -= dmg;
-            he.hitTimer = 320;
+            var isFrozen = he.frozen>0;
+            var finalDmg = isFrozen ? (dmg+22) : dmg;
+            he.health -= finalDmg;
+            he.hitTimer = isFrozen ? 120 : 320;
             he.frame = 0; he.frameTime = 0;
-            he.x += player.facingRight ? 14 : -14;
-            spawnText(he.x, he.laneY-22, '-'+dmg, '#ff4444');
+            he.x += player.facingRight ? (isFrozen?22:14) : (isFrozen?-22:-14);
+            if(isFrozen){
+              // SHATTER al golpear congelado
+              he.frozen=0;
+              spawnText(he.x, he.laneY-32, 'SHATTER! -'+finalDmg, '#a5f3ff');
+              camera.shake = 10;
+              score+= isFrozen?80:0;
+              for(var s=0;s<8;s++){
+                iceShatters.push({x:he.x, y:he.laneY-18, vx:(Math.random()*10-5), vy:(Math.random()*-6-1), life:480, maxLife:480, rot:Math.random()*6.28, vr:(Math.random()*0.4-0.2), size:3+Math.random()*4, gold:false});
+              }
+              for(var g=0;g<3;g++){
+                iceTrails.push({x:he.x, y:he.laneY-12, vx:Math.random()*6-3, vy:Math.random()*-4-1, life:260, maxLife:260, size:2+Math.random()*2, gold:true});
+              }
+            } else {
+              spawnText(he.x, he.laneY-22, '-'+finalDmg, '#ff4444');
+            }
             if(isPunch) player.attackHit=true; else player.kickHit=true;
             if(he.health<=0){
               he.dead=true; he.deadTimer=0; enemiesDefeated++; score+= (he.type==='thug_gun'?120:100);
-              spawnText(he.x, he.laneY-40, 'KO!', '#ffd700');
+              spawnText(he.x, he.laneY-40, he.frozen>0?'SHATTER KO!':'KO!', '#ffd700');
+              if(isFrozen){
+                for(var s2=0;s2<10;s2++){
+                  iceShatters.push({x:he.x, y:he.laneY-18, vx:(Math.random()*12-6), vy:(Math.random()*-7-1), life:560, maxLife:560, rot:Math.random()*6.28, vr:(Math.random()*0.5-0.25), size:3+Math.random()*5, gold:Math.random()>0.5});
+                }
+              }
             }
             break;
           }
         }
-        if(boss && !boss.dead && boss.frozen<=0){
+        if(boss && !boss.dead){
           var bdx = boss.x - player.x; var bdy = boss.laneY - playerLaneY;
           if(Math.abs(bdy)<=rangeY+8){
             var bInFront = player.facingRight ? (bdx>10 && bdx<rangeX+12) : (bdx<-10 && bdx>-(rangeX+12));
@@ -1083,7 +1480,21 @@ function loop(time){
     
     // Projectiles
     for(var i=projectiles.length-1;i>=0;i--){
-      var p=projectiles[i]; p.x+=p.vx; p.life-=16;
+      var p=projectiles[i];
+      if(p.type==='ice' && p.homing && p.target && !p.target.dead){
+        var tdx=(p.target.x - p.x);
+        var tdy=(p.target.laneY - p.y);
+        var tdist=Math.hypot(tdx,tdy);
+        if(tdist<500 && tdist>5){
+          var pull=0.42;
+          p.vx+=(tdx/tdist)*pull;
+          p.vy+=(tdy/tdist)*pull*0.6;
+          var sp=Math.hypot(p.vx,p.vy);
+          var maxSp=(window.ICE_SPEED||7.5)*1.15;
+          if(sp>maxSp){ p.vx=(p.vx/sp)*maxSp; p.vy=(p.vy/sp)*maxSp; }
+        }
+      }
+      p.x+=p.vx; p.y+=p.vy; p.life-=16;
       if(p.life<=0){ projectiles.splice(i,1); continue; }
       // v2.72 TRAIL: deja rastro de escarcha dorada/celeste
       if(p.type==='ice' && Math.random()>0.3){
@@ -1092,7 +1503,19 @@ function loop(time){
       var hit=false; var hitEnemy=null; var wasFrozen=false;
       for(var ei=0;ei<enemies.length;ei++){
         var e=enemies[ei]; if(e.dead) continue;
-        if(Math.abs(p.y-e.laneY)<50 && Math.abs(p.x-e.x)<60){
+        var isTarget = p.target && p.target===e;
+        var radX = isTarget ? 95 : 60;
+        var radY = isTarget ? 75 : 50;
+        var canHit = false;
+        if(isTarget){
+          var d=Math.hypot(p.x-e.x, p.y-e.laneY);
+          if(d<90) canHit=true;
+          else if(Math.abs(p.y-e.laneY)<radY && Math.abs(p.x-e.x)<radX) canHit=true;
+        } else {
+          if(Math.abs(p.y-e.laneY)<radY && Math.abs(p.x-e.x)<radX) canHit=true;
+        }
+        if(!canHit) continue;
+        {
           wasFrozen = e.frozen>0;
           if(wasFrozen){
             // SHATTER! enemigo ya congelado
@@ -1207,11 +1630,7 @@ function loop(time){
     // Dibujo
     var lvl=LEVELS[currentLevel];
     ctx.fillStyle='rgb('+lvl.bgColor[0]+','+lvl.bgColor[1]+','+lvl.bgColor[2]+')'; ctx.fillRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle='rgb('+lvl.groundColor[0]+','+lvl.groundColor[1]+','+lvl.groundColor[2]+')'; ctx.fillRect(0,laneTop,canvas.width,canvas.height-laneTop);
-    // Grid suelo celeste oscuro
-    ctx.strokeStyle='rgba(126,240,255,0.05)'; for(var i=0;i<canvas.width;i+=90){ var sx=(i-(camera.x%90)); ctx.beginPath(); ctx.moveTo(sx,laneTop); ctx.lineTo(sx-15,canvas.height); ctx.stroke(); }
-    // Progreso
-    var prog=camera.x/Math.max(1,camera.worldWidth-canvas.width); ctx.fillStyle='rgba(0,0,0,0.4)'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56,4); ctx.fillStyle='#7ef0ff'; ctx.fillRect(canvas.width*0.22,8,canvas.width*0.56*prog,4);
+    drawLevelBackground(lvl);
     
     for(var ei=0;ei<enemies.length;ei++){
       var e=enemies[ei]; if(e.dead) continue;
@@ -1310,6 +1729,7 @@ function loop(time){
     }
     
     drawPlayer(time);
+    if(typeof drawIceTargeting==='function') drawIceTargeting();
     if(typeof drawIceTargeting==='function') drawIceTargeting();
 
 
