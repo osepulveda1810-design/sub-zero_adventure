@@ -38,7 +38,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 #btn-kick{grid-column:3;grid-row:2} #btn-kick .symbol{width:20px;height:20px;border:2.5px solid #f87171;border-radius:50%;background:transparent;}
 #btn-jump{grid-column:2;grid-row:3} #btn-jump .symbol::before{content:"✕";font-size:20px;color:#7dd3fc;}
 .menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.92);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;align-items:center;padding:60px 16px 20px;overflow:auto} .btn-premium{background:rgba(126,240,255,0.08);border:1.5px solid rgba(126,240,255,0.32);color:#7ef0ff;padding:12px 24px;border-radius:14px;font-weight:800;margin-top:10px;min-width:260px;font-size:12px;cursor:pointer;pointer-events:auto}
-#wave-arrow{position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center}
+#wave-arrow{position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center;animation:floatIce 2s ease-in-out infinite}@keyframes floatIce{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-6px)}}
 #live-editor{position:fixed;top:58px;right:8px;width:min(92vw, 400px);max-height:82vh;overflow:auto;background:rgba(5,10,20,0.97);border:1px solid rgba(126,240,255,0.22);border-radius:14px;padding:12px;z-index:2000;display:none;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.6)} #live-editor.active{display:block !important}
 .live-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px;margin-top:10px}
 .live-control{display:flex;align-items:center;gap:6px;margin-top:7px} .live-control label{font-size:9px;color:rgba(126,240,255,0.7);min-width:48px;font-weight:600} .live-control input[type="range"]{flex:1;height:4px;accent-color:#7ef0ff} .live-control input[type="number"]{width:62px;background:rgba(0,0,0,0.5);border:1px solid rgba(126,240,255,0.25);color:#7ef0ff;border-radius:6px;padding:4px 6px;font-size:11px;text-align:center;font-weight:700}
@@ -46,10 +46,10 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 #editor-char-select{width:100%;margin-top:6px;background:rgba(0,0,0,0.6);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700}
 </style></head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.76 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 276</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.79 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 279</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
-<div id="wave-arrow"><div style="font-size:48px;color:#facc15">➡️</div><div id="wave-arrow-text" style="background:rgba(0,0,0,0.7);border:1px solid #facc15;color:#facc15;padding:6px 14px;border-radius:20px;font-weight:900;font-size:12px">AVANZA</div></div>
+<div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
 <div id="hud" style="display:none"><div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:3px;background:rgba(0,0,0,0.5);margin-top:3px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff)"></div></div></div><div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/9</div></div><div class="hud-box"><div class="label">PROGRESO</div><div class="value" id="hud-progress">0%</div><div class="value" style="font-size:9px" id="hud-enemies">0/12</div></div><div class="hud-box"><div class="label">SCORE</div><div class="value" id="hud-score">0 pts</div></div></div>
 <div id="controls" style="display:none">
 <div id="analog-base"><div id="analog-stick"></div></div>
@@ -64,7 +64,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.76 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.79 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
 </div>
 <div id="live-editor" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v2.54</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
@@ -79,7 +79,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="2.76";
+const GAME_VERSION="2.79";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -399,7 +399,7 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0};
+let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
@@ -420,7 +420,37 @@ function updateCamera(){
 function getWorldWidthForLevel(i){ return i===0 ? 3600 : 4800; }
 let enemies=[], boss=null, projectiles=[], iceTrails=[], iceShatters=[], frostDecals=[], floatingTexts=[], particles=[];
 var spawnTimer=0, enemiesDefeated=0, bossSpawned=false, currentLevel=0, score=0, attachedIce=null;
-const canvas=document.getElementById('gameCanvas'); const ctx=canvas.getContext('2d');
+const canvas=document.getElementById('gameCanvas');
+
+// --- ICE TARGET MANUAL SELECT - toque en enemigo ---
+canvas.addEventListener('click', function(ev){
+  if(!player.isChargingIce && !player.isIceLoaded) return;
+  var rect=canvas.getBoundingClientRect();
+  var sx=ev.clientX - rect.left;
+  var sy=ev.clientY - rect.top;
+  var worldX = camera.x + sx;
+  var worldY = laneTop + (sy/canvas.height)*(laneBottom-laneTop);
+  // buscar enemigo cerca del toque
+  if(selectIceTargetAt(worldX, worldY)){
+    player._manualLock=true;
+  }
+});
+canvas.addEventListener('touchstart', function(ev){
+  if(!player.isChargingIce && !player.isIceLoaded) return;
+  if(ev.touches.length===0) return;
+  var rect=canvas.getBoundingClientRect();
+  var t=ev.touches[0];
+  var sx=t.clientX - rect.left;
+  var sy=t.clientY - rect.top;
+  var worldX = camera.x + sx;
+  var worldY = laneTop + (sy/canvas.height)*(laneBottom-laneTop);
+  if(selectIceTargetAt(worldX, worldY)){
+    player._manualLock=true;
+    ev.preventDefault();
+  }
+}, {passive:false});
+
+ const ctx=canvas.getContext('2d');
 const keys={right:false,left:false,up:false,down:false};
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 
@@ -430,13 +460,132 @@ function tryPunch(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].
  if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH AIR"); return; } player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
 function tryJump(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='jump'; dummyEnemy.previewTimer=600; return; } }catch(e){}
  if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
+
+function getIceCandidates(){
+  var list=[];
+  if(!enemies || enemies.length===0) return list;
+  var px=player.x, py=playerLaneY;
+  var dir=player.facingRight?1:-1;
+  for(var i=0;i<enemies.length;i++){
+    var e=enemies[i];
+    if(e.dead || e.frozen>0) continue;
+    var dx=e.x - px;
+    if(dir>0 && dx<10) continue;
+    if(dir<0 && dx>-10) continue;
+    if(Math.abs(dx)>620) continue;
+    if(Math.abs(e.laneY - py)>90) continue;
+    var dist=Math.abs(dx)+Math.abs(e.laneY-py)*0.6;
+    list.push({e:e, dist:dist});
+  }
+  list.sort(function(a,b){return a.dist-b.dist;});
+  return list.map(function(o){return o.e;});
+}
+function findIceTarget(){
+  var cands=getIceCandidates();
+  return cands.length>0 ? cands[0] : null;
+}
+function cycleIceTarget(dir){
+  var cands=getIceCandidates();
+  if(cands.length===0){ player.iceTarget=null; return; }
+  if(!player.iceTarget){
+    player.iceTarget=cands[0];
+    return;
+  }
+  var idx=cands.indexOf(player.iceTarget);
+  if(idx===-1){ player.iceTarget=cands[0]; return; }
+  idx=(idx+dir+cands.length)%cands.length;
+  player.iceTarget=cands[idx];
+  // feedback visual
+  if(typeof spawnText==='function') spawnText(player.iceTarget.x, player.iceTarget.laneY-50, '❄ TARGET ❄', '#7ef0ff');
+}
+function selectIceTargetAt(worldX, worldY){
+  if(!enemies) return false;
+  var best=null, bestDist=70;
+  for(var i=0;i<enemies.length;i++){
+    var e=enemies[i];
+    if(e.dead || e.frozen>0) continue;
+    var dx=e.x - worldX;
+    var dy=e.laneY - worldY;
+    var d=Math.hypot(dx,dy);
+    if(d<bestDist){ bestDist=d; best=e; }
+  }
+  if(best){
+    player.iceTarget=best;
+    if(typeof spawnText==='function') spawnText(best.x, best.laneY-50, '❄ ELEGIDO ❄', '#e0fbff');
+    return true;
+  }
+  return false;
+}
+
+function drawIceTargeting(){
+  if(!player.isChargingIce && !player.isIceLoaded) return;
+  var target=player.iceTarget;
+  if(!target || target.dead) return;
+  var tx=target.x - camera.x;
+  var ty=target.laneY;
+  if(tx<-50 || tx>canvas.width+50) return;
+  // flecha helada sobre enemigo
+  var t=Date.now()*0.005;
+  var bob=Math.sin(t*2)*6;
+  ctx.save();
+  ctx.translate(tx, ty-95 + bob);
+  // triangulo apuntando abajo
+  ctx.shadowColor='rgba(126,240,255,0.9)'; ctx.shadowBlur=12;
+  ctx.fillStyle='#e0fbff';
+  ctx.beginPath();
+  ctx.moveTo(0,0);
+  ctx.lineTo(-14,-18);
+  ctx.lineTo(14,-18);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.5; ctx.stroke();
+  // circulo de lock
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(126,240,255,0.6)';
+  ctx.lineWidth=2;
+  ctx.setLineDash([4,4]);
+  ctx.beginPath(); ctx.arc(0, -30, 18+Math.sin(t)*2, 0, Math.PI*2); ctx.stroke();
+  ctx.setLineDash([]);
+  // texto
+  ctx.fillStyle='#7ef0ff'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+  ctx.fillText('❄ LOCK ❄',0,-52);
+  // linea punteada desde player al target
+  var px=player.x - camera.x;
+  var py=playerLaneY-30;
+  ctx.strokeStyle='rgba(126,240,255,0.35)';
+  ctx.lineWidth=1.5;
+  ctx.setLineDash([6,6]);
+  ctx.beginPath();
+  ctx.moveTo(px,py);
+  // curva suave
+  var midX=(px+tx)/2;
+  ctx.quadraticCurveTo(midX, py-30, tx, ty-70);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
   var sy = attachedIce ? attachedIce.y : playerLaneY-28;
-  projectiles.push({x:sx,y:sy,vx:(player.facingRight?1:-1)*7.5,vy:0,type:'ice',life:3000});
+    var target=player.iceTarget;
+  var vx=(player.facingRight?1:-1)*7.5, vy=0;
+  if(target && !target.dead && target.frozen<=0){
+    var dx=(target.x - sx);
+    var dy=(target.laneY - sy);
+    var dist=Math.hypot(dx,dy);
+    if(dist>0 && dist<560){
+      var speed=(window.ICE_SPEED||7.5);
+      vx=(dx/dist)*speed;
+      vy=(dy/dist)*speed*0.55;
+    }
+  }
+  projectiles.push({x:sx,y:sy,vx:vx,vy:vy,type:'ice',life:3000, homing: target?true:false, target: target});
   attachedIce=null;
   player.isChargingIce=false;
   player.isIceLoaded=false;
+  player.iceTarget=null;
+  player._manualLock=false;
+  player._upHeld=false; player._downHeld=false;
   player.iceChargeTimer=0;
   player.isShootingIce=true;
   player.shootIceTimer=0;
@@ -458,6 +607,8 @@ function tryIce(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].is
   player.isIceLoaded=false;
   player.isShootingIce=false;
   player.iceChargeTimer=0;
+  player._manualLock=false;
+
   player.anim='ice_charge';
   player.frame=0;
   player.frameTime=0;
@@ -488,14 +639,83 @@ function createBoss(type,x,laneY){
 }
 var currentWave=0, totalWaves=3, waveSize=5, waveInProgress=false, nextWaveTriggerX=0, waitingForAdvance=false;
 function getAliveCount(){ var c=0; for(var i=0;i<enemies.length;i++){ if(!enemies[i].dead) c++; } return c; }
+
+var winterArrowAnim=null;
+function drawWinterArrow(t){
+  var cvs=document.getElementById('winterArrowCanvas'); if(!cvs) return;
+  var ctx=cvs.getContext('2d'); if(!ctx) return;
+  var W=cvs.width, H=cvs.height;
+  ctx.clearRect(0,0,W,H);
+  var cx=W/2, cy=H/2 - 10;
+  var pulse = 1 + Math.sin(t*0.005)*0.04;
+  ctx.save();
+  ctx.translate(cx,cy);
+  ctx.scale(pulse,pulse);
+  ctx.shadowColor='rgba(126,240,255,0.8)'; ctx.shadowBlur=18;
+  ctx.beginPath();
+  ctx.moveTo(-110,-22);
+  ctx.lineTo(50,-22);
+  ctx.lineTo(50,-38);
+  ctx.lineTo(125,0);
+  ctx.lineTo(50,38);
+  ctx.lineTo(50,22);
+  ctx.lineTo(-110,22);
+  ctx.closePath();
+  var grad=ctx.createLinearGradient(-110,-20,125,20);
+  grad.addColorStop(0,'#ffffff');
+  grad.addColorStop(0.15,'#e0fbff');
+  grad.addColorStop(0.5,'#7ef0ff');
+  grad.addColorStop(0.85,'#0ea5e9');
+  grad.addColorStop(1,'#0369a1');
+  ctx.fillStyle=grad;
+  ctx.fill();
+  ctx.shadowBlur=0;
+  ctx.strokeStyle='rgba(255,255,255,0.9)';
+  ctx.lineWidth=2.5;
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(-95,-10);
+  ctx.lineTo(45,-10);
+  ctx.strokeStyle='rgba(255,255,255,0.7)';
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+  ctx.fillStyle='rgba(255,255,255,0.95)';
+  for(var i=0;i<3;i++){
+    var px= 70 + i*15 + Math.sin(t*0.003+i)*2;
+    ctx.beginPath();
+    ctx.moveTo(px,-6); ctx.lineTo(px+4,0); ctx.lineTo(px,6); ctx.lineTo(px-4,0); ctx.closePath();
+    ctx.fill();
+  }
+  ctx.font='bold 16px monospace';
+  ctx.fillStyle='#e0fbff';
+  var flakes=[{x:-90,y:-32,r:0},{x:-70,y:32,r:0.5},{x:10,y:-42,r:1},{x:30,y:42,r:0.2},{x:90,y:-10,r:0.8}];
+  for(var f=0;f<flakes.length;f++){
+    var fl=flakes[f];
+    var sy = fl.y + Math.sin(t*0.002+fl.r*3)*3;
+    ctx.save(); ctx.translate(fl.x,sy); ctx.rotate(t*0.001+fl.r);
+    ctx.fillText('❄',-6,6);
+    ctx.restore();
+  }
+  ctx.restore();
+  ctx.fillStyle='rgba(224,251,255,0.6)';
+  for(var p=0;p<6;p++){
+    var px = (t*0.05 + p*55) % (W+40) -20;
+    var py = (t*0.08 + p*37) % (H+20) -10;
+    ctx.beginPath(); ctx.arc(px,py,1.5,0,6.28); ctx.fill();
+  }
+}
 function showWaveArrow(show, text){
   var el=document.getElementById('wave-arrow');
   if(!el) return;
   if(show){
     el.style.display='flex';
-    if(text) var tEl=document.getElementById('wave-arrow-text')||el.querySelector('.arrow-text'); if(tEl) tEl.textContent=text;
+    if(text){ var tEl=document.getElementById('wave-arrow-text'); if(tEl) tEl.textContent='❄ '+text.toUpperCase()+' ❄'; }
+    if(winterArrowAnim) cancelAnimationFrame(winterArrowAnim);
+    function loop(ts){ drawWinterArrow(ts); winterArrowAnim=requestAnimationFrame(loop); }
+    winterArrowAnim=requestAnimationFrame(loop);
   } else {
     el.style.display='none';
+    if(winterArrowAnim) cancelAnimationFrame(winterArrowAnim);
   }
 }
 function spawnWave(){
@@ -640,7 +860,7 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v2.76 FIX: Flip sprite based on facing direction
+      // v2.79 FIX: Flip sprite based on facing direction
       // walk.png points RIGHT, so:
       // - facingRight=true (moving right) → draw NORMAL
       // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
@@ -716,6 +936,14 @@ function loop(time){
     }
     if(player.isChargingIce){
       player.iceChargeTimer+=16;
+      // targeting hielo - busca enemigo al frente
+      if(player.iceChargeTimer%100<16 && !player._manualLock){ player.iceTarget=findIceTarget(); }
+      // ciclo manual con arriba/abajo mientras cargas
+      if(keys.up && !player._upHeld){ player._upHeld=true; player._manualLock=true; cycleIceTarget(-1); }
+      if(!keys.up) player._upHeld=false;
+      if(keys.down && !player._downHeld){ player._downHeld=true; player._manualLock=true; cycleIceTarget(1); }
+      if(!keys.down) player._downHeld=false;
+
       var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
       if(attachedIce){
         attachedIce.x=player.x+(player.facingRight?ICE_ALIGN.charging.x:-ICE_ALIGN.charging.x)*_sc;
@@ -731,7 +959,8 @@ function loop(time){
           attachedIce.life=5000;
           attachedIce.holdTimer=0;
         }
-        spawnText(player.x,playerLaneY-30,'¡HIELO CARGADO!','#7ef0ff');
+        if(!player.iceTarget) player.iceTarget=findIceTarget();
+        spawnText(player.x,playerLaneY-30, player.iceTarget ? '¡LOCK: '+(player.iceTarget.type||'ENEMIGO')+'!': '¡HIELO CARGADO!','#7ef0ff');
         setTimeout(function(){ if(player.isIceLoaded && attachedIce){ fireIceProjectile(); } }, 200);
       }
     }
@@ -1081,6 +1310,8 @@ function loop(time){
     }
     
     drawPlayer(time);
+    if(typeof drawIceTargeting==='function') drawIceTargeting();
+
 
     // v2.15d FINAL - Bola CHICA 13px sobre manos - scale 0.6 - Y10 X29 / Y18 X40
     if(attachedIce){
