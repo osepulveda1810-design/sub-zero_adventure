@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="display:none" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v3.01 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 301</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="display:none" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v3.04 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 304</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -103,13 +103,39 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div class="menu-winter-bg"></div>
 <canvas id="menu-snow-canvas"></canvas>
 <div id="menu-snow-dom" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:hidden"></div>
-<div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-update" style="min-width:120px" onclick="showMenu('update')">INFO</button></div></div>
+<div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)" data-fixed="1">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-settings" style="min-width:120px" onclick="showMenu('settings')">⚙ AJUSTES</button></div></div>
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#7ef0ff">NIVELES</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;max-width:720px;width:100%"></div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div>
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v3.01 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
+
+<div id="menu-settings" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px;width:100%"><h2 style="color:#7ef0ff;letter-spacing:3px">⚙ AJUSTES</h2>
+<div style="margin-top:18px;display:flex;flex-direction:column;gap:14px;text-align:left">
+  <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
+    <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎨 EDICIÓN DE SPRITES</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Entra al nivel de edición para ajustar posiciones, hitboxes y animaciones de Sub-Zero y enemigos.</div>
+    <button class="btn-premium" style="width:100%;background:linear-gradient(135deg,#4ecca3,#7ef0ff);color:#000;font-weight:900" onclick="startLevel(0)">✏️ ABRIR EDITOR DE SPRITES (NIVEL 0)</button>
+    <button class="btn-premium" style="width:100%;margin-top:8px" onclick="toggleLiveEditor()">🎚️ EDITOR RÁPIDO LIVE</button>
+  </div>
+  <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
+    <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎮 OPACIDAD DE BOTONES</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Ajusta la transparencia de los controles táctiles. 100% totalmente visibles, 20% casi invisibles.</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:10px;color:rgba(255,255,255,0.5)">20%</span>
+      <input id="opacity-slider" type="range" min="20" max="100" value="85" style="flex:1;accent-color:#7ef0ff" oninput="setControlsOpacity(this.value)">
+      <span style="font-size:10px;color:rgba(255,255,255,0.5)">100%</span>
+      <span id="opacity-value" style="font-size:12px;font-weight:800;color:#7ef0ff;min-width:38px;text-align:center">85%</span>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center">
+      <button onclick="setControlsOpacity(100)" title="100% visible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(126,240,255,0.25);color:#e0fbff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🔆</span><span style="font-size:9px">100%</span></button>
+      <button onclick="setControlsOpacity(60)" title="60% medio" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(126,240,255,0.18);color:#c8f4ff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🌙</span><span style="font-size:9px">60%</span></button>
+      <button onclick="setControlsOpacity(30)" title="30% casi invisible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">👻</span><span style="font-size:9px">30%</span></button>
+    </div>
+  </div>
 </div>
+<button class="btn-premium" style="margin-top:18px;width:100%" onclick="showMenu('main')">VOLVER</button>
+</div></div>
+
 <div id="live-editor" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v2.54</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
 <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;margin-bottom:10px"><label style="font-size:9px;color:#7ef0ff;font-weight:800">PERSONAJE:</label><select id="editor-char-select" onchange="changeCharacter(this.value)"><option value="player">PLAYER - Sub-Zero</option><option value="thug">ENEMIGO - Thug</option><option value="thug_gun">ENEMIGO - Thug Gun</option></select></div>
@@ -123,7 +149,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.01";
+const GAME_VERSION="3.04";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -616,6 +642,36 @@ function initWinterMenu(){
   menuSnowRunning=true;
   animateSnow();
 }
+
+// --- AJUSTES - OPACIDAD BOTONES ---
+function setControlsOpacity(val){
+  var v=parseInt(val);
+  if(isNaN(v)) v=85;
+  v=Math.max(20, Math.min(100, v));
+  localStorage.setItem('sz_controls_opacity', v);
+  var slider=document.getElementById('opacity-slider');
+  var label=document.getElementById('opacity-value');
+  if(slider && slider.value!=v) slider.value=v;
+  if(label) label.textContent=v+'%';
+  var controls=document.getElementById('controls');
+  var analog=document.getElementById('analog-base');
+  var psBtns=document.querySelectorAll('.ps-btn');
+  var opacity = v/100;
+  if(controls){
+    controls.style.opacity=opacity;
+  }
+  // Also adjust individual button opacity for better effect
+  psBtns.forEach(function(b){ b.style.opacity=opacity; });
+  if(analog){ analog.style.opacity=opacity; }
+}
+function loadControlsOpacity(){
+  var saved=localStorage.getItem('sz_controls_opacity');
+  var v = saved ? parseInt(saved) : 85;
+  setControlsOpacity(v);
+}
+document.addEventListener('DOMContentLoaded', function(){ setTimeout(loadControlsOpacity, 200); });
+
+
 function stopWinterMenu(){
   menuSnowRunning=false;
   if(menuSnowRaf) cancelAnimationFrame(menuSnowRaf);
@@ -1165,7 +1221,7 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v3.01 FIX: Flip sprite based on facing direction
+      // v3.04 FIX: Flip sprite based on facing direction
       // walk.png points RIGHT, so:
       // - facingRight=true (moving right) → draw NORMAL
       // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
@@ -2096,7 +2152,7 @@ bindKeys('btn-up','up'); bindKeys('btn-down','down'); bindKeys('btn-left','left'
 document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
 
   var btnPlay = document.getElementById('btn-play');
-  if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(0); });
+  if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(1); });
 
   var btnLevels = document.getElementById('btn-levels');
   if(btnLevels) btnLevels.addEventListener('click', function(){ showMenu('levels'); });
@@ -2104,8 +2160,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.g
   var btnHow = document.getElementById('btn-how');
   if(btnHow) btnHow.addEventListener('click', function(){ showHowToPlay(); });
 
-  var btnUpdate = document.getElementById('btn-update');
-  if(btnUpdate) btnUpdate.addEventListener('click', function(){ showMenu('update'); });
+  var btnUpdate = document.getElementById('btn-settings');
+  if(btnUpdate) btnUpdate.addEventListener('click', function(){ showMenu('settings'); });
 });
 
 document.getElementById('btn-ice').addEventListener('click',function(){ tryIce(); });
@@ -2148,12 +2204,23 @@ document.addEventListener('keyup',function(e){
 });
 
 var grid=document.getElementById('level-grid');
+grid.innerHTML='';
+var displayNum=1;
 LEVELS.forEach(function(lvl,i){
+  if(lvl.isEditor) return;
   var b=document.createElement('button'); b.className='btn-premium'; b.style.textAlign='left';
-  b.innerHTML='<div style="font-weight:800;color:#7ef0ff">'+(i+1)+'. '+lvl.name+'</div><div style="font-size:9px;opacity:0.55;margin-top:3px">'+lvl.subtitle+' • Jefe: '+lvl.boss+'</div>';
-  b.onclick=function(){ startLevel(i); };
+  b.innerHTML='<div style="font-weight:800;color:#7ef0ff">'+(displayNum)+'. '+lvl.name+'</div><div style="font-size:9px;opacity:0.55;margin-top:3px">'+lvl.subtitle+' • Jefe: '+lvl.boss+'</div>';
+  b.onclick=(function(idx){ return function(){ startLevel(idx); }; })(i);
   grid.appendChild(b);
+  displayNum++;
 });
+try{
+  var btnLevels=document.getElementById('btn-levels');
+  if(btnLevels){
+    var count=LEVELS.filter(function(l){return !l.isEditor}).length;
+    btnLevels.textContent='NIVELES ('+count+')';
+  }
+}catch(e){}
 
 window.addEventListener('resize',function(){ if(currentState==='PLAYING'){ try{ setupCanvas(); }catch(e){} } });
 try{ setupCanvas(); }catch(e){}
@@ -2170,7 +2237,7 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
 (function(){
   function enableMenuButtons(){
     try{
-      var ids = ['btn-play','btn-levels','btn-how','btn-update'];
+      var ids = ['btn-play','btn-levels','btn-how','btn-settings'];
       ids.forEach(function(id){
         var el = document.getElementById(id);
         if(el){
@@ -2207,13 +2274,13 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
   document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
 
     var bp=document.getElementById('btn-play');
-    if(bp) bp.addEventListener('click', function(){ startLevel(0); });
+    if(bp) bp.addEventListener('click', function(){ startLevel(1); });
     var bl=document.getElementById('btn-levels');
     if(bl) bl.addEventListener('click', function(){ showMenu('levels'); });
     var bh=document.getElementById('btn-how');
     if(bh) bh.addEventListener('click', function(){ showHowToPlay(); });
-    var bu=document.getElementById('btn-update');
-    if(bu) bu.addEventListener('click', function(){ showMenu('update'); });
+    var bu=document.getElementById('btn-settings');
+    if(bu) bu.addEventListener('click', function(){ showMenu('settings'); });
   });
 })();
 
@@ -2225,7 +2292,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.g
 
   // MENU PRINCIPAL
   var btnPlay = document.getElementById('btn-play');
-  if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(0); });
+  if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(1); });
 
   var btnLevels = document.getElementById('btn-levels');
   if(btnLevels) btnLevels.addEventListener('click', function(){ showMenu('levels'); });
@@ -2233,8 +2300,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.g
   var btnHow = document.getElementById('btn-how');
   if(btnHow) btnHow.addEventListener('click', function(){ showHowToPlay(); });
 
-  var btnUpdate = document.getElementById('btn-update');
-  if(btnUpdate) btnUpdate.addEventListener('click', function(){ showMenu('update'); });
+  var btnUpdate = document.getElementById('btn-settings');
+  if(btnUpdate) btnUpdate.addEventListener('click', function(){ showMenu('settings'); });
 
   // MENU STORY
   var btnStartGame = document.querySelector('#menu-story .btn-premium');
