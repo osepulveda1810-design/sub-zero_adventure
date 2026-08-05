@@ -26,31 +26,68 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 #top-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);border-bottom:none;position:absolute;top:0;left:0;right:0;z-index:20;pointer-events:none;transition:opacity 0.3s}#top-bar .logo{font-weight:900;letter-spacing:3px;color:#7ef0ff;opacity:0.8;font-size:14px;text-shadow:0 0 10px rgba(126,240,255,0.5)}#top-bar .badge{pointer-events:auto;opacity:0.7;font-size:9px} .logo{font-weight:900;color:#7ef0ff;letter-spacing:4px;font-size:18px} .badge{background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;padding:5px 12px;border-radius:20px;font-weight:900;font-size:10px;cursor:pointer;border:none}
 #canvas-wrapper{flex:1;position:relative;background:#0a0e1a;overflow:hidden;min-height:0}canvas{width:100%;height:100%;display:block}
 #hud{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:6px;justify-content:space-between;z-index:30;pointer-events:none} .hud-box{background:rgba(5,10,20,0.75);border:1px solid rgba(126,240,255,0.18);border-radius:12px;padding:6px 10px;min-width:64px;backdrop-filter:blur(8px)} .hud-box .label{font-size:7px;color:rgba(126,240,255,0.5)} .hud-box .value{font-weight:800;font-size:11px}
-#controls{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:10px 14px calc(58px + env(safe-area-inset-bottom, 0px)) 14px;z-index:45;background:linear-gradient(0deg, rgba(5,10,20,0.6) 0%, transparent 100%);gap:12px;pointer-events:none;box-sizing:border-box}
+#controls{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-between;align-items:flex-end;padding:12px 18px calc(70px + env(safe-area-inset-bottom, 0px)) 18px;z-index:45;background:linear-gradient(0deg, rgba(5,10,20,0.65) 0%, transparent 100%);gap:16px;pointer-events:none;box-sizing:border-box}
 #analog-base{width:86px;height:86px;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.14);border-radius:50%;position:relative;backdrop-filter:blur(12px);box-shadow:inset 0 0 18px rgba(0,0,0,0.4);pointer-events:auto;touch-action:none;flex-shrink:0}
 #analog-stick{width:40px;height:40px;background:radial-gradient(circle at 30% 30%, rgba(126,240,255,0.38), rgba(126,240,255,0.14));border:1.5px solid rgba(126,240,255,0.4);border-radius:50%;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);box-shadow:0 2px 6px rgba(0,0,0,0.4);transition:transform 0.05s;}
 #analog-base.active{background:rgba(255,255,255,0.10);border-color:rgba(126,240,255,0.28)}
-.action-cross{display:grid;grid-template-columns:44px 44px 44px;grid-template-rows:44px 44px 44px;gap:6px;place-items:center;pointer-events:auto;flex-shrink:0}
-.ps-btn{width:44px;height:44px;border-radius:50%;background:rgba(77,77,77,0.55);background:radial-gradient(circle at 35% 35%, rgba(90,90,90,0.8), rgba(55,55,55,0.6));border:1.5px solid rgba(255,255,255,0.14);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.35), inset 0 1px 1px rgba(255,255,255,0.18);cursor:pointer;backdrop-filter:blur(10px);transition:transform 0.08s;}
+.action-cross{display:grid;grid-template-columns:62px 62px 62px;grid-template-rows:62px 62px 62px;gap:14px;place-items:center;pointer-events:auto;flex-shrink:0}
+.ps-btn{width:62px;height:62px;border-radius:50%;background:rgba(77,77,77,0.62);background:radial-gradient(circle at 35% 35%, rgba(100,100,100,0.85), rgba(55,55,55,0.7));border:2px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px rgba(0,0,0,0.45), inset 0 1.5px 1.5px rgba(255,255,255,0.22);cursor:pointer;backdrop-filter:blur(10px);transition:transform 0.08s;pointer-events:auto}
 .ps-btn:active{transform:scale(0.88);filter:brightness(1.2)}
 #btn-ice{grid-column:2;grid-row:1} #btn-ice .symbol::before{content:"△";font-size:22px;-webkit-text-stroke:2.2px #6ee7b7;color:transparent;}
-#btn-punch{grid-column:1;grid-row:2} #btn-punch .symbol{width:18px;height:18px;border:2.5px solid #f48fb1;background:transparent;}
-#btn-kick{grid-column:3;grid-row:2} #btn-kick .symbol{width:20px;height:20px;border:2.5px solid #f87171;border-radius:50%;background:transparent;}
+#btn-punch{grid-column:1;grid-row:2} #btn-punch .symbol{width:28px;height:28px;border:2.5px solid #f48fb1;background:transparent;}
+#btn-kick{grid-column:3;grid-row:2} #btn-kick .symbol{width:30px;height:30px;border:2.5px solid #f87171;border-radius:50%;background:transparent;}
 #btn-jump{grid-column:2;grid-row:3} #btn-jump .symbol::before{content:"✕";font-size:20px;color:#7dd3fc;}
-.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.92);backdrop-filter:blur(20px);z-index:999;display:flex;flex-direction:column;align-items:center;padding:60px 16px 20px;overflow:auto} .btn-premium{background:rgba(126,240,255,0.08);border:1.5px solid rgba(126,240,255,0.32);color:#7ef0ff;padding:12px 24px;border-radius:14px;font-weight:800;margin-top:10px;min-width:260px;font-size:12px;cursor:pointer;pointer-events:auto}
+.menu-overlay{position:absolute;inset:0;background:rgba(5,10,20,0.92);backdrop-filter:blur(12px);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;overflow:auto} .btn-premium{background:rgba(126,240,255,0.08);border:1.5px solid rgba(126,240,255,0.32);color:#7ef0ff;padding:12px 24px;border-radius:14px;font-weight:800;margin-top:10px;min-width:260px;font-size:12px;cursor:pointer;pointer-events:auto}
 #wave-arrow{position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center;animation:floatIce 2s ease-in-out infinite}@keyframes floatIce{0%,100%{transform:translate(-50%,-50%) translateY(0)}50%{transform:translate(-50%,-50%) translateY(-6px)}}
 #live-editor{position:fixed;top:58px;right:8px;width:min(92vw, 400px);max-height:82vh;overflow:auto;background:rgba(5,10,20,0.97);border:1px solid rgba(126,240,255,0.22);border-radius:14px;padding:12px;z-index:2000;display:none;backdrop-filter:blur(18px);box-shadow:0 8px 32px rgba(0,0,0,0.6)} #live-editor.active{display:block !important}
 .live-item{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px;margin-top:10px}
 .live-control{display:flex;align-items:center;gap:6px;margin-top:7px} .live-control label{font-size:9px;color:rgba(126,240,255,0.7);min-width:48px;font-weight:600} .live-control input[type="range"]{flex:1;height:4px;accent-color:#7ef0ff} .live-control input[type="number"]{width:62px;background:rgba(0,0,0,0.5);border:1px solid rgba(126,240,255,0.25);color:#7ef0ff;border-radius:6px;padding:4px 6px;font-size:11px;text-align:center;font-weight:700}
 .btn-live{background:rgba(126,240,255,0.1);border:1px solid rgba(126,240,255,0.2);color:#7ef0ff;padding:6px 10px;border-radius:8px;font-size:10px;cursor:pointer} .btn-live-sm{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:3px 8px;border-radius:6px;font-size:9px;cursor:pointer}
 #editor-char-select{width:100%;margin-top:6px;background:rgba(0,0,0,0.6);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;padding:8px 10px;border-radius:8px;font-size:11px;font-weight:700}
-</style></head><body>
+
+.action-cross .ps-btn{margin:4px}
+#controls{pointer-events:auto}
+#analog-base{pointer-events:auto}
+
+
+#btn-ice{grid-column:2;grid-row:1}
+#btn-punch{grid-column:1;grid-row:2}
+#btn-kick{grid-column:3;grid-row:2}
+#btn-jump{grid-column:2;grid-row:3}
+
+</style>
+<style id="winter-menu-css">
+#menu-snow-canvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:1;opacity:0.85}
+.menu-winter-bg{position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(ellipse at 30% 20%, rgba(126,240,255,0.10), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(180,220,255,0.06), transparent 40%), linear-gradient(to bottom, #0a1428 0%, #13223f 100%);z-index:0}
+
+#menu-main{background:transparent !important;backdrop-filter:none !important}
+#menu-main .menu-winter-bg{position:absolute;inset:0;z-index:0;background:radial-gradient(ellipse at 30% 20%, rgba(126,240,255,0.10), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(180,220,255,0.06), transparent 40%), linear-gradient(to bottom, #0a1428 0%, #13223f 50%, #0d1a33 100%)}
+#menu-main #menu-snow-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+#menu-main #menu-snow-dom{z-index:2}
+#menu-main > div, #menu-main > button{z-index:3;position:relative}
+
+.menu-overlay{overflow:hidden}
+.snowflake-char{position:absolute;top:-10px;color:#c8f4ff;text-shadow:0 0 8px rgba(126,240,255,0.8), 0 0 16px rgba(126,240,255,0.4);user-select:none;pointer-events:none;z-index:2}
+
+.action-cross .ps-btn{margin:4px}
+#controls{pointer-events:auto}
+#analog-base{pointer-events:auto}
+
+
+#btn-ice{grid-column:2;grid-row:1}
+#btn-punch{grid-column:1;grid-row:2}
+#btn-kick{grid-column:3;grid-row:2}
+#btn-jump{grid-column:2;grid-row:3}
+
+</style>
+
+</head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="display:none" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v2.93 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 293</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="display:none" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none">🎚️ EDITOR</button><div class="badge">v3.01 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 301</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
-<button id="btn-pause" style="position:absolute;top:10px;right:14px;z-index:25;background:rgba(0,0,0,0.55);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:800;backdrop-filter:blur(6px);display:none;cursor:pointer">⏸ PAUSA</button>
+<button id="btn-pause" style="position:absolute;top:12px;right:108px;z-index:25;background:rgba(0,0,0,0.62);border:1px solid rgba(126,240,255,0.35);color:#7ef0ff;padding:7px 12px;border-radius:10px;font-size:11px;font-weight:800;backdrop-filter:blur(6px);display:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4)">⏸ PAUSA</button>
 
 <div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
 <div id="hud" style="display:none"><div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:3px;background:rgba(0,0,0,0.5);margin-top:3px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff)"></div></div></div><div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/9</div></div><div class="hud-box"><div class="label">PROGRESO</div><div class="value" id="hud-progress">0%</div><div class="value" style="font-size:9px" id="hud-enemies">0/12</div></div><div class="hud-box"><div class="label">SCORE</div><div class="value" id="hud-score">0 pts</div></div></div>
@@ -62,12 +99,16 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <button class="ps-btn" id="btn-kick"><span class="symbol"></span></button>
 <button class="ps-btn" id="btn-jump"><span class="symbol"></span></button>
 </div></div>
-<div id="menu-main" class="menu-overlay"><div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-update" style="min-width:120px" onclick="showMenu('update')">INFO</button></div></div>
+<div id="menu-main" class="menu-overlay">
+<div class="menu-winter-bg"></div>
+<canvas id="menu-snow-canvas"></canvas>
+<div id="menu-snow-dom" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:hidden"></div>
+<div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v2.54</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (9)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-update" style="min-width:120px" onclick="showMenu('update')">INFO</button></div></div>
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#7ef0ff">NIVELES</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;max-width:720px;width:100%"></div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div>
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
-<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v2.93 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
+<div id="menu-update" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px"><h2 style="color:#7ef0ff">v3.01 FIX</h2><div style="margin-top:12px;font-size:11px;color:rgba(255,255,255,0.6);text-align:left;line-height:1.6;background:rgba(0,0,0,0.3);padding:12px;border-radius:10px">- Fix: Enemigos miran dirección correcta (flip X según facingRight)<br>- Fix: thug_gun usa attack.png como walk (no tiene walk.png)<br>- Fallback walk→attack para enemigos sin walk.png</div><button class="btn-premium" style="margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
 </div>
 <div id="live-editor" style="display:none">
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v2.54</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
@@ -82,7 +123,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="2.93";
+const GAME_VERSION="3.01";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -428,7 +469,7 @@ function updateCamera(){
   if(camera.shake>0) camera.shake-=16;
 }
 function getWorldWidthForLevel(i){ return i===0 ? 3600 : 4800; }
-let enemies=[], boss=null, projectiles=[], iceTrails=[], iceShatters=[], frostDecals=[], floatingTexts=[], particles=[];
+let enemies=[], crates=[], pickups=[], boss=null, projectiles=[], iceTrails=[], iceShatters=[], frostDecals=[], floatingTexts=[], particles=[];
 var spawnTimer=0, enemiesDefeated=0, bossSpawned=false, currentLevel=0, score=0, attachedIce=null;
 const canvas=document.getElementById('gameCanvas');
 
@@ -479,6 +520,128 @@ if(btnPause){
     }
   });
 }
+
+// --- WINTER MENU SNOW ---
+let menuSnowParticles=[];
+let menuSnowRunning=false;
+let menuSnowRaf=0;
+function initWinterMenu(){
+  var canvas=document.getElementById('menu-snow-canvas');
+  var domContainer=document.getElementById('menu-snow-dom');
+  if(!canvas) return;
+  var ctx=canvas.getContext('2d');
+  function resize(){
+    var rect=canvas.getBoundingClientRect();
+    canvas.width=rect.width;
+    canvas.height=rect.height;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  menuSnowParticles=[];
+  for(var i=0;i<12;i++){
+    menuSnowParticles.push({
+      x: Math.random()*canvas.width,
+      y: Math.random()*canvas.height - canvas.height,
+      r: 1+Math.random()*2.2,
+      speed: 0.4+Math.random()*1.8,
+      drift: (Math.random()-0.5)*0.8,
+      opacity: 0.2+Math.random()*0.5,
+      wobble: Math.random()*Math.PI*2,
+      wobbleSpeed: 0.01+Math.random()*0.02,
+      char: Math.random()<0.18 ? '❄' : (Math.random()<0.3 ? '❅' : '·')
+    });
+  }
+  // DOM snowflakes for ❄ chars
+  if(domContainer){
+    domContainer.innerHTML='';
+    for(var j=0;j<5;j++){
+      var el=document.createElement('div');
+      el.className='snowflake-char';
+      el.textContent=['❄','❅','❆'][Math.floor(Math.random()*3)];
+      el.style.left=(Math.random()*100)+'%';
+      el.style.fontSize=(10+Math.random()*18)+'px';
+      el.style.animationDelay=(Math.random()*5)+'s';
+      el._speed=0.6+Math.random()*1.2;
+      el._drift=(Math.random()-0.5)*0.6;
+      el._y=-20-Math.random()*200;
+      el._x=parseFloat(el.style.left);
+      el._opacity=0.5+Math.random()*0.5;
+      domContainer.appendChild(el);
+    }
+  }
+  function animateSnow(){
+    if(!menuSnowRunning) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // canvas dots
+    for(var i=0;i<menuSnowParticles.length;i++){
+      var p=menuSnowParticles[i];
+      p.y+=p.speed;
+      p.x+=p.drift + Math.sin(p.wobble)*0.4;
+      p.wobble+=p.wobbleSpeed;
+      if(p.y>canvas.height+10){
+        p.y=-10;
+        p.x=Math.random()*canvas.width;
+      }
+      if(p.x<0) p.x=canvas.width;
+      if(p.x>canvas.width) p.x=0;
+      ctx.globalAlpha=p.opacity;
+      if(p.char==='·'){
+        ctx.fillStyle='#c8f4ff';
+        ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      } else {
+        ctx.fillStyle='#e6fbff';
+        ctx.font=p.r*4+'px monospace';
+        ctx.fillText(p.char, p.x, p.y);
+      }
+    }
+    ctx.globalAlpha=1;
+    // DOM flakes
+    if(domContainer){
+      var domFlakes=domContainer.children;
+      for(var k=0;k<domFlakes.length;k++){
+        var d=domFlakes[k];
+        d._y+=d._speed;
+        d._x+=d._drift + Math.sin(d._y*0.01)*0.3;
+        d.style.top=d._y+'px';
+        d.style.left=d._x+'%';
+        d.style.opacity=d._opacity * (1 - d._y/canvas.height*0.2);
+        if(d._y>canvas.height+20){
+          d._y=-20;
+          d._x=Math.random()*100;
+        }
+      }
+    }
+    menuSnowRaf=requestAnimationFrame(animateSnow);
+  }
+  menuSnowRunning=true;
+  animateSnow();
+}
+function stopWinterMenu(){
+  menuSnowRunning=false;
+  if(menuSnowRaf) cancelAnimationFrame(menuSnowRaf);
+}
+function handleMenuWinterVisibility(){
+  var mainMenu=document.getElementById('menu-main');
+  var isVisible = mainMenu && mainMenu.style.display!=='none';
+  if(isVisible && !menuSnowRunning){
+    setTimeout(initWinterMenu, 50);
+  } else if(!isVisible && menuSnowRunning){
+    stopWinterMenu();
+  }
+}
+// Hook into showMenu
+// showMenu hook removed - will hook later
+document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
+
+  setTimeout(function(){
+    var mainMenu=document.getElementById('menu-main');
+    if(mainMenu && mainMenu.style.display!=='none'){
+      initWinterMenu();
+    }
+  }, 300);
+});
+
+
 function updatePauseButton(){
   var bp=document.getElementById('btn-pause');
   if(!bp) return;
@@ -762,6 +925,7 @@ function setupCanvas(){
     var h=wrapper.clientHeight||window.innerHeight-62;
     canvas.width=w; canvas.height=h;
     camera.worldWidth=getWorldWidthForLevel(currentLevel);
+    if(typeof spawnCratesForLevel==='function'){ try{ spawnCratesForLevel(LEVELS[currentLevel]); }catch(e){ console.log(e); } }
     laneBottom=h-90;
     laneTop=Math.max(120,laneBottom-200);
     if(playerLaneY==0||playerLaneY==360) playerLaneY=laneBottom;
@@ -882,6 +1046,7 @@ function spawnWave(){
   }
   currentWave++;
   waveInProgress=true;
+  if(currentWave===1 && typeof spawnCratesForLevel==='function'){ try{ spawnCratesForLevel(LEVELS[currentLevel]); }catch(e){} }
   waitingForAdvance=false;
   showWaveArrow(false);
   nextWaveTriggerX=0;
@@ -1000,7 +1165,7 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v2.93 FIX: Flip sprite based on facing direction
+      // v3.01 FIX: Flip sprite based on facing direction
       // walk.png points RIGHT, so:
       // - facingRight=true (moving right) → draw NORMAL
       // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
@@ -1028,6 +1193,187 @@ function drawEnemy(e){
 
 
 
+
+
+
+// --- CAJAS ROMPIBLES + COPO NIEVE VIDA ---
+function spawnCratesForLevel(lvl){
+  crates=[];
+  if(lvl && lvl.isEditor) return;
+  var worldW = (typeof camera!=='undefined' && camera.worldWidth) ? camera.worldWidth : 3500;
+  var count = Math.floor(worldW/650); // una cada 650px
+  for(var i=0;i<count;i++){
+    var cx = 400 + i*650 + Math.random()*200;
+    var cy = laneTop + 20 + Math.random()*(laneBottom-laneTop-40);
+    crates.push({
+      x: cx,
+      laneY: cy,
+      w: 42,
+      h: 38,
+      health: 2,
+      maxHealth: 2,
+      destroyed: false,
+      shake: 0,
+      type: 'wood'
+    });
+  }
+}
+function createSnowflakePickup(x,y){
+  pickups.push({
+    x: x,
+    laneY: y,
+    yOffset: 0,
+    w: 22,
+    h: 22,
+    life: 12000,
+    timer: 0,
+    collected: false,
+    bob: Math.random()*Math.PI*2
+  });
+}
+function updateCrates(){
+  for(var i=crates.length-1;i>=0;i--){
+    var c=crates[i];
+    if(c.shake>0) c.shake-=16;
+    if(c.destroyed) continue;
+    // colision con jugador golpeando
+    if(player && (player.isPunching || player.isKicking) && !c._hitCooldown){
+      var dist = Math.hypot(player.x - c.x, playerLaneY - c.laneY);
+      if(dist < 70){
+        // solo si esta en anim de golpe y frame de impacto
+        var canHit = false;
+        if(player.isPunching && player.frame>=2) canHit=true;
+        if(player.isKicking && player.frame>=1) canHit=true;
+        if(canHit){
+          c.health--;
+          c.shake=180;
+          c._hitCooldown=true;
+          setTimeout((function(cc){ return function(){ cc._hitCooldown=false; }; })(c), 180);
+          spawnText(c.x, c.laneY-20, 'CRACK!', '#ffcc66');
+          if(typeof spawnParticles==='function'){
+            for(var p=0;p<6;p++) spawnParticles(c.x + (Math.random()-0.5)*20, c.laneY, '#8b5a2b');
+          }
+          if(c.health<=0){
+            c.destroyed=true;
+            // explotar caja
+            if(typeof spawnParticles==='function'){
+              for(var p=0;p<12;p++) spawnParticles(c.x, c.laneY, '#d4a574');
+            }
+            spawnText(c.x, c.laneY-30, 'CAJA ROTA', '#ffcc88');
+            // 70% chance de copo de vida
+            if(Math.random()<0.7){
+              createSnowflakePickup(c.x, c.laneY-10);
+              spawnText(c.x, c.laneY-45, '❄ VIDA!', '#7ef0ff');
+            }
+            // remover despues de un rato
+            setTimeout((function(idx){ return function(){ crates.splice(idx,1); }; })(i), 400);
+          }
+        }
+      }
+    }
+  }
+}
+function updatePickups(dt){
+  for(var i=pickups.length-1;i>=0;i--){
+    var p=pickups[i];
+    p.timer+=dt;
+    p.bob+=dt*0.005;
+    p.yOffset = Math.sin(p.bob)*4;
+    p.life-=dt;
+    if(p.life<=0){ pickups.splice(i,1); continue; }
+    if(p.collected) continue;
+    // colision con jugador
+    if(player){
+      var d=Math.hypot(player.x - p.x, playerLaneY - p.laneY);
+      if(d<48){
+        p.collected=true;
+        // curar vida
+        var heal=28;
+        if(player.health<player.maxHealth){
+          player.health=Math.min(player.maxHealth, player.health+heal);
+          spawnText(p.x, p.laneY-25, '+'+heal+' VIDA ❄', '#7ef0ff');
+          if(typeof spawnParticles==='function'){
+            for(var pp=0;pp<10;pp++) spawnParticles(p.x, p.laneY, '#7ef0ff');
+          }
+        } else {
+          spawnText(p.x, p.laneY-25, 'VIDA MAX', '#88ff88');
+        }
+        setTimeout((function(idx){ return function(){ pickups.splice(idx,1); }; })(i), 150);
+      }
+    }
+  }
+}
+function drawCrates(){
+  for(var i=0;i<crates.length;i++){
+    var c=crates[i];
+    if(c.destroyed) continue;
+    var sx = c.x - camera.x;
+    var sy = c.laneY;
+    var sc = 1 - ((laneBottom-c.laneY)/Math.max(1,laneBottom-laneTop))*0.15;
+    sc*=1.1;
+    if(sx<-60 || sx>canvas.width+60) continue;
+    ctx.save();
+    ctx.translate(sx + (c.shake>0 ? (Math.random()-0.5)*c.shake*0.06 : 0), sy + (c.shake>0 ? (Math.random()-0.5)*c.shake*0.04 : 0));
+    ctx.scale(sc, sc);
+    // sombra
+    ctx.fillStyle='rgba(0,0,0,0.28)';
+    ctx.beginPath(); ctx.ellipse(0, 16, 18, 5, 0,0,Math.PI*2); ctx.fill();
+    // caja madera
+    ctx.fillStyle='#8b5a2b';
+    ctx.fillRect(-18,-14,36,28);
+    ctx.fillStyle='#a67c52';
+    ctx.fillRect(-18,-14,36,6);
+    ctx.fillStyle='#6b4423';
+    ctx.fillRect(-18,8,36,6);
+    // tablas
+    ctx.strokeStyle='rgba(0,0,0,0.35)'; ctx.lineWidth=1;
+    ctx.strokeRect(-18,-14,36,28);
+    ctx.beginPath(); ctx.moveTo(-2,-14); ctx.lineTo(-2,14); ctx.stroke();
+    // clavos
+    ctx.fillStyle='#3a3a3a';
+    ctx.fillRect(-14,-10,2,2); ctx.fillRect(10,-10,2,2);
+    ctx.fillRect(-14,8,2,2); ctx.fillRect(10,8,2,2);
+    // simbolo copo si tiene vida dentro (brilla)
+    if(!c._noDrop){
+      ctx.save();
+      ctx.globalAlpha=0.18+Math.sin(Date.now()*0.004 + i)*0.12;
+      ctx.fillStyle='#7ef0ff';
+      ctx.beginPath(); ctx.arc(0,0,6,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+    ctx.restore();
+  }
+}
+function drawPickups(){
+  for(var i=0;i<pickups.length;i++){
+    var p=pickups[i];
+    var sx=p.x - camera.x;
+    var sy=p.laneY + p.yOffset;
+    if(sx<-30 || sx>canvas.width+30) continue;
+    var alpha = p.life<2000 ? (Math.sin(p.timer*0.01)*0.5+0.5) : 1;
+    ctx.save();
+    ctx.globalAlpha=alpha;
+    ctx.translate(sx, sy);
+    // sombra flotante
+    ctx.fillStyle='rgba(0,0,0,0.18)';
+    ctx.beginPath(); ctx.ellipse(0, 14, 10, 3, 0,0,Math.PI*2); ctx.fill();
+    // brillo
+    ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=18;
+    ctx.fillStyle='#c8f4ff';
+    ctx.beginPath();
+    // dibujar copo de nieve 6 puntas
+    for(var a=0;a<6;a++){
+      var ang=a*Math.PI/3 + p.bob*0.3;
+      ctx.moveTo(0,0);
+      ctx.lineTo(Math.cos(ang)*10, Math.sin(ang)*10);
+    }
+    ctx.strokeStyle='#e6fbff'; ctx.lineWidth=1.8; ctx.stroke();
+    ctx.beginPath(); ctx.arc(0,0,7,0,Math.PI*2); ctx.fillStyle='rgba(126,240,255,0.85)'; ctx.fill();
+    ctx.fillStyle='#ffffff'; ctx.font='bold 11px monospace'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('❄', 0, 0);
+    ctx.restore();
+  }
+}
 
 
 function drawCityBackground(lvl){
@@ -1517,6 +1863,8 @@ function loop(time){
       if(Math.abs(dx)<60 && Math.abs(dy)<40){ boss.attacking=true; player.health-=0.25; }
     }
     if(boss && boss.frozen>0) boss.frozen-=16;
+    if(typeof updateCrates==='function') updateCrates();
+    if(typeof updatePickups==='function') updatePickups(16);
     
     if(attachedIce && !player.isChargingIce && !player.isIceLoaded){ attachedIce.life-=16; if(attachedIce.life<=0) attachedIce=null; }
     
@@ -1524,6 +1872,8 @@ function loop(time){
     var lvl=LEVELS[currentLevel];
     ctx.fillStyle='rgb('+lvl.bgColor[0]+','+lvl.bgColor[1]+','+lvl.bgColor[2]+')'; ctx.fillRect(0,0,canvas.width,canvas.height);
     drawLevelBackground(lvl);
+    if(typeof drawCrates==='function') drawCrates();
+    if(typeof drawPickups==='function') drawPickups();
     
     for(var ei=0;ei<enemies.length;ei++){
       var e=enemies[ei]; if(e.dead) continue;
@@ -1661,7 +2011,17 @@ function loop(time){
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
       document.getElementById('health-bar').style.width=player.health+'%';
       document.getElementById('hud-level').textContent=(currentLevel+1)+'/'+LEVELS.length;
-      document.getElementById('hud-progress').textContent=Math.round(prog*100)+'%';
+      var iceProgDisplay=0;
+      if(player && player.isChargingIce && typeof player.iceChargeTimer!=='undefined'){
+        iceProgDisplay=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
+      } else if(player && player.isIceLoaded){
+        iceProgDisplay=1;
+      } else if(typeof attachedIce!=='undefined' && attachedIce && attachedIce.chargeProgress!=null){
+        iceProgDisplay=attachedIce.chargeProgress;
+      } else {
+        iceProgDisplay=0;
+      }
+      document.getElementById('hud-progress').textContent=Math.round(iceProgDisplay*100)+'%';
       document.getElementById('hud-enemies').textContent=enemiesDefeated+'/'+LEVELS[currentLevel].enemyCount;
       document.getElementById('hud-score').textContent=score+' pts';
     }catch(e){}
@@ -1733,7 +2093,8 @@ function bindKeys(id,dir){
 }
 bindKeys('btn-up','up'); bindKeys('btn-down','down'); bindKeys('btn-left','left'); bindKeys('btn-right','right');
 // MENU BUTTONS - addEventListener (replaces inline onclick)
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
+
   var btnPlay = document.getElementById('btn-play');
   if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(0); });
 
@@ -1799,7 +2160,8 @@ try{ setupCanvas(); }catch(e){}
 try{ showMenu('main'); }catch(e){}
 
 // Exponer globales
-document.addEventListener('DOMContentLoaded', function(){ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite FIX + scale 0.7"; }catch(e){} });
+document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
+ try{ var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var bn=document.getElementById('build-num'); if(bn) bn.textContent='BUILD '+GAME_VERSION; document.title="Sub-Zero's v"+GAME_VERSION+" - bola sobre sprite FIX + scale 0.7"; }catch(e){} });
 window.showMenu=showMenu; window.startLevel=startLevel; window.startGameInit=startGameInit; window.forceStartGame=forceStartGame;
 window.pauseGame=pauseGame; window.resumeGame=resumeGame; window.saveGameState=saveGameState; window.exitToMenu=exitToMenu;
 window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
@@ -1842,7 +2204,8 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
     enableMenuButtons();
   };
   // Fix explicito para botones principales por si onclick inline falla
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
+
     var bp=document.getElementById('btn-play');
     if(bp) bp.addEventListener('click', function(){ startLevel(0); });
     var bl=document.getElementById('btn-levels');
@@ -1858,7 +2221,8 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
 // ============================================================
 // BOTONES - addEventListener (reemplaza onclick inline)
 // ============================================================
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function(){ try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
+
   // MENU PRINCIPAL
   var btnPlay = document.getElementById('btn-play');
   if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(0); });
