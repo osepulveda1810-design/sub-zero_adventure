@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 322 - 8 NIVELES + NIEVE + BASE 32/0</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 323 - SPAWN SEPARADO</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -150,7 +150,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.22";
+const GAME_VERSION="3.23";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -1332,17 +1332,40 @@ function spawnWave(){
   var remaining=lvl.enemyCount - enemiesDefeated;
   if(remaining<=0) return;
   var toSpawn=Math.min(waveSize, remaining);
-  if(remaining>=5 && Math.random()>0.5) toSpawn=5; else toSpawn=Math.min(4, remaining);
+  if(remaining>=5 && Math.random()>0.5) toSpawn=4; else toSpawn=Math.min(3, remaining); // max 3-4 por oleada, no 5 amontonados
   if(currentWave===totalWaves-1) toSpawn=remaining;
   var cw = canvas.width;
-  var spawnCenterX = camera.x + cw + 120 + Math.random()*80;
+  var spawnCenterX = camera.x + cw + 140 + Math.random()*100;
+  // Distribucion en Y sin solaparse - precalcular posiciones Y separadas
+  var ySlots = [];
+  var yRange = Math.max(30, laneBottom - laneTop - 30);
+  var minGap = Math.max(35, yRange / (toSpawn+1));
+  for(var yi=0; yi<toSpawn; yi++){
+    var baseY = laneTop + 20 + (yi+0.5)*(yRange/toSpawn);
+    baseY += (Math.random()*24-12); // jitter 12px
+    ySlots.push(baseY);
+  }
+  // Shuffle Y para que no sea lineal
+  for(var sh=ySlots.length-1; sh>0; sh--){
+    var j=Math.floor(Math.random()*(sh+1));
+    var tmp=ySlots[sh]; ySlots[sh]=ySlots[j]; ySlots[j]=tmp;
+  }
   for(var i=0;i<toSpawn;i++){
     var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
-    var fromFront = Math.random()>0.25;
+    var fromFront = Math.random()>0.65; // 65% vienen de frente (derecha), 35% por detras (izquierda) - evita 1 izq 4 der juntos
     var x;
-    if(fromFront){ x=spawnCenterX + Math.random()*100 + i*38; }
-    else { x=camera.x - 80 - Math.random()*60 - i*20; if(x<20) x=20+Math.random()*40; }
-    var laneY=laneTop+14+Math.random()*(laneBottom-laneTop-28);
+    if(fromFront){ 
+      // Espaciado amplio: 110px entre cada uno + random 60px, no 38px
+      x=spawnCenterX + i*115 + Math.random()*70; 
+    }
+    else { 
+      x=camera.x - 90 - Math.random()*80 - i*95; 
+      if(x<30) x=30+Math.random()*60; 
+    }
+    var laneY = ySlots[i] || (laneTop+20+Math.random()*(laneBottom-laneTop-40));
+    // Clamp Y
+    if(laneY < laneTop+10) laneY = laneTop+10;
+    if(laneY > laneBottom-10) laneY = laneBottom-10;
     var e=createEnemy(type,x,laneY); 
     if(e){ e.fromFront=fromFront; enemies.push(e); }
   }
