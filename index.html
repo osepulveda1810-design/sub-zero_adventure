@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 326b - NINJA WALK 9F EXTERNO</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 327 - NINJA RENEGADE UPDATE</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -150,7 +150,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.26b";
+const GAME_VERSION="3.27";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -205,14 +205,14 @@ const ENEMY_SPRITE_CONFIG = {
     dead: { file: "dead.png", frames: 1, speed: 360, scaleX: 1.50, scaleY: 1.75, anchorX: 0, anchorY: 55 }
   },
   ninja_renegade: {
-    idle: { file: "idle.png", frames: 4, speed: 160, scaleX: 1.30, scaleY: 1.90, anchorX: 3, anchorY: 52 },
+    idle: { file: "idle.png", frames: 4, speed: 160, scaleX: 1.90, scaleY: 2.00, anchorX: 3, anchorY: 65 },
     walk: { file: "walk.png", frames: 9, speed: 70, scaleX: 2.05, scaleY: 1.80, anchorX: 2, anchorY: 68 },
     punch: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.35, scaleY: 1.28, anchorX: 2, anchorY: 0 },
     kick: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.50, scaleY: 1.32, anchorX: 1, anchorY: 1 },
-    attack: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.65, scaleY: 1.90, anchorX: 2, anchorY: 69 },
-    hit: { file: "hit.png", frames: 3, speed: 100, scaleX: 1.60, scaleY: 1.85, anchorX: 0, anchorY: 69 },
-    frozen: { file: "frozen.png", frames: 1, speed: 360, scaleX: 1.50, scaleY: 1.65, anchorX: 0, anchorY: 47 },
-    dead: { file: "dead.png", frames: 1, speed: 360, scaleX: 2.15, scaleY: 3.45, anchorX: -53, anchorY: 65 }
+    attack: { file: "attack.png", frames: 4, speed: 75, scaleX: 2.20, scaleY: 2.30, anchorX: 2, anchorY: 91 },
+    hit: { file: "hit.png", frames: 3, speed: 100, scaleX: 2.05, scaleY: 2.10, anchorX: 0, anchorY: 69 },
+    frozen: { file: "frozen.png", frames: 1, speed: 360, scaleX: 1.85, scaleY: 1.90, anchorX: 0, anchorY: 47 },
+    dead: { file: "dead.png", frames: 1, speed: 360, scaleX: 2.30, scaleY: 3.45, anchorX: -53, anchorY: 65 }
   }
 };
 
