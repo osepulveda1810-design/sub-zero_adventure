@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 323 - SPAWN SEPARADO</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 326b - NINJA WALK 9F EXTERNO</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -150,7 +150,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.23";
+const GAME_VERSION="3.26b";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -206,7 +206,7 @@ const ENEMY_SPRITE_CONFIG = {
   },
   ninja_renegade: {
     idle: { file: "idle.png", frames: 4, speed: 160, scaleX: 1.30, scaleY: 1.90, anchorX: 3, anchorY: 52 },
-    walk: { file: "walk.png", frames: 4, speed: 90, scaleX: 2.05, scaleY: 1.80, anchorX: 0, anchorY: 67 },
+    walk: { file: "walk.png", frames: 9, speed: 70, scaleX: 2.05, scaleY: 1.80, anchorX: 2, anchorY: 68 },
     punch: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.35, scaleY: 1.28, anchorX: 2, anchorY: 0 },
     kick: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.50, scaleY: 1.32, anchorX: 1, anchorY: 1 },
     attack: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.65, scaleY: 1.90, anchorX: 2, anchorY: 69 },
@@ -1335,7 +1335,7 @@ function spawnWave(){
   if(remaining>=5 && Math.random()>0.5) toSpawn=4; else toSpawn=Math.min(3, remaining); // max 3-4 por oleada, no 5 amontonados
   if(currentWave===totalWaves-1) toSpawn=remaining;
   var cw = canvas.width;
-  var spawnCenterX = camera.x + cw + 140 + Math.random()*100;
+  var spawnCenterX = camera.x + cw + 280 + currentWave*90 + Math.random()*120; // FIX v3.25: spawnea 280+ mas adelante, cada oleada mas lejos
   // Distribucion en Y sin solaparse - precalcular posiciones Y separadas
   var ySlots = [];
   var yRange = Math.max(30, laneBottom - laneTop - 30);
@@ -1395,10 +1395,10 @@ function prepareNextWaveAdvance(){
   if(currentWave>=totalWaves) return;
   if(enemiesDefeated>=LEVELS[currentLevel].enemyCount) return;
   waitingForAdvance=true;
-  nextWaveTriggerX = player.x + 160 + currentWave*60;
-  // clamp
-  if(nextWaveTriggerX>camera.worldWidth-200) nextWaveTriggerX=camera.worldWidth-300;
-  showWaveArrow(true, 'AVANZA - OLEADA '+(currentWave+1)+'/'+totalWaves+' ➡️');
+  // FIX v3.25: avanza MAS adelante, no en misma zona
+  nextWaveTriggerX = player.x + 380 + currentWave*120; // antes 160+60, ahora 380+120
+  if(nextWaveTriggerX>camera.worldWidth-250) nextWaveTriggerX=camera.worldWidth-280;
+  showWaveArrow(true, 'AVANZA ➡️ OLEADA '+(currentWave+1)+'/'+totalWaves);
   if(typeof spawnText==='function') spawnText(player.x, playerLaneY-60, 'AVANZA PARA SIGUIENTE OLEADA', '#facc15');
 }
 
@@ -1959,22 +1959,28 @@ function loop(time){
           var inFront = player.facingRight ? (dx>8 && dx<rangeX) : (dx<-8 && dx>-rangeX);
           if(inFront){
             var isFrozen = he.frozen>0;
-            var finalDmg = isFrozen ? (dmg+22) : dmg;
+            var finalDmg = isFrozen ? (dmg+50) : dmg; // FIX v3.24: mas daño a congelados para garantizar KO
+            var effectiveRangeY = isFrozen ? 95 : rangeY; // hitbox mas grande si esta congelado
+            if(isFrozen && Math.abs(dy)>effectiveRangeY) { /* permitir hit aunque Y un poco lejos */ }
+            else if(!isFrozen && Math.abs(dy)>rangeY) continue;
             he.health -= finalDmg;
-            he.hitTimer = isFrozen ? 120 : 320;
+            he.hitTimer = isFrozen ? 140 : 320;
             he.frame = 0; he.frameTime = 0;
-            he.x += player.facingRight ? (isFrozen?22:14) : (isFrozen?-22:-14);
+            he.x += player.facingRight ? (isFrozen?28:14) : (isFrozen?-28:-14);
             if(isFrozen){
-              // SHATTER al golpear congelado
-              he.frozen=0;
-              spawnText(he.x, he.laneY-32, 'SHATTER! -'+finalDmg, '#a5f3ff');
-              camera.shake = 10;
-              score+= isFrozen?80:0;
-              for(var s=0;s<8;s++){
-                iceShatters.push({x:he.x, y:he.laneY-18, vx:(Math.random()*10-5), vy:(Math.random()*-6-1), life:480, maxLife:480, rot:Math.random()*6.28, vr:(Math.random()*0.4-0.2), size:3+Math.random()*4, gold:false});
+              // SHATTER al golpear congelado - FIX: daño masivo + muerte garantizada si vida < 50%
+              if(he.health > 0 && he.maxHealth>0 && he.health/he.maxHealth < 0.55){
+                he.health = 0; // remate si queda <55%
               }
-              for(var g=0;g<3;g++){
-                iceTrails.push({x:he.x, y:he.laneY-12, vx:Math.random()*6-3, vy:Math.random()*-4-1, life:260, maxLife:260, size:2+Math.random()*2, gold:true});
+              he.frozen=0;
+              spawnText(he.x, he.laneY-38, 'SHATTER! -'+finalDmg, '#a5f3ff');
+              camera.shake = 14;
+              score+= 120;
+              for(var s=0;s<12;s++){
+                iceShatters.push({x:he.x, y:he.laneY-18, vx:(Math.random()*12-6), vy:(Math.random()*-7-2), life:520, maxLife:520, rot:Math.random()*6.28, vr:(Math.random()*0.5-0.25), size:4+Math.random()*5, gold:Math.random()>0.4});
+              }
+              for(var g=0;g<5;g++){
+                iceTrails.push({x:he.x, y:he.laneY-12, vx:Math.random()*6-3, vy:Math.random()*-4-1, life:300, maxLife:300, size:2+Math.random()*3, gold:true});
               }
             } else {
               spawnText(he.x, he.laneY-22, '-'+finalDmg, '#ff4444');
@@ -2027,8 +2033,8 @@ function loop(time){
       } else {
         // Esperando que el jugador avance
         showWaveArrow(true, 'AVANZA - OLEADA '+(currentWave+1)+'/'+totalWaves+' ➡️');
-        // Si el jugador avanzo lo suficiente, spawnea
-        if(player.x >= nextWaveTriggerX - 40){
+        // FIX v3.25: requiere avanzar bien adelante
+        if(player.x >= nextWaveTriggerX - 20){
           spawnWave();
           spawnTimer=0;
         }
@@ -2082,20 +2088,19 @@ function loop(time){
         {
           wasFrozen = e.frozen>0;
           if(wasFrozen){
-            // SHATTER! enemigo ya congelado
-            e.health-=35;
-            spawnText(e.x,e.laneY-30,'SHATTER! +150','#a5f3ff');
-            score+=150;
-            camera.shake=14;
-            // 10 cristales grandes
-            for(var s=0;s<10;s++){
-              iceShatters.push({x:e.x, y:e.laneY-18, vx:(Math.random()*10-5), vy:(Math.random()*-6-1), life:520, maxLife:520, rot:Math.random()*6.28, vr:(Math.random()*0.4-0.2), size:3+Math.random()*5, gold:false});
+            // SHATTER! enemigo ya congelado - FIX v3.24: daño garantizado + muerte
+            e.health-=65; // antes 35
+            spawnText(e.x,e.laneY-32,'SHATTER! +150','#a5f3ff');
+            score+=180;
+            camera.shake=16;
+            for(var s=0;s<14;s++){
+              iceShatters.push({x:e.x, y:e.laneY-18, vx:(Math.random()*12-6), vy:(Math.random()*-8-2), life:560, maxLife:560, rot:Math.random()*6.28, vr:(Math.random()*0.5-0.25), size:4+Math.random()*5, gold:Math.random()>0.3});
             }
-            // particulas doradas extra
-            for(var g=0;g<5;g++){
-              iceTrails.push({x:e.x, y:e.laneY-12, vx:Math.random()*6-3, vy:Math.random()*-4-1, life:300, maxLife:300, size:2+Math.random()*2, gold:true});
+            for(var g=0;g<6;g++){
+              iceTrails.push({x:e.x, y:e.laneY-12, vx:Math.random()*6-3, vy:Math.random()*-4-1, life:320, maxLife:320, size:3+Math.random()*2, gold:true});
             }
-            if(e.health<=0){ e.dead=true; e.deadTimer=0; enemiesDefeated++; score+=100; spawnText(e.x,e.laneY-45,'KO!','#ffd700'); }
+            if(e.health<=0 || e.health/e.maxHealth < 0.5){ e.dead=true; e.deadTimer=0; enemiesDefeated++; score+=120; spawnText(e.x,e.laneY-48,'SHATTER KO!','#ffd700'); }
+            else { e.frozen=0; } // rompe hielo aunque no muera
           } else {
             e.frozen=3500; e.health-=12; spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
             camera.shake=6;
