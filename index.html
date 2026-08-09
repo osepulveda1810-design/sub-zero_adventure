@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 327 - NINJA RENEGADE UPDATE</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 336 - PISO SUTIL FIX</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -150,7 +150,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.27";
+const GAME_VERSION="3.36";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -160,7 +160,7 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 
 const SPRITE_CONFIG = {
   idle: { file: "idle.png", frames: 4, speed: 130, scaleX: 0.75, scaleY: 1.00, anchorX: 0, anchorY: 25 },
-  walk: { file: "walk.png", frames: 4, speed: 130, scaleX: 1.30, scaleY: 1.40, anchorX: 1, anchorY: 46 },
+  walk: { file: "walk.png", frames: 4, speed: 130, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29 },
   punch: { file: "punch.png", frames: 4, speed: 100, scaleX: 1.70, scaleY: 1.40, anchorX: 3, anchorY: 47 },
   kick: { file: "kick.png", frames: 4, speed: 100, scaleX: 1.85, scaleY: 1.45, anchorX: 9, anchorY: 58 },
   jump: { file: "jump.png", frames: 3, speed: 155, scaleX: 1.20, scaleY: 1.20, anchorX: 0, anchorY: 23 },
@@ -206,7 +206,7 @@ const ENEMY_SPRITE_CONFIG = {
   },
   ninja_renegade: {
     idle: { file: "idle.png", frames: 4, speed: 160, scaleX: 1.90, scaleY: 2.00, anchorX: 3, anchorY: 65 },
-    walk: { file: "walk.png", frames: 9, speed: 70, scaleX: 2.05, scaleY: 1.80, anchorX: 2, anchorY: 68 },
+    walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 1.40, scaleY: 1.75, anchorX: 2, anchorY: 51, cols: 5, rows: 2 },
     punch: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.35, scaleY: 1.28, anchorX: 2, anchorY: 0 },
     kick: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.50, scaleY: 1.32, anchorX: 1, anchorY: 1 },
     attack: { file: "attack.png", frames: 4, speed: 75, scaleX: 2.20, scaleY: 2.30, anchorX: 2, anchorY: 91 },
@@ -1433,14 +1433,30 @@ function drawPlayer(time){
   else { player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
   if(useSprite){
     try{
-      var sw=Math.floor(sprite.naturalWidth/total); var sh=sprite.naturalHeight;
-      var sx=Math.floor((player.frame||0)*sw);
+      // v3.30: soporte grilla 5x2 para player walk
+      var cols = cfg.cols || total;
+      var rows = cfg.rows || Math.ceil(total / cols);
+      var sw, sh, sx, sy;
+      if(cfg.cols && cfg.rows){
+        sw = Math.floor(sprite.naturalWidth / cols);
+        sh = Math.floor(sprite.naturalHeight / rows);
+        var col = Math.floor((player.frame||0) % cols);
+        var row = Math.floor((player.frame||0) / cols);
+        sx = col * sw;
+        sy = row * sh;
+      } else {
+        sw=Math.floor(sprite.naturalWidth/total);
+        sh=sprite.naturalHeight;
+        sx=Math.floor((player.frame||0)*sw);
+        sy=0;
+      }
       var tw=Math.round(100*sc*(cfg.scaleX||1)), th=Math.round(110*sc*(cfg.scaleY||1));
       var ax=(cfg.anchorX||0)*sc;
       var dx=Math.round(player.x-camera.x)-Math.round(tw/2)+Math.round(ax);
       var dy=Math.round(playerLaneY-th+10+(cfg.anchorY||0)*sc+(player.jumpOffset||0));
       ctx.save(); ctx.imageSmoothingEnabled=false;
-      if(!player.facingRight){ ctx.scale(-1,1); ctx.drawImage(sprite,sx,0,sw,sh,-dx-tw,dy,tw,th); } else { ctx.drawImage(sprite,sx,0,sw,sh,dx,dy,tw,th); }
+      if(typeof sy==='undefined'){ sy=0; }
+      if(!player.facingRight){ ctx.scale(-1,1); ctx.drawImage(sprite,sx,sy,sw,sh,-dx-tw,dy,tw,th); } else { ctx.drawImage(sprite,sx,sy,sw,sh,dx,dy,tw,th); }
       ctx.restore(); return;
     }catch(e){}
   }
@@ -1480,8 +1496,39 @@ function drawEnemy(e){
     var cfg=(ENEMY_SPRITE_CONFIG[type]&&ENEMY_SPRITE_CONFIG[type][animToUse])||{frames:1};
     var total=cfg.frames||1;
     var frame=Math.floor(e.frame||0)%total;
-    var sw=Math.floor(sprite.naturalWidth/total);
-    var sx=Math.floor(frame*sw);
+    // v3.29: SOPORTE GRILLA 5x2, 3x3, etc - si cfg.cols existe usa grilla
+    var cols = cfg.cols || total; // por defecto tira horizontal
+    var rows = cfg.rows || Math.ceil(total / cols);
+    var sw, sh, sx, sy;
+    if(cols>1 && cfg.rows){ // modo grilla explicito
+      sw = Math.floor(sprite.naturalWidth / cols);
+      sh = Math.floor(sprite.naturalHeight / rows);
+      var col = frame % cols;
+      var row = Math.floor(frame / cols);
+      sx = col * sw;
+      sy = row * sh;
+    } else if(total>4 && sprite.naturalHeight > sprite.naturalWidth*0.6){
+      // autodeteccion grilla si es cuadrado alto: probar 5x2 si total=10
+      if(total===10){
+        cols=5; rows=2;
+        sw = Math.floor(sprite.naturalWidth / cols);
+        sh = Math.floor(sprite.naturalHeight / rows);
+        var col = frame % cols;
+        var row = Math.floor(frame / cols);
+        sx = col * sw;
+        sy = row * sh;
+      } else {
+        sw=Math.floor(sprite.naturalWidth/total);
+        sx=Math.floor(frame*sw);
+        sy=0;
+        sh=sprite.naturalHeight;
+      }
+    } else {
+      sw=Math.floor(sprite.naturalWidth/total);
+      sx=Math.floor(frame*sw);
+      sy=0;
+      sh=sprite.naturalHeight;
+    }
     var sc=(1-((laneBottom-e.laneY)/200)*0.12)*1.15;
     var tw=Math.round(90*sc*(cfg.scaleX||1)), th=Math.round(110*sc*(cfg.scaleY||1));
     var ax=(cfg.anchorX||0)*sc, ay=(cfg.anchorY||0)*sc;
@@ -1499,7 +1546,9 @@ function drawEnemy(e){
         ctx.scale(-1, 1);
         ctx.translate(-(drawX+tw/2), 0);
       }
-      ctx.drawImage(sprite,sx,0,sw,sprite.naturalHeight,drawX,dy,tw,th);
+      // v3.29: dibujar con sy,sh si es grilla
+      if(typeof sy==='undefined'){ sy=0; sh=sprite.naturalHeight; }
+      ctx.drawImage(sprite,sx,sy,sw,sh,drawX,dy,tw,th);
       ctx.restore();
       if(!e.dead){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, tw, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, tw*(e.health/e.maxHealth), 3); }
       return true;
@@ -1703,24 +1752,26 @@ function drawPickups(){
 
 function drawCityBackground(lvl){
   var w=canvas.width, h=canvas.height;
+  // Cargar textura de piso externa si existe
+  if(typeof floorTextureImg==='undefined'){
+    window.floorTextureImg = new Image();
+    floorTextureImg.src = "assets/backgrounds/floor_city.jpg";
+    floorTextureImg.loaded = false;
+    floorTextureImg.onload = function(){ floorTextureImg.loaded=true; console.log('floor_city.jpg cargado'); };
+    floorTextureImg.onerror = function(){ console.log('floor_city.jpg no encontrado, usando procedural'); floorTextureImg.loaded=false; floorTextureImg.failed=true; };
+  }
   if(typeof cityBgImg !== 'undefined' && cityBgImg && cityBgImg.loaded){
     var imgW = cityBgImg.width;
     var imgH = cityBgImg.height;
     
-    // Esta imagen ya es vista lateral plana, perfecta para scroll horizontal
-    // Parte de arriba (0-78%) son edificios, parte de abajo (78-100%) es calle plana
-    
-    // 1. DIBUJAR CIELO + SKYLINE LEJANO (detras de todo) - parallax muy lento 0.05
-    var skyParallax = 0.05;
-    var skyOffset = - (camera.x * skyParallax) % (w*0.8);
-    // degradado cielo nocturno
+    // 1. CIELO
     var skyGrad=ctx.createLinearGradient(0,0,0,laneTop);
     skyGrad.addColorStop(0,'#0a0e1e');
     skyGrad.addColorStop(1,'#1a2440');
     ctx.fillStyle=skyGrad;
     ctx.fillRect(0,0,w,laneTop);
     
-    // skyline lejano de la imagen - recortamos solo la parte superior 0-30% donde estan rascacielos
+    // skyline lejano 0-32%
     var skylineSrcH = imgH * 0.32;
     var skylineDestH = laneTop * 0.85;
     var skylineScale = w*1.2 / imgW;
@@ -1729,50 +1780,67 @@ function drawCityBackground(lvl){
     for(var si=-1; si<3; si++){
       ctx.drawImage(cityBgImg, 0, 0, imgW, skylineSrcH, skyOffsetX + si*scaledSkyW, laneTop - skylineDestH, scaledSkyW, skylineDestH);
     }
-    // niebla sobre skyline
     ctx.fillStyle='rgba(20,30,60,0.35)';
     ctx.fillRect(0,laneTop - skylineDestH*0.5, w, skylineDestH*0.5);
 
-    // 2. EDIFICIOS MEDIOS - parte central de la imagen 30%-78% - parallax 0.18 acorde al scroll
+    // 2. EDIFICIOS MEDIOS 28%-78%
     var midSrcY = imgH * 0.28;
     var midSrcH = imgH * 0.50;
-    // Los edificios deben quedar con su base justo en laneTop (acera)
-    var buildingsDestH = laneTop * 0.95; // altura de edificios en pantalla
+    var buildingsDestH = laneTop * 0.95;
     var buildingsScale = buildingsDestH / midSrcH;
-    var buildingsW = imgW * buildingsScale * 1.8; // mas ancho para ver mas ciudad
+    var buildingsW = imgW * buildingsScale * 1.8;
     var parallaxMid = 0.18;
     var midOffsetX = - (camera.x * parallaxMid) % (buildingsW * 0.6);
-    
-    // Dibujar 4 copias para scroll largo y natural
     for(var mi=-1; mi<5; mi++){
       var mdx = midOffsetX + mi*buildingsW*0.6;
-      // recorte con un poco de overlap
       ctx.drawImage(cityBgImg, 0, midSrcY, imgW, midSrcH, mdx, laneTop - buildingsDestH, buildingsW, buildingsDestH);
     }
     
-    // 3. CALLE - parte inferior 78%-100% de la imagen, plana horizontal
-    // Esta calle ya es plana, sin perspectiva de fuga, perfecta para beat em up
-    var streetSrcY = imgH * 0.78;
-    var streetSrcH = imgH * 0.22;
+    // 3. PISO INDEPENDIENTE - USA TEXTURA REALISTA SI EXISTE
     var streetDestY = laneTop;
     var streetDestH = h - laneTop;
     
-    // La calle debe scrollear casi 1:1 con el jugador (parallax 0.9) para que se sienta que camina sobre ella
-    var streetParallax = 0.9;
-    var streetScale = streetDestH / streetSrcH * 1.1;
-    var streetW = imgW * streetScale * 1.5;
-    var streetOffsetX = - (camera.x * streetParallax) % (streetW * 0.5);
-    
-    for(var st=-1; st<4; st++){
-      var sdx = streetOffsetX + st*streetW*0.5;
-      ctx.drawImage(cityBgImg, 0, streetSrcY, imgW, streetSrcH, sdx, streetDestY, streetW, streetDestH);
+    if(typeof floorTextureImg!=='undefined' && floorTextureImg.loaded && !floorTextureImg.failed){
+      // FIX v3.36: textura sutil, no estirada, baja opacidad
+      var texW = 380; // mas chico = menos manchas gigantes
+      var texH = 380;
+      var offsetX = -(camera.x * 0.9) % texW;
+      // base oscura primero
+      ctx.fillStyle='#0f1722';
+      ctx.fillRect(0, streetDestY, w, streetDestH);
+      // dibujar textura con baja opacidad, sin estirar
+      ctx.save();
+      ctx.globalAlpha = 0.28; // muy sutil
+      ctx.imageSmoothingEnabled = true;
+      for(var fx=-2; fx<6; fx++){
+        for(var fy=0; fy<2; fy++){
+          var ty = streetDestY + fy*texH;
+          if(ty > streetDestY+streetDestH) continue;
+          ctx.drawImage(floorTextureImg, 0, 0, floorTextureImg.width, floorTextureImg.height, offsetX+fx*texW, ty, texW, texH);
+        }
+      }
+      ctx.restore();
+      // oscurecer y uniformar para que personajes resalten
+      var darkGrad = ctx.createLinearGradient(0, streetDestY, 0, streetDestY+streetDestH);
+      darkGrad.addColorStop(0, 'rgba(0,0,0,0.35)');
+      darkGrad.addColorStop(1, 'rgba(0,0,0,0.55)');
+      ctx.fillStyle = darkGrad;
+      ctx.fillRect(0, streetDestY, w, streetDestH);
+    } else {
+      // Fallback procedural (si no hay imagen)
+      var floorGrad = ctx.createLinearGradient(0, streetDestY, 0, streetDestY+streetDestH);
+      floorGrad.addColorStop(0, '#1a2436');
+      floorGrad.addColorStop(0.18, '#121a2a');
+      floorGrad.addColorStop(0.55, '#0e1726');
+      floorGrad.addColorStop(1, '#0a1220');
+      ctx.fillStyle = floorGrad;
+      ctx.fillRect(0, streetDestY, w, streetDestH);
+      ctx.fillStyle='rgba(255,50,90,0.06)';
+      ctx.fillRect(0, laneTop+8, w, 28);
+      ctx.fillStyle='rgba(40,180,255,0.05)';
+      ctx.fillRect(0, laneTop+38, w, 22);
     }
     
-    // oscurecer un poco la calle para que personajes resalten
-    ctx.fillStyle='rgba(0,0,0,0.22)';
-    ctx.fillRect(0, laneTop, w, streetDestH);
-    
-    // lineas de carril - ajustadas a zona caminable
     var midLaneY = laneTop + (laneBottom-laneTop)*0.58;
     ctx.strokeStyle='rgba(255,220,90,0.32)';
     ctx.lineWidth=1.8;
@@ -1783,31 +1851,23 @@ function drawCityBackground(lvl){
     ctx.stroke();
     ctx.setLineDash([]);
     
-    // bordes de acera
-    ctx.fillStyle='rgba(255,255,255,0.06)';
-    ctx.fillRect(0, laneTop, w, 2);
-    ctx.fillStyle='rgba(0,0,0,0.35)';
-    ctx.fillRect(0, laneBottom-2, w, 2);
+    ctx.fillStyle='rgba(180,200,220,0.12)';
+    ctx.fillRect(0, laneTop, w, 3);
+    ctx.fillStyle='rgba(0,0,0,0.45)';
+    ctx.fillRect(0, laneBottom-3, w, 3);
+    ctx.fillStyle='rgba(0,0,0,0.25)';
+    ctx.fillRect(0, laneTop, w, 10);
 
-    // luz de neones reflejada en suelo mojado - sutil
-    ctx.fillStyle='rgba(255,40,80,0.04)';
-    ctx.fillRect(0, laneTop+10, w, 30);
-    ctx.fillStyle='rgba(40,200,255,0.04)';
-    ctx.fillRect(0, laneTop+40, w, 20);
-
-    // viñeteado
-    var vignette=ctx.createRadialGradient(w/2,h/2, w*0.35, w/2,h/2, w);
+    var vignette=ctx.createRadialGradient(w/2, streetDestY+streetDestH*0.4, w*0.25, w/2, streetDestY+streetDestH*0.5, w*0.9);
     vignette.addColorStop(0,'rgba(0,0,0,0)');
-    vignette.addColorStop(1,'rgba(0,0,0,0.32)');
+    vignette.addColorStop(1,'rgba(0,0,0,0.38)');
     ctx.fillStyle=vignette;
-    ctx.fillRect(0,0,w,h);
+    ctx.fillRect(0,streetDestY,w,streetDestH);
     return;
   }
-  // fallback
   ctx.fillStyle='rgb('+lvl.groundColor[0]+','+lvl.groundColor[1]+','+lvl.groundColor[2]+')';
   ctx.fillRect(0,laneTop,canvas.width,canvas.height-laneTop);
 }
-
 
 function drawLevelBackground(lvl){
   if(!lvl) return;
