@@ -83,7 +83,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 </head><body>
 <div id="game-container">
-<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 336 - PISO SUTIL FIX</div></div></div>
+<div id="top-bar"><div class="logo">SUB-ZERO</div><div style="display:flex;gap:6px;align-items:center"><button id="btn-open-live" class="badge" style="background:rgba(126,240,255,0.15);border:1px solid rgba(126,240,255,0.3);color:#7ef0ff;display:none;cursor:pointer;pointer-events:auto">🎚️ EDITOR</button><div class="badge">v3.05 FIX</div><div class="badge" style="background:rgba(255,255,255,0.1);color:#7ef0ff">BUILD 338 - WALK 5x2 AUTO-DETECT FIX</div></div></div>
 <div id="canvas-wrapper">
 <canvas id="gameCanvas"></canvas>
 
@@ -150,7 +150,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 </div>
 <script>
-const GAME_VERSION="3.36";
+const GAME_VERSION="3.38";
 let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
@@ -160,7 +160,7 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 
 const SPRITE_CONFIG = {
   idle: { file: "idle.png", frames: 4, speed: 130, scaleX: 0.75, scaleY: 1.00, anchorX: 0, anchorY: 25 },
-  walk: { file: "walk.png", frames: 4, speed: 130, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29 },
+  walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29, cols: 5, rows: 2 }, // 5x2 alta res, si usas tira 4 frames pon frames:4 y borra cols/rows
   punch: { file: "punch.png", frames: 4, speed: 100, scaleX: 1.70, scaleY: 1.40, anchorX: 3, anchorY: 47 },
   kick: { file: "kick.png", frames: 4, speed: 100, scaleX: 1.85, scaleY: 1.45, anchorX: 9, anchorY: 58 },
   jump: { file: "jump.png", frames: 3, speed: 155, scaleX: 1.20, scaleY: 1.20, anchorX: 0, anchorY: 23 },
@@ -1433,11 +1433,15 @@ function drawPlayer(time){
   else { player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
   if(useSprite){
     try{
-      // v3.30: soporte grilla 5x2 para player walk
-      var cols = cfg.cols || total;
-      var rows = cfg.rows || Math.ceil(total / cols);
+      // v3.38: auto-deteccion grilla 5x2 universal
+      var cols = cfg.cols || (total===10 ? 5 : total);
+      var rows = cfg.rows || (total===10 ? 2 : 1);
+      // si total=4 pero imagen es ancha tipo 5x2, forzar 5x2
+      if(!cfg.cols && sprite.naturalWidth > sprite.naturalHeight*1.8 && total===10){
+        cols=5; rows=2;
+      }
       var sw, sh, sx, sy;
-      if(cfg.cols && cfg.rows){
+      if(rows>1 || cols!==total){
         sw = Math.floor(sprite.naturalWidth / cols);
         sh = Math.floor(sprite.naturalHeight / rows);
         var col = Math.floor((player.frame||0) % cols);
@@ -1496,33 +1500,17 @@ function drawEnemy(e){
     var cfg=(ENEMY_SPRITE_CONFIG[type]&&ENEMY_SPRITE_CONFIG[type][animToUse])||{frames:1};
     var total=cfg.frames||1;
     var frame=Math.floor(e.frame||0)%total;
-    // v3.29: SOPORTE GRILLA 5x2, 3x3, etc - si cfg.cols existe usa grilla
-    var cols = cfg.cols || total; // por defecto tira horizontal
-    var rows = cfg.rows || Math.ceil(total / cols);
+    // v3.38: auto-deteccion grilla universal 5x2
+    var cols = cfg.cols || (total===10 ? 5 : total);
+    var rows = cfg.rows || (total===10 ? 2 : 1);
     var sw, sh, sx, sy;
-    if(cols>1 && cfg.rows){ // modo grilla explicito
+    if(rows>1 || cols!==total || total===10){
       sw = Math.floor(sprite.naturalWidth / cols);
       sh = Math.floor(sprite.naturalHeight / rows);
       var col = frame % cols;
       var row = Math.floor(frame / cols);
       sx = col * sw;
       sy = row * sh;
-    } else if(total>4 && sprite.naturalHeight > sprite.naturalWidth*0.6){
-      // autodeteccion grilla si es cuadrado alto: probar 5x2 si total=10
-      if(total===10){
-        cols=5; rows=2;
-        sw = Math.floor(sprite.naturalWidth / cols);
-        sh = Math.floor(sprite.naturalHeight / rows);
-        var col = frame % cols;
-        var row = Math.floor(frame / cols);
-        sx = col * sw;
-        sy = row * sh;
-      } else {
-        sw=Math.floor(sprite.naturalWidth/total);
-        sx=Math.floor(frame*sw);
-        sy=0;
-        sh=sprite.naturalHeight;
-      }
     } else {
       sw=Math.floor(sprite.naturalWidth/total);
       sx=Math.floor(frame*sw);
