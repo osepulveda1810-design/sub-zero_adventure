@@ -164,11 +164,11 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 
 const SPRITE_CONFIG = {
   idle: { file: "idle.png", frames: 4, speed: 130, scaleX: 0.75, scaleY: 1.00, anchorX: 0, anchorY: 25 },
-  walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29, cols: 5, rows: 2 },
+  walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29, cols: 5, rows: 2 }, // 5x2 alta res, si usas tira 4 frames pon frames:4 y borra cols/rows
   punch: { file: "punch.png", frames: 4, speed: 100, scaleX: 1.70, scaleY: 1.40, anchorX: 3, anchorY: 47 },
   kick: { file: "kick.png", frames: 4, speed: 100, scaleX: 1.85, scaleY: 1.45, anchorX: 9, anchorY: 58 },
   jump: { file: "jump.png", frames: 3, speed: 155, scaleX: 1.20, scaleY: 1.20, anchorX: 0, anchorY: 23 },
-  flip_jump: { file: "flip_jump.png", frames: 12, speed: 85, scaleX: 1.10, scaleY: 1.20, anchorX: 0, anchorY: 23, cols: 4, rows: 3 },
+  flip_jump: { file: "flip_jump.png", frames: 12, speed: 75, scaleX: 1.10, scaleY: 1.20, anchorX: 0, anchorY: 23, cols: 4, rows: 3 },
   ice_charge: { file: "ice_charge.png", frames: 1, speed: 300, scaleX: 1.00, scaleY: 0.95, anchorX: 0, anchorY: 25 },
   ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 300, scaleX: 1.25, scaleY: 1.00, anchorX: 0, anchorY: 29 },
   punch_air: { file: "punch_air.png", frames: 1, speed: 350, scaleX: 1.15, scaleY: 0.75, anchorX: 0, anchorY: -30 },
@@ -709,7 +709,7 @@ let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
-let FLIP_JUMP_FORCE=-22.5;
+let FLIP_JUMP_FORCE=-20.5;
 let lastJumpTap=0;
 let flipJumpCooldown=0;
 let _oldPlayer={x:120,y:0,speed:3.2,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8};
@@ -975,54 +975,43 @@ function tryKick(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].i
  if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
 function tryPunch(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='punch'; dummyEnemy.previewTimer=800; return; } }catch(e){}
  if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH AIR"); return; } player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
-function tryJump(){
-  try{
-    var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor;
-    if(isEd && currentEditChar!=='player' && dummyEnemy){
-      dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='jump'; dummyEnemy.previewTimer=600; return;
-    }
-  }catch(e){}
-  var now=Date.now();
-  var delta=now-lastJumpTap;
-  lastJumpTap=now;
-  // Doble tap X = flip opcional
-  if(delta<350 && delta>40 && player.grounded && flipJumpCooldown<=0 && player.landingTimer<=0){
-    if(!player.isChargingIce && !player.isIceLoaded && !player.isFlipJumping){
-      player.grounded=false;
-      player.vy=FLIP_JUMP_FORCE;
-      player.jumpOffset=-4;
-      player.frame=0; player.frameTime=0;
-      player.anim='flip_jump'; player._lastAnim='flip_jump';
-      player.isFlipJumping=true; player.flipJumpTimer=0;
-      player.flipJumpForward = player.facingRight ? 6.5 : -6.5;
-      player.landingTimer=0; flipJumpCooldown=900;
-      if(typeof spawnText==='function') spawnText(player.x, playerLaneY-50, '¡SALTO MORTAL!', '#7ef0ff');
-      return;
-    }
-  }
-  if(!player.grounded) return;
-  if(player.landingTimer>0) return;
-  if(player.isChargingIce || player.isIceLoaded) return;
-  if(player.isFlipJumping) return;
-  player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2;
-  player.frame=0; player.frameTime=0; player.anim='jump';
+function tryJump(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='jump'; dummyEnemy.previewTimer=600; return; } }catch(e){}
+ if(!player.grounded) return;
+ if(player.landingTimer>0) return;
+ if(player.isChargingIce || player.isIceLoaded) return;
+ if(player.isFlipJumping) return;
+ player.grounded=false;
+ player.vy=JUMP_FORCE;
+ player.jumpOffset=-2;
+ player.frame=0; player.frameTime=0;
+ player.anim='jump';
 }
 
 function tryFlipJump(){
+  // BASADO 100% EN tryJump normal, solo cambia fuerza y añade avance
+  try{
+    var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor;
+    if(isEd && currentEditChar!=='player' && dummyEnemy){
+      dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='flip_jump'; dummyEnemy.previewTimer=1000; return;
+    }
+  }catch(e){}
   if(!player.grounded) return;
   if(player.landingTimer>0) return;
   if(flipJumpCooldown>0) return;
-  if(player.isFlipJumping) return;
   if(player.isChargingIce || player.isIceLoaded) return;
   if(player.isPunching || player.isKicking) return;
+  if(player.isFlipJumping) return;
+  // Igual que salto normal pero más alto
   player.grounded=false;
   player.vy=FLIP_JUMP_FORCE;
-  player.jumpOffset=-4;
+  player.jumpOffset=-2;
   player.frame=0; player.frameTime=0;
-  player.anim='flip_jump'; player._lastAnim='flip_jump';
-  player.isFlipJumping=true; player.flipJumpTimer=0;
+  player.anim='flip_jump';
+  player._lastAnim='flip_jump';
+  player.isFlipJumping=true;
   player.flipJumpForward = player.facingRight ? 6.5 : -6.5;
-  player.landingTimer=0; flipJumpCooldown=900;
+  flipJumpCooldown=900;
+  player.landingTimer=0;
 }
 
 function getIceCandidates(){
@@ -1469,7 +1458,6 @@ function drawPlayer(time){
   try{ if(typeof updatePauseButton==='function') updatePauseButton(); var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player'){ return; } }catch(e){}
   var sc=(1-((laneBottom-playerLaneY)/200)*0.12)*PLAYER_SCALE;
   var anim=player.anim||'idle';
-  // PRIORIDAD: flip_jump debe respetarse, no sobreescribirse por jump
   if(anim!=='punch_air' && anim!=='kick_air' && anim!=='flip_jump'){
     if(player.isShootingIce) anim='ice_shoot';
     else if(player.isChargingIce||player.isIceLoaded) anim='ice_charge';
@@ -1478,8 +1466,6 @@ function drawPlayer(time){
     else if(player.isKicking) anim='kick';
     else if(!player.grounded) anim='jump';
     else if(keys.right||keys.left||keys.up||keys.down) anim='walk';
-  } else if(anim==='flip_jump' && !player.isFlipJumping && player.grounded){
-    anim='idle';
   }
   var cfg=SPRITE_CONFIG[anim]||SPRITE_CONFIG.idle;
   var sprite=playerSprites[anim];
@@ -1497,15 +1483,6 @@ function drawPlayer(time){
   if(anim==='idle'||anim==='walk'){ player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
   else if(anim==='punch'||anim==='kick'){ player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame++; player.frameTime=0; if(player.frame>=4){ player.frame=0; player.anim='idle'; player.isPunching=false; player.isKicking=false; } } }
   else if(anim==='jump'){ player.frame=player.grounded?0:(player.vy<0?0:1); }
-  else if(anim==='flip_jump'){ 
-    // Flip no hace loop raro, avanza frame a frame hasta caer
-    player.frameTime+=16; 
-    if(player.frameTime>cfg.speed){ 
-      player.frame++; 
-      if(player.frame>=total) player.frame=total-1;
-      player.frameTime=0; 
-    } 
-  }
   else { player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
   if(useSprite){
     try{
@@ -1530,17 +1507,10 @@ function drawPlayer(time){
         sx=Math.floor((player.frame||0)*sw);
         sy=0;
       }
-      // FIX para flip_jump: inset de 3px para evitar que se traslapen frames del sheet pegado
-      if(cfg && cfg.file && cfg.file.indexOf('flip_jump')!==-1){
-        var inset = 3;
-        sx += inset; sy += inset; sw -= inset*2; sh -= inset*2;
-      }
       var tw=Math.round(100*sc*(cfg.scaleX||1)), th=Math.round(110*sc*(cfg.scaleY||1));
       var ax=(cfg.anchorX||0)*sc;
       var dx=Math.round(player.x-camera.x)-Math.round(tw/2)+Math.round(ax);
       var dy=Math.round(playerLaneY-th+10+(cfg.anchorY||0)*sc+(player.jumpOffset||0));
-      // Limitar altura máxima del salto mortal para que no se vaya del techo como en el video
-      if(player.isFlipJumping && dy < 20) dy = 20;
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(typeof sy==='undefined'){ sy=0; }
       if(!player.facingRight){ ctx.scale(-1,1); ctx.drawImage(sprite,sx,sy,sw,sh,-dx-tw,dy,tw,th); } else { ctx.drawImage(sprite,sx,sy,sw,sh,dx,dy,tw,th); }
@@ -1963,40 +1933,31 @@ function loop(time){
     if(currentState!=='PLAYING') return;
     if(isPaused) return;
     
-    // --- FISICA SALTO + SALTO MORTAL - REGENERADO ALTO ---
+    // --- FISICA SALTO + FLIP - BASADO EN SALTO NORMAL ---
     if(flipJumpCooldown>0) flipJumpCooldown-=16;
     if(!player.grounded){
+      // Misma física que salto normal
       if(player.isFlipJumping){
-        player.vy+=GRAVITY*0.82;
+        // Flip usa misma gravedad que salto normal para que suba igual de bien, solo más fuerza inicial
+        player.vy+=GRAVITY;
         player.jumpOffset+=player.vy;
+        // Extra: avanza hacia adelante
         player.x+=player.flipJumpForward;
-        if(typeof player.flipJumpTimer==='undefined') player.flipJumpTimer=0;
-        player.flipJumpTimer+=16;
-        if(player.flipJumpForward>0) player.facingRight=true; else player.facingRight=false;
       } else {
         player.vy+=GRAVITY;
         player.jumpOffset+=player.vy;
       }
       if(player.jumpOffset>=0){
         player.jumpOffset=0; player.vy=0; player.grounded=true;
-        player.landingTimer = player.isFlipJumping ? 80 : 180;
+        player.landingTimer=180;
         if(player.isFlipJumping){
           player.isFlipJumping=false;
           player.flipJumpForward=0;
           player.anim='idle';
-          player.frame=0; player.frameTime=0;
-          player._lastAnim='idle';
-          player.flipJumpTimer=0;
+          player.frame=0;
         }
       }
-    } else {
-      if(player.landingTimer>0) player.landingTimer-=16;
-      if(player.anim==='flip_jump' && player.grounded){
-        player.anim='idle';
-        player.isFlipJumping=false;
-        player.frame=0; player.frameTime=0;
-      }
-    }
+    } else if(player.landingTimer>0){ player.landingTimer-=16; }
 
     // --- PUNCH & KICK RESET FALLBACK ---
     if(player.isPunching){
@@ -2082,10 +2043,10 @@ function loop(time){
         if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
       }
     }
-    // === COLISION SOLIDA PLAYER vs ENEMIGOS - FIX: flip jump puede pasar por encima ===
+    // === COLISION SOLIDA PLAYER vs ENEMIGOS - flip puede pasar por encima ===
     try{
-      if(player.isFlipJumping){
-        // Durante salto mortal, sin colisión - puede pasar sobre enemigos
+      if(player.isFlipJumping || !player.grounded){
+        // En aire (salto normal o flip) no bloquear, dejar pasar
       } else if(enemies && enemies.length>0){
         for(var _ci=0; _ci<enemies.length; _ci++){
           var _ce = enemies[_ci];
@@ -2131,9 +2092,8 @@ function loop(time){
         }
       }
     }catch(e){}
-    if(player.isFlipJumping){ player.anim='flip_jump'; }
-    else if(player.anim==='punch_air' || player.anim==='kick_air' || player.anim==='flip_jump'){
-      // mantener animaciones aéreas ya establecidas
+    if(player.anim==='punch_air' || player.anim==='kick_air'){
+      // mantener animaciones aéreas ya establecidas por tryPunch/tryKick
     } else if(player.isShootingIce){ player.anim='ice_shoot'; }
     else if(player.isChargingIce || player.isIceLoaded){ player.anim='ice_charge'; }
     else if(player.isPunching){ player.anim='punch'; }
@@ -2402,11 +2362,11 @@ function loop(time){
           }
         }catch(e){}
         var _canAttack = (_attackingCount < 2);
-        // === COLISION SOLIDA: no atravesar al player (pero si player hace flip, dejar pasar) ===
+        // === COLISION SOLIDA: no atravesar al player si está muy cerca ===
         var _canMove = true;
         var _nextX = en.x + (d>0 ? (dx/d)*en.speed*0.52 : 0);
         var _nextY = en.laneY + (d>0 ? (dy/d)*en.speed*0.48 : 0);
-        if(!player.isFlipJumping && Math.abs(player.x - _nextX) < 62 && Math.abs(playerLaneY - _nextY) < 34){
+        if(Math.abs(player.x - _nextX) < 62 && Math.abs(playerLaneY - _nextY) < 34){
           if(d < 75){
             _canMove = false;
             // Si no puede atacar (ya hay 2 atacando), rodea en Y
