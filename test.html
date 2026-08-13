@@ -1227,12 +1227,28 @@ function setupCanvas(){
     var h=wrapper.clientHeight||window.innerHeight-62;
     canvas.width=w; canvas.height=h;
     camera.worldWidth=getWorldWidthForLevel(currentLevel);
-    if(typeof spawnCratesForLevel==='function'){ try{ spawnCratesForLevel(LEVELS[currentLevel]); }catch(e){ console.log(e); } }
+    
     var baseBottom=h-90;
-    var baseTop=Math.max(120,baseBottom-200);
-    laneBottom=baseBottom + 32; // abajo 32 fijo - pedido
-    laneTop=baseTop + 0; // arriba 0 - sin limite extra
-    if(playerLaneY==0||playerLaneY==360) playerLaneY=laneBottom;
+var baseTop=Math.max(120,baseBottom-200);
+var oldTop=laneTop, oldBottom=laneBottom;
+if(typeof FLOOR_REF_OFFSET!=='undefined'){
+  laneTop=baseTop+TOP_LIMIT_OFFSET;
+  laneBottom=baseBottom-FLOOR_REF_OFFSET;
+} else {
+  laneTop=baseTop;
+  laneBottom=baseBottom;
+}
+var clampY=function(y){ return Math.max(laneTop, Math.min(laneBottom, y)); };
+if(typeof oldTop==='number' && typeof oldBottom==='number' && oldBottom>oldTop && laneBottom>laneTop){
+  var rescaleY=function(y){ return clampY(laneTop + (y-oldTop)*(laneBottom-laneTop)/(oldBottom-oldTop)); };
+  playerLaneY=rescaleY(playerLaneY);
+  for(var i=0;i<enemies.length;i++) enemies[i].laneY=rescaleY(enemies[i].laneY);
+  for(var c=0;c<crates.length;c++) crates[c].laneY=rescaleY(crates[c].laneY);
+  for(var p=0;p<pickups.length;p++) pickups[p].laneY=rescaleY(pickups[p].laneY);
+  if(boss && !boss.dead) boss.laneY=rescaleY(boss.laneY);
+} else {
+  playerLaneY=laneBottom;
+}
     if(camera.x > camera.worldWidth - w) camera.x = Math.max(0, camera.worldWidth - w);
   }catch(e){ console.log(e); }
 }
@@ -1373,7 +1389,7 @@ function spawnWave(){
   }
   currentWave++;
   waveInProgress=true;
-  if(currentWave===1 && typeof spawnCratesForLevel==='function'){ try{ spawnCratesForLevel(LEVELS[currentLevel]); }catch(e){} }
+  if(currentWave===1 && crates.length===0 && typeof spawnCratesForLevel==='function'){ try{ spawnCratesForLevel(LEVELS[currentLevel]); }catch(e){} }
   waitingForAdvance=false;
   showWaveArrow(false);
   nextWaveTriggerX=0;
@@ -2623,7 +2639,7 @@ function showMenu(id){
 function startLevel(idx){
   try{
     currentLevel=idx; camera.worldWidth=getWorldWidthForLevel(idx);
-    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; enemiesDefeated=0; bossSpawned=false; if(typeof resetWaves==='function') resetWaves(); player.x=120; player.health=100; score=0;
+    camera.x=0; camera.targetX=0; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; crates=[]; pickups=[]; floatingTexts=[]; enemiesDefeated=0; bossSpawned=false; currentWave=0; waitingForAdvance=false; showWaveArrow(false); if(typeof resetWaves==='function') resetWaves(); player.x=120; player.health=100; score=0;
     setupCanvas();
     var lvl=LEVELS[idx];
     document.getElementById('story-title').textContent=lvl.name;
@@ -2663,21 +2679,7 @@ function bindKeys(id,dir){
   el.addEventListener('mousedown',down); el.addEventListener('mouseup',up); el.addEventListener('mouseleave',up);
 }
 bindKeys('btn-up','up'); bindKeys('btn-down','down'); bindKeys('btn-left','left'); bindKeys('btn-right','right');
-// MENU BUTTONS - addEventListener (replaces inline onclick)
-document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSelector(); }catch(e){} try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
 
-  var btnPlay = document.getElementById('btn-play');
-  if(btnPlay) btnPlay.addEventListener('click', function(){ startLevel(1); });
-
-  var btnLevels = document.getElementById('btn-levels');
-  if(btnLevels) btnLevels.addEventListener('click', function(){ showMenu('levels'); });
-
-  var btnHow = document.getElementById('btn-how');
-  if(btnHow) btnHow.addEventListener('click', function(){ showHowToPlay(); });
-
-  var btnUpdate = document.getElementById('btn-settings');
-  if(btnUpdate) btnUpdate.addEventListener('click', function(){ showMenu('settings'); });
-});
 
 document.getElementById('btn-ice').addEventListener('click',function(){ tryIce(); });
 var bp=document.getElementById('btn-punch');
@@ -2803,18 +2805,7 @@ window.showHowToPlay=showHowToPlay; window.checkUpdate=checkUpdate;
     }
     enableMenuButtons();
   };
-  // Fix explicito para botones principales por si onclick inline falla
-  document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSelector(); }catch(e){} try{ var mm=document.getElementById('menu-main'); if(mm){ mm.style.display='flex'; } }catch(e){}
 
-    var bp=document.getElementById('btn-play');
-    if(bp) bp.addEventListener('click', function(){ startLevel(1); });
-    var bl=document.getElementById('btn-levels');
-    if(bl) bl.addEventListener('click', function(){ showMenu('levels'); });
-    var bh=document.getElementById('btn-how');
-    if(bh) bh.addEventListener('click', function(){ showHowToPlay(); });
-    var bu=document.getElementById('btn-settings');
-    if(bu) bu.addEventListener('click', function(){ showMenu('settings'); });
-  });
 })();
 
 
