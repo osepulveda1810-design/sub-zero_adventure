@@ -109,6 +109,15 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#7ef0ff">NIVELES</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;max-width:720px;width:100%"></div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div>
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
 <div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
+<div id="menu-gameover" class="menu-overlay" style="display:none">
+  <div style="text-align:center">
+    <h2 style="color:#ff4444;font-size:28px;margin-bottom:10px">☠ GAME OVER ☠</h2>
+    <div id="gameover-score" style="color:#7ef0ff;font-size:14px;margin-bottom:20px">SCORE FINAL: 0 pts</div>
+    <button id="btn-retry" class="btn-premium" style="width:80%;margin:6px auto">▶ REINTENTAR NIVEL</button>
+    <button id="btn-gameover-exit" class="btn-premium" style="width:80%;margin:6px auto">⏏ SALIR AL MENÚ</button>
+  </div>
+</div>
+
 <div id="menu-howtoplay" class="menu-overlay" style="display:none"><div style="max-width:480px;width:100%"><h2 style="color:#7ef0ff;text-align:center">CÓMO JUGAR v2.54</h2><div style="background:rgba(0,0,0,0.3);border-radius:12px;padding:12px;margin-top:12px;font-size:12px;line-height:1.6">- Sin errores btnExport<br>- Enemies fallback a idle si falta punch/kick<br>- Path enemies/ OK</div><button class="btn-premium" style="width:100%;margin-top:14px" onclick="showMenu('main')">VOLVER</button></div></div>
 
 <div id="menu-settings" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px;width:100%"><h2 style="color:#7ef0ff;letter-spacing:3px">⚙ AJUSTES</h2>
@@ -964,6 +973,8 @@ function updatePauseButton(){
 }
 
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
+var lastFrameTime=0, frameDt=16, ts=1;
+var GAME_SPEED=0.7;
 
 function tryKick(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='kick'; dummyEnemy.previewTimer=800; return; } }catch(e){}
  if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
@@ -1453,10 +1464,10 @@ function drawPlayer(time){
   if(typeof player.frame==='undefined') player.frame=0;
   if(player.frame>=total) player.frame=0; // clamp si viene de anim mas larga
   if(!player.frameTime) player.frameTime=0;
-  if(anim==='idle'||anim==='walk'){ player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
-  else if(anim==='punch'||anim==='kick'){ player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame++; player.frameTime=0; if(player.frame>=4){ player.frame=0; player.anim='idle'; player.isPunching=false; player.isKicking=false; } } }
+  if(anim==='idle'||anim==='walk'){ player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
+  else if(anim==='punch'||anim==='kick'){ player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame++; player.frameTime=0; if(player.frame>=4){ player.frame=0; player.anim='idle'; player.isPunching=false; player.isKicking=false; } } }
   else if(anim==='jump'){ player.frame=player.grounded?0:(player.vy<0?0:1); }
-  else { player.frameTime+=16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
+  else { player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
   if(useSprite){
     try{
       // v3.38: auto-deteccion grilla 5x2 universal
@@ -1903,8 +1914,14 @@ function drawLevelBackground(lvl){
 function loop(time){
   try{
     requestAnimationFrame(loop);
-    if(currentState!=='PLAYING') return;
-    if(isPaused) return;
+if(currentState!=='PLAYING'){ lastFrameTime=time; return; }
+if(isPaused){ lastFrameTime=time; return; }
+var rawDt=time-lastFrameTime;
+lastFrameTime=time;
+if(!(rawDt>0)) rawDt=16;
+if(rawDt>50) rawDt=50;
+frameDt=rawDt*GAME_SPEED;
+ts=frameDt/16;
     
     // --- FISICA SALTO ---
     if(!player.grounded){
@@ -2066,6 +2083,7 @@ function loop(time){
     
     updateCamera();
 
+// --- PUNCH/KICK HIT DETECTION ---
     if(player.isPunching || player.isKicking){
       var isPunch = player.isPunching;
       var alreadyHit = isPunch ? player.attackHit : player.kickHit;
@@ -2132,6 +2150,49 @@ function loop(time){
               if(isPunch) player.attackHit=true; else player.kickHit=true;
               if(boss.health<=0){ boss.dead=true; score+=500; }
             }
+          }
+        }
+      }
+    }
+
+
+// --- ANIMACION PLAYER ---
+    if(player.frameTime===undefined) player.frameTime=0;
+    player.frameTime+=16;
+    var cfg=SPRITE_CONFIG[player.anim];
+    var spd=cfg?cfg.speed:120;
+    if(player.frameTime>spd){
+      player.frameTime=0;
+      player.frame++;
+      var frames=cfg?cfg.frames:4;
+      if(player.frame>=frames){
+        if(player.anim==='punch' || player.anim==='kick' || player.anim==='punch_air' || player.anim==='kick_air' || player.anim==='ice_shoot'){
+          player.frame=frames-1;
+        } else {
+          player.frame=0;
+        }
+      }
+    }
+
+// --- ANIMACION ENEMIGOS ---
+    for(var ei=0;ei<enemies.length;ei++){
+      var e=enemies[ei];
+      if(e.dead && e.deathTimer<=0) continue;
+      e.frameTime+=16;
+      var ecfg=ENEMY_SPRITE_CONFIG[e.type]? ENEMY_SPRITE_CONFIG[e.type][e.anim] : null;
+      var esp=ecfg?ecfg.speed:120;
+      if(e.frameTime>esp){
+        e.frameTime=0;
+        e.frame++;
+        var ef=ecfg?ecfg.frames:1;
+        if(e.frame>=ef){
+          if(e.anim==='attack' || e.anim==='hit'){
+            e.frame=0;
+            if(e.anim==='hit'){ e.anim='idle'; }
+          } else if(e.anim==='dead'){
+            e.frame=ef-1;
+          } else {
+            e.frame=0;
           }
         }
       }
@@ -2255,97 +2316,83 @@ function loop(time){
 
 
     
+// --- UPDATE ENEMIGOS ---
     for(var ei=0;ei<enemies.length;ei++){
-      var en=enemies[ei];
-      // FRAME ANIMATION FOR ALL ENEMIES
-      if(typeof en.frame==='undefined') en.frame=0;
-      if(typeof en.frameTime==='undefined') en.frameTime=0;
-      en.frameTime+=16;
-      var _ca='idle';
-      if(en.previewAnim && en.previewTimer>0) _ca=en.previewAnim;
-      else if(en.frozen>0) _ca='frozen';
-      else if(en.dead) _ca='dead';
-      else if(en.hitTimer>0) _ca='hit';
-      else if(en.attacking) _ca='attack';
-      else if(en.isMoving) _ca='walk';
-      var _cfg=ENEMY_SPRITE_CONFIG[en.type] && ENEMY_SPRITE_CONFIG[en.type][_ca];
-      var _sp=_cfg?_cfg.speed:160;
-      var _fr=_cfg?_cfg.frames:1;
-      if(en.frameTime>_sp){ en.frame=(en.frame+1)%_fr; en.frameTime=0; }
-      // EDITOR DUMMY HANDLING
-      var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor;
-      var isSolo=isEd && en.isDummy && currentEditChar!=='player';
-      if(isSolo){
-        if(en.previewTimer>0) en.previewTimer-=16; else en.previewAnim=null;
-        if(en.hitTimer>0) en.hitTimer-=16;
-        if(en.frozen>0) en.frozen-=16;
-        if(en.attacking){ en.attackTimer=(en.attackTimer||0)+16; if(en.attackTimer>700){ en.attacking=false; en.attackTimer=0; en.previewAnim=null; en.previewTimer=0; en.frame=0; } }
+      var e=enemies[ei];
+      if(e.dead){
+        if(e.deathTimer>0) e.deathTimer-=16;
         continue;
       }
-      // NORMAL ENEMY AI
-      if(en.frozen>0){ en.frozen-=16; en.isMoving=false; en.attacking=false; continue; }
-      if(en.dead) continue;
-      var dx=player.x-en.x; var dy=playerLaneY-en.laneY; var d=Math.sqrt(dx*dx+dy*dy);
-      if(typeof en.attackCooldown==='undefined') en.attackCooldown=0;
-      if(en.attackCooldown>0) en.attackCooldown-=16;
-      if(typeof en.hitTimer==='undefined') en.hitTimer=0;
-      if(en.hitTimer>0){ en.hitTimer-=16; en.isMoving=false; en.attacking=false; }
-      else {
-        en.isMoving=false;
-        if(en.attackTimer>0){ en.attackTimer-=16; if(en.attackTimer<=0) en.attacking=false; }
-        // === LIMITE DE ATACANTES SIMULTANEOS - max 2 atacando ===
-        var _attackingCount = 0;
-        try{
-          for(var _ac=0; _ac<enemies.length; _ac++){
-            if(enemies[_ac].attacking && !enemies[_ac].dead) _attackingCount++;
-          }
-        }catch(e){}
-        var _canAttack = (_attackingCount < 2);
-        // === COLISION SOLIDA: no atravesar al player si está muy cerca ===
-        var _canMove = true;
-        var _nextX = en.x + (d>0 ? (dx/d)*en.speed*0.52 : 0);
-        var _nextY = en.laneY + (d>0 ? (dy/d)*en.speed*0.48 : 0);
-        if(Math.abs(player.x - _nextX) < 62 && Math.abs(playerLaneY - _nextY) < 34){
-          if(d < 75){
-            _canMove = false;
-            // Si no puede atacar (ya hay 2 atacando), rodea en Y
-            if(!_canAttack || Math.abs(dx) < 50){
-              var _side = (en.laneY < playerLaneY) ? -1 : 1;
-              // Evitar irse fuera de lane
-              var _targetY = en.laneY + _side * 35;
-              if(_targetY >= laneTop+15 && _targetY <= laneBottom-15){
-                en.laneY += _side * en.speed * 0.55;
-              } else {
-                en.laneY -= _side * en.speed * 0.35;
-              }
-              en.isMoving = true;
-              if(dx>0) en.facingRight=true; else if(dx<0) en.facingRight=false;
+      if(e.frozen>0){
+        e.frozen-=16;
+        if(e.frozen<=0){
+          e.frozen=0;
+          e.anim='idle';
+          e.frame=0;
+        }
+        continue;
+      }
+      if(e.hitTimer>0){
+        e.hitTimer-=16;
+        if(e.hitTimer<=0){
+          e.anim='idle';
+          e.frame=0;
+        }
+        continue;
+      }
+      if(e.attacking){
+        e.attackTimer+=16;
+        if(e.attackTimer>600){
+          e.attacking=false;
+          e.anim='idle';
+          e.frame=0;
+          e.attackTimer=0;
+        }
+        // daño al player si cerca (1 golpe por ataque)
+        if(e.attackTimer>250 && e.attackTimer<350 && !e.hitApplied){
+          var dx=Math.abs(e.x-player.x);
+          var dy=Math.abs(e.laneY-playerLaneY);
+          if(dx<55 && dy<35){
+            if(player.health>0){
+              e.hitApplied=true;
+              player.health-=10;
+              player.hitTimer=300;
+              spawnText(player.x, playerLaneY-40, '-10', '#ff4444');
+              camera.shake=8;
             }
           }
         }
-        if(_canMove && d>62){
-          en.x+=(dx/d)*en.speed*0.52;
-          en.laneY+=(dy/d)*en.speed*0.48;
-          en.isMoving=true;
-          if(dx>0) en.facingRight=true; else if(dx<0) en.facingRight=false;
-        } else if(!_canMove && d>62){
-          // Ya estamos en modo rodeo, no hacer nada más
-        }
-        // Ataque solo si está en rango y hay espacio para atacar
-        if(Math.abs(dx)<56 && Math.abs(dy)<44){
-          if(en.attackCooldown<=0 && _canAttack){
-            en.attacking=true;
-            en.attackTimer=260;
-            en.attackCooldown=1400 + Math.random()*800;
-            player.health-= (en.damage*0.18);
-            if(player.health<0) player.health=0;
-          } else if(en.attackCooldown<=0 && !_canAttack){
-            // Esperar - no atacar todos a la vez
-            en.attackCooldown = 300 + Math.random()*400;
-          }
-        }
+        continue;
       }
+      // IA movimiento
+      var dxp=player.x-e.x;
+      var dyp=playerLaneY-e.laneY;
+      var dist=Math.hypot(dxp,dyp);
+      var inRange=Math.abs(dxp)<55 && Math.abs(dyp)<35;
+      if(dist>400){
+        e.isMoving=false;
+        e.anim='idle';
+      } else if(!inRange){
+        e.isMoving=true;
+        e.anim='walk';
+        var sp=e.speed||2;
+        e.x+= (dxp/dist)*sp;
+        e.laneY+= (dyp/dist)*sp*0.7;
+        if(dxp>0) e.facingRight=true; else e.facingRight=false;
+      } else {
+        e.isMoving=false;
+        // atacar
+        e.attacking=true;
+        e.anim='attack';
+        e.frame=0;
+        e.attackTimer=0;
+        e.hitApplied=false;
+      }
+      // clamp lane
+      if(e.laneY<laneTop) e.laneY=laneTop;
+      if(e.laneY>laneBottom) e.laneY=laneBottom;
     }
+
     // === SEPARACION ENEMIGO vs ENEMIGO - evita amontonamiento ===
     try{
       for(var _s1=0; _s1<enemies.length; _s1++){
@@ -2393,7 +2440,8 @@ function loop(time){
     if(typeof drawCrates==='function') drawCrates();
     if(typeof drawPickups==='function') drawPickups();
     
-    // --- DEPTH SORTING POR Y v3.22 - FIX PISADA + 8 NIVELES + NIEVE ---
+    // --- RENDER ---
+// --- DEPTH SORTING POR Y v3.22 - FIX PISADA + 8 NIVELES + NIEVE ---
     try{
       var drawList = [];
       if(typeof player!=='undefined' && player){
@@ -2613,7 +2661,19 @@ function loop(time){
       document.getElementById('hud-score').textContent=score+' pts';
     }catch(e){}
     
-    if(player.health<=0){ currentState='MENU'; showMenu('main'); player.health=100; }
+    if(player.health<=0 && currentState==='PLAYING'){
+  currentState='GAMEOVER';
+  isPaused=true;
+  try{ showWaveArrow(false); }catch(e){}
+  var hud=document.getElementById('hud'); if(hud) hud.style.display='none';
+  var controls=document.getElementById('controls'); if(controls) controls.style.display='none';
+  var bp=document.getElementById('btn-pause'); if(bp) bp.style.display='none';
+  try{
+    var goScore=document.getElementById('gameover-score');
+    if(goScore) goScore.textContent='SCORE FINAL: '+score+' pts';
+  }catch(e){}
+  showMenu('gameover');
+}
     if(boss && boss.dead){ spawnText(boss.x,boss.laneY-30,'VICTORIA!','#ffd700'); setTimeout(function(){ if(currentLevel<LEVELS.length-1){ currentLevel++; startLevel(currentLevel); } else { currentState='MENU'; showMenu('main'); } }, 1500); boss=null; }
     
   }catch(err){
@@ -2881,6 +2941,14 @@ document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSel
     }
   });
 });
+
+document.addEventListener('DOMContentLoaded', function(){
+  var br=document.getElementById('btn-retry');
+  if(br) br.addEventListener('click', function(){ player.health=player.maxHealth||100; score=0; startLevel(currentLevel); });
+  var be=document.getElementById('btn-gameover-exit');
+  if(be) be.addEventListener('click', function(){ exitToMenu(); });
+});
+
 </script>
 <script>
 (function(){
