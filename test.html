@@ -974,14 +974,23 @@ function updatePauseButton(){
 
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 var lastFrameTime=0, frameDt=16, ts=1;
-var GAME_SPEED=0.3;
+var GAME_SPEED=0.4;
+var DIST_STOP=45;  // distancia a la que el enemigo se frena y ataca
+var DIST_DMG=45;   // alcance del golpe del enemigo
+var DIST_BODY=50;
+var DEBUG_MODE=false;
+if(!DEBUG_MODE){
+  console.log=function(){};
+  console.warn=function(){};
+  console.info=function(){};
+}  // distancia mínima cuerpo a cuerpo (anti-empuje)
 
 function tryKick(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='kick'; dummyEnemy.previewTimer=800; return; } }catch(e){}
  if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
 function tryPunch(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='punch'; dummyEnemy.previewTimer=800; return; } }catch(e){}
- if(player.isPunching || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH AIR"); return; } player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
+ if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH AIR"); return; } player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
 function tryJump(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='jump'; dummyEnemy.previewTimer=600; return; } }catch(e){}
- if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
+ if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; if(player.isPunching || player.isKicking) return; player.grounded=false; player.vy=JUMP_FORCE; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
 
 function getIceCandidates(){
   var list=[];
@@ -1381,15 +1390,14 @@ function spawnWave(){
   }
   for(var i=0;i<toSpawn;i++){
     var type=lvl.enemyTypes[Math.floor(Math.random()*lvl.enemyTypes.length)];
-    var fromFront = Math.random()>0.65; // 65% vienen de frente (derecha), 35% por detras (izquierda) - evita 1 izq 4 der juntos
+    var fromFront = Math.random()>0.35 || player.x<450;
     var x;
-    if(fromFront){ 
-      // Espaciado amplio: 110px entre cada uno + random 60px, no 38px
-      x=spawnCenterX + i*115 + Math.random()*70; 
+    if(fromFront){
+      x=spawnCenterX + i*115 + Math.random()*70;
     }
-    else { 
-      x=camera.x - 90 - Math.random()*80 - i*95; 
-      if(x<30) x=30+Math.random()*60; 
+    else {
+      x=player.x - 320 - Math.random()*120 - i*95;
+      if(x<30) x=30+Math.random()*60;
     }
     var laneY = ySlots[i] || (laneTop+20+Math.random()*(laneBottom-laneTop-40));
     // Clamp Y
@@ -1502,6 +1510,14 @@ function drawPlayer(time){
     }catch(e){}
   }
   var w=Math.round(90*sc), h=Math.round(110*sc); ctx.fillStyle='#7ef0ff'; ctx.fillRect(player.x-camera.x-w/2, playerLaneY-h, w, h);
+
+  if(player.hurtFlash>0){
+    ctx.globalAlpha=(player.hurtFlash/220)*0.45;
+    ctx.fillStyle='#ff4444';
+    ctx.fillRect(px-28, py-62, 56, 66);
+    ctx.globalAlpha=1;
+  }
+
 }
 function drawEnemy(e){
   var ex=Math.round(e.x-camera.x);
@@ -1575,7 +1591,12 @@ function drawEnemy(e){
       if(typeof sy==='undefined'){ sy=0; sh=sprite.naturalHeight; }
       ctx.drawImage(sprite,sx,sy,sw,sh,drawX,dy,tw,th);
       ctx.restore();
-      if(!e.dead && e.health<e.maxHealth){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, tw, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, tw*(e.health/e.maxHealth), 3); }
+      if(!e.dead && e.health<e.maxHealth){
+        ctx.fillStyle='rgba(0,0,0,0.5)';
+        ctx.fillRect(ex, e.laneY-66, tw, 4);
+        ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444';
+        ctx.fillRect(ex, e.laneY-66, tw*(e.health/e.maxHealth), 4);
+      }
       return true;
     }catch(err){}
   }
@@ -1675,10 +1696,10 @@ function updateCrates(){
 function updatePickups(dt){
   for(var i=pickups.length-1;i>=0;i--){
     var p=pickups[i];
-    p.timer+=dt;
+    p.timer+=frameDt;
     p.bob+=dt*0.005;
     p.yOffset = Math.sin(p.bob)*4;
-    p.life-=dt;
+    p.life-=frameDt;
     if(p.life<=0){ pickups.splice(i,1); continue; }
     if(p.collected) continue;
     // colision con jugador
@@ -2080,6 +2101,7 @@ ts=frameDt/16;
     if(player.x > _maxX) player.x = _maxX;
     if(player.x<20) player.x=20;
     if(player.x>camera.worldWidth-60) player.x=camera.worldWidth-60;
+    if(player.hurtFlash>0) player.hurtFlash-=frameDt;
     
     updateCamera();
 
@@ -2089,8 +2111,8 @@ ts=frameDt/16;
       var alreadyHit = isPunch ? player.attackHit : player.kickHit;
       var timer = isPunch ? (player.punchTimer||0) : (player.kickTimer||0);
       if(!alreadyHit && timer>80 && timer<420){
-        var rangeX = isPunch ? 88 : 98;
-        var rangeY = isPunch ? 68 : 78;
+        var rangeX = isPunch ? 100 : 115;
+        var rangeY = isPunch ? 80 : 95;
         var dmg = isPunch ? 14 : 20;
         for(var hi=0; hi<enemies.length; hi++){
           var he = enemies[hi];
@@ -2352,11 +2374,13 @@ ts=frameDt/16;
         if(e.attackTimer>250 && e.attackTimer<350 && !e.hitApplied){
           var dx=Math.abs(e.x-player.x);
           var dy=Math.abs(e.laneY-playerLaneY);
-          if(dx<55 && dy<35){
+          if(dx<DIST_DMG && dy<35){
             if(player.health>0){
               e.hitApplied=true;
               player.health-=10;
               player.hitTimer=300;
+              player.hurtFlash=220;
+              player.x=Math.max(0,Math.min(camera.worldWidth-80, player.x+(e.x<player.x?16:-16)));
               spawnText(player.x, playerLaneY-40, '-10', '#ff4444');
               camera.shake=8;
             }
@@ -2368,7 +2392,7 @@ ts=frameDt/16;
       var dxp=player.x-e.x;
       var dyp=playerLaneY-e.laneY;
       var dist=Math.hypot(dxp,dyp);
-      var inRange=Math.abs(dxp)<55 && Math.abs(dyp)<35;
+      var inRange=Math.abs(dxp)<DIST_STOP && Math.abs(dyp)<35;
       if(dist>400){
         e.isMoving=false;
         e.anim='idle';
@@ -2403,16 +2427,25 @@ ts=frameDt/16;
         var sy=eb.laneY-ea.laneY;
         var adx=Math.abs(sx);
         var ady=Math.abs(sy);
-        if(adx<44 && ady<24){
+        if(adx<80 && ady<24){
           var dirx=sx>=0?1:-1;
           var diry=sy>=0?1:-1;
-          ea.x-=dirx*(44-adx)*0.25;
-          eb.x+=dirx*(44-adx)*0.25;
+          ea.x-=dirx*(80-adx)*0.25;
+          eb.x+=dirx*(80-adx)*0.25;
           ea.laneY-=diry*(24-ady)*0.15;
           eb.laneY+=diry*(24-ady)*0.15;
         }
       }
     }
+    for(var ci=0;ci<enemies.length;ci++){
+      var ec=enemies[ci];
+      if(ec.dead || ec.frozen>0) continue;
+      var bxp=ec.x-player.x, byp=ec.laneY-playerLaneY;
+      if(Math.abs(bxp)<DIST_BODY && Math.abs(byp)<30){
+        ec.x=player.x+(bxp>=0?DIST_BODY:-DIST_BODY);
+      }
+    }
+
 
 
 
@@ -2447,8 +2480,8 @@ ts=frameDt/16;
     if(boss && !boss.dead && boss.frozen<=0){
       var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
       boss.isMoving=false; boss.attacking=false;
-      if(d>70){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; boss.isMoving=true; if(dx>0) boss.facingRight=true; else if(dx<0) boss.facingRight=false; }
-      if(Math.abs(dx)<60 && Math.abs(dy)<40){ boss.attacking=true; player.health-=0.25; }
+      if(d>DIST_STOP+20){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; boss.isMoving=true; if(dx>0) boss.facingRight=true; else if(dx<0) boss.facingRight=false; }
+      if(Math.abs(dx)<DIST_DMG+20 && Math.abs(dy)<40){ boss.attacking=true; player.health-=0.25; }
     }
     if(boss && boss.frozen>0) boss.frozen-=16;
     if(typeof updateCrates==='function') updateCrates();
@@ -2811,7 +2844,7 @@ document.addEventListener('keydown',function(e){ if((e.code==='KeyJ' || e.key===
   if(e.key==='s'||e.key==='ArrowDown') keys.down=true;
   if(e.key==='j'||e.key==='J'){ player.anim='punch'; player.frame=0; setTimeout(function(){ player.anim='idle'; },300); }
   if(e.key==='k'||e.key==='K'){ player.anim='kick'; player.frame=0; setTimeout(function(){ player.anim='idle'; },350); }
-  if(e.key==='i'||e.key==='I'){ tryIce(); }
+  if((e.key==='i'||e.key==='I') && !e.repeat){ tryIce(); }
   if(e.code==='Space'){ tryJump(); }
 });
 document.addEventListener('keyup',function(e){
