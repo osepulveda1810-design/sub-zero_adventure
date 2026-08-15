@@ -92,7 +92,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <button id="btn-pause" style="position:absolute;top:12px;right:108px;z-index:25;background:rgba(0,0,0,0.62);border:1px solid rgba(126,240,255,0.35);color:#7ef0ff;padding:7px 12px;border-radius:10px;font-size:11px;font-weight:800;backdrop-filter:blur(6px);display:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4)">⏸ PAUSA</button>
 
 <div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
-<div id="hud" style="display:none"><div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:3px;background:rgba(0,0,0,0.5);margin-top:3px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff)"></div></div></div><div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/9</div></div><div class="hud-box"><div class="label">PROGRESO</div><div class="value" id="hud-progress">0%</div><div class="value" style="font-size:9px" id="hud-enemies">0/12</div></div><div class="hud-box"><div class="label">SCORE</div><div class="value" id="hud-score">0 pts</div></div></div>
+<div id="hud" style="display:none"><div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:3px;background:rgba(0,0,0,0.5);margin-top:3px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff)"></div></div></div><div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/8</div></div><div class="hud-box"><div class="label">PROGRESO</div><div class="value" id="hud-progress">0%</div><div class="value" style="font-size:9px" id="hud-enemies">0/12</div></div><div class="hud-box"><div class="label">SCORE</div><div class="value" id="hud-score">0 pts</div></div></div>
 <div id="controls" style="display:none">
 <div id="analog-base"><div id="analog-stick"></div></div>
 <div class="action-cross">
@@ -974,7 +974,7 @@ function updatePauseButton(){
 
 let currentState='MENU', gameLoopStarted=false, lastAnimTime=0, isPaused=false;
 var lastFrameTime=0, frameDt=16, ts=1;
-var GAME_SPEED=0.4;
+var GAME_SPEED=0.3;
 
 function tryKick(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='kick'; dummyEnemy.previewTimer=800; return; } }catch(e){}
  if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
@@ -1575,7 +1575,7 @@ function drawEnemy(e){
       if(typeof sy==='undefined'){ sy=0; sh=sprite.naturalHeight; }
       ctx.drawImage(sprite,sx,sy,sw,sh,drawX,dy,tw,th);
       ctx.restore();
-      if(!e.dead){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, tw, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, tw*(e.health/e.maxHealth), 3); }
+      if(!e.dead && e.health<e.maxHealth){ ctx.fillStyle='rgba(0,0,0,0.5)'; ctx.fillRect(ex, e.laneY-46, tw, 3); ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444'; ctx.fillRect(ex, e.laneY-46, tw*(e.health/e.maxHealth), 3); }
       return true;
     }catch(err){}
   }
@@ -2392,6 +2392,29 @@ ts=frameDt/16;
       if(e.laneY<laneTop) e.laneY=laneTop;
       if(e.laneY>laneBottom) e.laneY=laneBottom;
     }
+    // --- SEPARACION ENEMIGOS (evita superposicion) ---
+    for(var ai=0;ai<enemies.length;ai++){
+      var ea=enemies[ai];
+      if(ea.dead) continue;
+      for(var bi=ai+1;bi<enemies.length;bi++){
+        var eb=enemies[bi];
+        if(eb.dead) continue;
+        var sx=eb.x-ea.x;
+        var sy=eb.laneY-ea.laneY;
+        var adx=Math.abs(sx);
+        var ady=Math.abs(sy);
+        if(adx<44 && ady<24){
+          var dirx=sx>=0?1:-1;
+          var diry=sy>=0?1:-1;
+          ea.x-=dirx*(44-adx)*0.25;
+          eb.x+=dirx*(44-adx)*0.25;
+          ea.laneY-=diry*(24-ady)*0.15;
+          eb.laneY+=diry*(24-ady)*0.15;
+        }
+      }
+    }
+
+
 
     // === SEPARACION ENEMIGO vs ENEMIGO - evita amontonamiento ===
     try{
@@ -2645,7 +2668,7 @@ ts=frameDt/16;
     try{
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
       document.getElementById('health-bar').style.width=player.health+'%';
-      document.getElementById('hud-level').textContent=(currentLevel+1)+'/'+LEVELS.length;
+      document.getElementById('hud-level').textContent=currentLevel+'/'+(LEVELS.length-1);
       var iceProgDisplay=0;
       if(player && player.isChargingIce && typeof player.iceChargeTimer!=='undefined'){
         iceProgDisplay=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);

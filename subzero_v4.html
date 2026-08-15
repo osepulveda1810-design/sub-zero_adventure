@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sub-Zero's v4.0 CLEAN</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #0a0e1a; color: #e0fbff; font-family: 'Courier New', monospace; user-select: none; -webkit-user-select: none; touch-action: none; }
+
+  /* === CANVAS DEL JUEGO === */
+  #canvas-wrapper { position: fixed; inset: 0; z-index: 1; }
+  #gameCanvas { display: block; width: 100%; height: 100%; background: linear-gradient(180deg, #0a1428 0%, #13223f 60%, #1a2a4a 100%); }
+
+  /* === HUD SUPERIOR === */
+  #hud { position: fixed; top: 0; left: 0; right: 0; z-index: 10; padding: 8px 12px; background: linear-gradient(180deg, rgba(10,14,26,0.85), rgba(10,14,26,0)); display: none; justify-content: space-between; align-items: center; gap: 10px; font-size: 11px; pointer-events: none; }
+  #hud > div { background: rgba(13,19,32,0.7); padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(126,240,255,0.25); }
+  #hud-hp { color: #4ecca3; font-weight: 900; }
+  #hud-wave { color: #e0fbff; }
+  #hud-enemies { color: #ffcc00; }
+  #hud-progress { color: #e0fbff; }
+  #hud-score { color: #ffd700; font-weight: 900; }
+  #btn-pause { position: fixed; top: 8px; right: 8px; z-index: 20; background: rgba(13,19,32,0.85); color: #e0fbff; border: 1px solid rgba(126,240,255,0.4); border-radius: 6px; padding: 6px 12px; font-family: inherit; font-weight: 900; cursor: pointer; display: none; }
+
+  /* === CONTROLES TACTILES === */
+  #controls { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; padding: 10px; display: none; justify-content: space-between; align-items: flex-end; gap: 10px; pointer-events: none; }
+  #controls > div { pointer-events: auto; }
+  .ps-btn { width: 58px; height: 58px; border-radius: 50%; background: rgba(13,19,32,0.85); border: 2px solid rgba(126,240,255,0.5); color: #e0fbff; font-weight: 900; font-size: 20px; cursor: pointer; touch-action: none; font-family: inherit; }
+  .ps-btn:active { background: rgba(126,240,255,0.3); }
+  .dpad { display: grid; grid-template-columns: repeat(3, 48px); grid-template-rows: repeat(3, 48px); gap: 4px; }
+  .dpad .ps-btn { width: 48px; height: 48px; border-radius: 10px; font-size: 16px; }
+  .dpad .ps-btn:nth-child(1) { grid-column: 2; grid-row: 1; }
+  .dpad .ps-btn:nth-child(2) { grid-column: 1; grid-row: 2; }
+  .dpad .ps-btn:nth-child(3) { grid-column: 3; grid-row: 2; }
+  .dpad .ps-btn:nth-child(4) { grid-column: 2; grid-row: 3; }
+  .actions { display: grid; grid-template-columns: repeat(2, 58px); gap: 8px; }
+  .actions .ps-btn:nth-child(1) { background: rgba(126,240,255,0.25); border-color: #7ef0ff; }
+  .actions .ps-btn:nth-child(2) { background: rgba(255,76,76,0.2); border-color: #ff6b6b; }
+  .actions .ps-btn:nth-child(3) { background: rgba(126,240,255,0.25); border-color: #7ef0ff; }
+  .actions .ps-btn:nth-child(4) { background: rgba(255,215,0,0.2); border-color: #ffd700; }
+
+  /* === STICK ANALOGICO === */
+  #analog-base { position: fixed; bottom: 30px; left: 30px; width: 120px; height: 120px; border-radius: 50%; background: rgba(13,19,32,0.5); border: 2px solid rgba(126,240,255,0.3); z-index: 10; display: none; touch-action: none; }
+  #analog-stick { position: absolute; top: 50%; left: 50%; width: 56px; height: 56px; border-radius: 50%; background: rgba(126,240,255,0.5); border: 2px solid #7ef0ff; transform: translate(-50%, -50%); pointer-events: none; }
+  #analog-base.active { background: rgba(126,240,255,0.2); }
+
+  /* === MENUS OVERLAY === */
+  .menu-overlay { position: fixed; inset: 0; z-index: 100; background: radial-gradient(ellipse at center, rgba(10,14,26,0.92), rgba(5,8,16,0.98)); display: none; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+  .menu-overlay.active { display: flex; }
+  .menu-card { background: rgba(13,19,32,0.92); border: 1px solid rgba(126,240,255,0.35); border-radius: 12px; padding: 24px; max-width: 500px; width: 100%; max-height: 85vh; overflow-y: auto; box-shadow: 0 0 40px rgba(126,240,255,0.2); }
+  .menu-card h2 { color: #7ef0ff; font-size: 22px; margin-bottom: 16px; text-align: center; letter-spacing: 2px; }
+  .menu-card p, .menu-card li { font-size: 12px; line-height: 1.6; color: #c8d6e5; margin-bottom: 8px; }
+  .menu-card ul { padding-left: 20px; margin-bottom: 12px; }
+  .btn-premium { display: block; width: 100%; padding: 12px 16px; margin: 8px 0; background: linear-gradient(90deg, rgba(126,240,255,0.15), rgba(126,240,255,0.05)); color: #e0fbff; border: 1px solid rgba(126,240,255,0.4); border-radius: 8px; font-family: inherit; font-weight: 700; font-size: 13px; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .btn-premium:hover, .btn-premium:active { background: linear-gradient(90deg, rgba(126,240,255,0.3), rgba(126,240,255,0.1)); border-color: #7ef0ff; box-shadow: 0 0 20px rgba(126,240,255,0.3); }
+  .btn-premium.primary { background: linear-gradient(90deg, rgba(126,240,255,0.35), rgba(126,240,255,0.15)); border-color: #7ef0ff; text-align: center; font-size: 14px; letter-spacing: 1px; }
+  .btn-premium.danger { background: linear-gradient(90deg, rgba(255,76,76,0.25), rgba(255,76,76,0.1)); border-color: #ff6b6b; color: #ffcccc; text-align: center; }
+  .menu-subtitle { text-align: center; color: #7ef0ff; font-size: 11px; letter-spacing: 3px; margin-bottom: 8px; opacity: 0.7; }
+  .menu-version { text-align: center; color: rgba(224,251,255,0.4); font-size: 10px; margin-top: 8px; }
+
+  /* === CANVAS DE NIEVE DEL MENU === */
+  #menu-snow-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.6; }
+
+  /* === GRID DE NIVELES === */
+  #level-grid { display: grid; gap: 8px; }
+
+  /* === GAMEOVER === */
+  #menu-gameover .menu-card { border-color: rgba(255,76,76,0.5); box-shadow: 0 0 40px rgba(255,76,76,0.3); }
+  #menu-gameover h2 { color: #ff4444; font-size: 28px; }
+  #gameover-score { color: #7ef0ff; font-size: 16px; text-align: center; margin: 16px 0; }
+
+  /* === VERSION BADGE === */
+  #version-badge { position: fixed; bottom: 6px; left: 8px; z-index: 50; color: rgba(126,240,255,0.4); font-size: 10px; pointer-events: none; }
+
+  /* === AJUSTES === */
+  .settings-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; }
+  .settings-row label { flex: 0 0 120px; color: #e0fbff; font-size: 12px; }
+  .settings-row input[type="range"] { flex: 1; }
+  .settings-row .val { flex: 0 0 40px; text-align: right; color: #7ef0ff; font-weight: 900; }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 480px) {
+    .ps-btn { width: 52px; height: 52px; font-size: 18px; }
+    .dpad .ps-btn { width: 44px; height: 44px; }
+    .actions .ps-btn { width: 52px; height: 52px; }
+    #analog-base { width: 100px; height: 100px; }
+    #analog-stick { width: 48px; height: 48px; }
+    .menu-card { padding: 16px; }
+    .menu-card h2 { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- === CANVAS DEL JUEGO === -->
+<div id="canvas-wrapper">
+  <canvas id="gameCanvas"></canvas>
+</div>
+
+<!-- === HUD SUPERIOR === -->
+<div id="hud">
+  <div>❤ <span id="hud-hp">100</span></div>
+  <div>OLEADA <span id="hud-wave">0/3</span></div>
+  <div>ENEMIGOS <span id="hud-enemies">0/0</span></div>
+  <div>PROGRESO <span id="hud-progress">0%</span></div>
+  <div>SCORE <span id="hud-score">0</span></div>
+</div>
+<button id="btn-pause">⏸ PAUSA</button>
+
+<!-- === CONTROLES TACTILES (botones) === -->
+<div id="controls">
+  <div class="dpad">
+    <button class="ps-btn" id="btn-up">▲</button>
+    <button class="ps-btn" id="btn-left">◀</button>
+    <button class="ps-btn" id="btn-right">▶</button>
+    <button class="ps-btn" id="btn-down">▼</button>
+  </div>
+  <div class="actions">
+    <button class="ps-btn" id="btn-jump">△</button>
+    <button class="ps-btn" id="btn-ice">❄</button>
+    <button class="ps-btn" id="btn-punch">□</button>
+    <button class="ps-btn" id="btn-kick">○</button>
+  </div>
+</div>
+
+<!-- === STICK ANALOGICO === -->
+<div id="analog-base">
+  <div id="analog-stick"></div>
+</div>
+
+<!-- === VERSION BADGE === -->
+<div id="version-badge">v4.0 CLEAN</div>
+
+<!-- ============================================ -->
+<!-- === MENUS === -->
+<!-- ============================================ -->
+
+<!-- MENU PRINCIPAL -->
+<div id="menu-main" class="menu-overlay">
+  <canvas id="menu-snow-canvas"></canvas>
+  <div class="menu-card">
+    <div class="menu-subtitle" id="menu-version">SUB-ZERO'S ADVENTURES</div>
+    <h2>SUB-ZERO</h2>
+    <div class="menu-version">v<span id="vb-main">4.0</span> CLEAN</div>
+    <button class="btn-premium primary" id="btn-play">▶ JUGAR HISTORIA</button>
+    <button class="btn-premium" id="btn-levels">📋 NIVELES (<span id="level-count">8</span>)</button>
+    <button class="btn-premium" id="btn-how">📖 CÓMO JUGAR</button>
+    <button class="btn-premium" id="btn-settings">⚙ AJUSTES</button>
+  </div>
+</div>
+
+<!-- MENU NIVELES -->
+<div id="menu-levels" class="menu-overlay">
+  <div class="menu-card">
+    <h2>SELECCIONAR NIVEL</h2>
+    <div id="level-grid"></div>
+    <button class="btn-premium" id="btn-levels-back">← VOLVER</button>
+  </div>
+</div>
+
+<!-- MENU HISTORIA (antes de empezar nivel) -->
+<div id="menu-story" class="menu-overlay">
+  <div class="menu-card">
+    <h2 id="story-title">—</h2>
+    <p id="story-sub" style="color:#7ef0ff; font-style:italic;"></p>
+    <p id="story-text" style="margin:16px 0;"></p>
+    <p id="story-boss" style="color:#ffd700; font-weight:900;"></p>
+    <p id="story-meta" style="font-size:10px; color:rgba(224,251,255,0.5); margin-top:12px;"></p>
+    <button class="btn-premium primary" id="btn-start-level">▶ COMENZAR</button>
+    <button class="btn-premium" id="btn-story-back">← VOLVER</button>
+  </div>
+</div>
+
+<!-- MENU PAUSA -->
+<div id="menu-pause" class="menu-overlay">
+  <div class="menu-card">
+    <h2 id="pause-title">PAUSA</h2>
+    <button class="btn-premium primary" id="btn-resume">▶ CONTINUAR</button>
+    <button class="btn-premium" id="btn-save">💾 GUARDAR</button>
+    <button class="btn-premium danger" id="btn-exit">⏏ SALIR AL MENÚ</button>
+  </div>
+</div>
+
+<!-- MENU GAME OVER -->
+<div id="menu-gameover" class="menu-overlay">
+  <div class="menu-card">
+    <h2>☠ GAME OVER ☠</h2>
+    <div id="gameover-score">SCORE FINAL: 0 pts</div>
+    <button class="btn-premium primary" id="btn-retry">▶ REINTENTAR NIVEL</button>
+    <button class="btn-premium" id="btn-gameover-exit">⏏ SALIR AL MENÚ</button>
+  </div>
+</div>
+
+<!-- MENU COMO JUGAR -->
+<div id="menu-howtoplay" class="menu-overlay">
+  <div class="menu-card">
+    <h2>CÓMO JUGAR</h2>
+    <ul>
+      <li><b>Mover:</b> D-pad, stick analógico, o WASD / flechas</li>
+      <li><b>Puño:</b> botón □ o tecla J</li>
+      <li><b>Patada:</b> botón ○ o tecla K</li>
+      <li><b>Saltar:</b> botón △ o Espacio</li>
+      <li><b>Hielo:</b> botón ❄ o tecla I — mantén para cargar, suelta y toca un enemigo para apuntar, luego ❄ otra vez para disparar</li>
+      <li><b>Apuntar hielo:</b> toca un enemigo en pantalla para bloquear</li>
+    </ul>
+    <p>Versión <span id="vb-how">4.0</span> CLEAN — Build limpia sin bugs conocidos.</p>
+    <button class="btn-premium" id="btn-how-back">← VOLVER</button>
+  </div>
+</div>
+
+<!-- MENU AJUSTES -->
+<div id="menu-settings" class="menu-overlay">
+  <div class="menu-card">
+    <h2>AJUSTES</h2>
+    <div class="settings-row">
+      <label>Opacidad controles</label>
+      <input type="range" id="opacity-slider" min="20" max="100" step="1" value="85">
+      <span class="val" id="opacity-value">85%</span>
+    </div>
+    <button class="btn-premium" id="btn-settings-back">← VOLVER</button>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- === SCRIPTS === -->
+<!-- ============================================ -->
+<script>
+// ============================================================
+// v4.0 CLEAN — Parte 1: config + estado + menus + input básico
+// ============================================================
+
+// === CONFIG BASICA (se completa en Parte 2 con Z1) ===
+const GAME_VERSION = "4.0";
+const GAME_SPEED = 0.4;
+
+// Niveles placeholder (en Parte 2 se inyecta Z1 completo con LEVELS)
+const LEVELS = [
+  { id:0, name:"🎨 MODO EDICION", isEditor:true, enemyCount:0, enemyTypes:[], worldWidth:3600, boss:"Ninguno", bossTitle:"Modo Seguro", subtitle:"Laboratorio", story:"Ajusta sprites." },
+  { id:1, name:"Calles de la Ciudad", subtitle:"El Frio Amanece", boss:"Kano", bossTitle:"Lider del Dragon Negro", story:"Rastreando a Kano.", enemyCount:12, enemyTypes:["thug","thug_gun","ninja"], worldWidth:3200 },
+];
+
+// === ESTADO GLOBAL ===
+const keys = { left:false, right:false, up:false, down:false };
+let currentState = "MENU";   // MENU | STORY | PLAYING | PAUSED | GAMEOVER
+let isPaused = false;
+let currentLevel = 0;
+let gameLoopStarted = false;
+let lastFrameTime = 0;
+let frameDt = 16;
+let ts = 1;
+
+// === NAVEGACION DE MENUS ===
+function showMenu(id) {
+  document.querySelectorAll('.menu-overlay').forEach(m => m.classList.remove('active'));
+  const el = document.getElementById('menu-' + id);
+  if (el) el.classList.add('active');
+  currentState = 'MENU';
+  // Ocultar HUD y controles si estamos en menu
+  const hud = document.getElementById('hud');
+  const controls = document.getElementById('controls');
+  const analog = document.getElementById('analog-base');
+  const btnPause = document.getElementById('btn-pause');
+  if (hud) hud.style.display = 'none';
+  if (controls) controls.style.display = 'none';
+  if (analog) analog.style.display = 'none';
+  if (btnPause) btnPause.style.display = 'none';
+}
+
+function hideAllMenus() {
+  document.querySelectorAll('.menu-overlay').forEach(m => m.classList.remove('active'));
+}
+
+// === NIEVE DEL MENU ===
+let menuSnowRunning = false;
+let menuSnowRaf = 0;
+let menuSnowParticles = [];
+
+function initWinterMenu() {
+  const canvas = document.getElementById('menu-snow-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    canvas.width = r.width;
+    canvas.height = r.height;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+  menuSnowParticles = [];
+  for (let i = 0; i < 40; i++) {
+    menuSnowParticles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: 1 + Math.random() * 2,
+      speed: 0.3 + Math.random() * 1.2,
+      drift: (Math.random() - 0.5) * 0.6,
+      opacity: 0.2 + Math.random() * 0.5
+    });
+  }
+  menuSnowRunning = true;
+  function loop() {
+    if (!menuSnowRunning) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (const p of menuSnowParticles) {
+      p.y += p.speed;
+      p.x += p.drift + Math.sin(p.y * 0.01) * 0.3;
+      if (p.y > canvas.height + 10) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+      ctx.globalAlpha = p.opacity;
+      ctx.fillStyle = '#e6fbff';
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    menuSnowRaf = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function stopWinterMenu() {
+  menuSnowRunning = false;
+  if (menuSnowRaf) cancelAnimationFrame(menuSnowRaf);
+}
+
+// === INPUT TECLADO ===
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = true;
+  if (e.key === 'd' || e.key === 'ArrowRight') keys.right = true;
+  if (e.key === 'w' || e.key === 'ArrowUp') keys.up = true;
+  if (e.key === 's' || e.key === 'ArrowDown') keys.down = true;
+  if (e.code === 'Escape') {
+    if (currentState === 'PLAYING' && !isPaused) {
+      isPaused = true;
+      showMenu('pause');
+    } else if (currentState === 'MENU' && isPaused) {
+      // no-op
+    }
+  }
+});
+document.addEventListener('keyup', function(e) {
+  if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
+  if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
+  if (e.key === 'w' || e.key === 'ArrowUp') keys.up = false;
+  if (e.key === 's' || e.key === 'ArrowDown') keys.down = false;
+});
+
+// === INPUT TACTIL — botones (Pointer Events) ===
+function bindActionBtn(id, keyName) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const down = (e) => { e.preventDefault(); keys[keyName] = true; };
+  const up   = (e) => { e.preventDefault(); keys[keyName] = false; };
+  el.addEventListener('pointerdown', down);
+  el.addEventListener('pointerup', up);
+  el.addEventListener('pointercancel', up);
+  el.addEventListener('pointerleave', up);
+}
+bindActionBtn('btn-up', 'up');
+bindActionBtn('btn-down', 'down');
+bindActionBtn('btn-left', 'left');
+bindActionBtn('btn-right', 'right');
+
+// Botones de ataque/salto/hielo — placeholder, se conectan en Parte 2
+['btn-punch','btn-kick','btn-jump','btn-ice'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    console.log('Action pressed:', id);
+  });
+});
+
+// === STICK ANALOGICO ===
+(function() {
+  const base = document.getElementById('analog-base');
+  const stick = document.getElementById('analog-stick');
+  if (!base || !stick) return;
+  let active = false;
+  let center = { x: 0, y: 0 };
+  const maxDist = 40;
+
+  function getCenter() {
+    const r = base.getBoundingClientRect();
+    return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  function setKeysFromVector(v) {
+    keys.left = v.x < -0.3;
+    keys.right = v.x > 0.3;
+    keys.up = v.y < -0.3;
+    keys.down = v.y > 0.3;
+  }
+  function start(e) {
+    e.preventDefault();
+    active = true;
+    base.classList.add('active');
+    center = getCenter();
+    update(e);
+  }
+  function update(e) {
+    if (!active) return;
+    const cx = e.clientX, cy = e.clientY;
+    let dx = cx - center.x, dy = cy - center.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    if (dist > maxDist) {
+      const ang = Math.atan2(dy, dx);
+      dx = Math.cos(ang) * maxDist;
+      dy = Math.sin(ang) * maxDist;
+    }
+    stick.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+    setKeysFromVector({ x: dx / maxDist, y: dy / maxDist });
+  }
+  function end(e) {
+    e.preventDefault();
+    active = false;
+    base.classList.remove('active');
+    stick.style.transform = 'translate(-50%, -50%)';
+    setKeysFromVector({ x: 0, y: 0 });
+  }
+  base.addEventListener('pointerdown', start);
+  base.addEventListener('pointermove', update);
+  base.addEventListener('pointerup', end);
+  base.addEventListener('pointercancel', end);
+  base.addEventListener('pointerleave', end);
+})();
+
+// === GRID DE NIVELES ===
+function buildLevelGrid() {
+  const grid = document.getElementById('level-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  let displayNum = 1;
+  LEVELS.forEach((lvl, i) => {
+    if (lvl.isEditor) return;
+    const b = document.createElement('button');
+    b.className = 'btn-premium';
+    b.innerHTML = `<div style="font-weight:800;color:#7ef0ff">${displayNum}. ${lvl.name}</div>
+                   <div style="font-size:9px;opacity:0.55;margin-top:3px">${lvl.subtitle} • Jefe: ${lvl.boss}</div>`;
+    b.addEventListener('click', () => {
+      currentLevel = i;
+      const stTitle = document.getElementById('story-title');
+      const stSub = document.getElementById('story-sub');
+      const stText = document.getElementById('story-text');
+      const stBoss = document.getElementById('story-boss');
+      if (stTitle) stTitle.textContent = lvl.name;
+      if (stSub) stSub.textContent = lvl.subtitle;
+      if (stText) stText.textContent = lvl.story;
+      if (stBoss) stBoss.textContent = 'JEFE: ' + lvl.boss + ' - ' + lvl.bossTitle;
+      showMenu('story');
+    });
+    grid.appendChild(b);
+    displayNum++;
+  });
+  const countEl = document.getElementById('level-count');
+  if (countEl) countEl.textContent = displayNum - 1;
+}
+
+// === EVENTOS DE BOTONES DEL MENU ===
+document.getElementById('btn-play').addEventListener('click', () => {
+  currentLevel = 1;
+  showMenu('story');
+  const lvl = LEVELS[1];
+  const stTitle = document.getElementById('story-title');
+  const stSub = document.getElementById('story-sub');
+  const stText = document.getElementById('story-text');
+  const stBoss = document.getElementById('story-boss');
+  if (stTitle) stTitle.textContent = lvl.name;
+  if (stSub) stSub.textContent = lvl.subtitle;
+  if (stText) stText.textContent = lvl.story;
+  if (stBoss) stBoss.textContent = 'JEFE: ' + lvl.boss + ' - ' + lvl.bossTitle;
+});
+document.getElementById('btn-levels').addEventListener('click', () => { buildLevelGrid(); showMenu('levels'); });
+document.getElementById('btn-how').addEventListener('click', () => showMenu('howtoplay'));
+document.getElementById('btn-settings').addEventListener('click', () => showMenu('settings'));
+document.getElementById('btn-levels-back').addEventListener('click', () => showMenu('main'));
+document.getElementById('btn-story-back').addEventListener('click', () => showMenu('main'));
+document.getElementById('btn-how-back').addEventListener('click', () => showMenu('main'));
+document.getElementById('btn-settings-back').addEventListener('click', () => showMenu('main'));
+
+// COMENZAR nivel (placeholder — en Parte 2 arranca el loop)
+document.getElementById('btn-start-level').addEventListener('click', () => {
+  hideAllMenus();
+  currentState = 'PLAYING';
+  isPaused = false;
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('analog-base').style.display = 'block';
+  document.getElementById('btn-pause').style.display = 'block';
+  console.log('PLAYING — nivel', currentLevel);
+});
+
+// PAUSA
+document.getElementById('btn-pause').addEventListener('click', () => {
+  if (currentState === 'PLAYING' && !isPaused) {
+    isPaused = true;
+    showMenu('pause');
+    currentState = 'PAUSED';
+  }
+});
+document.getElementById('btn-resume').addEventListener('click', () => {
+  hideAllMenus();
+  isPaused = false;
+  currentState = 'PLAYING';
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('analog-base').style.display = 'block';
+  document.getElementById('btn-pause').style.display = 'block';
+});
+document.getElementById('btn-exit').addEventListener('click', () => {
+  showMenu('main');
+  isPaused = false;
+});
+document.getElementById('btn-save').addEventListener('click', () => {
+  alert('Guardado (placeholder)');
+});
+
+// GAME OVER
+document.getElementById('btn-retry').addEventListener('click', () => {
+  hideAllMenus();
+  currentState = 'PLAYING';
+  isPaused = false;
+  document.getElementById('hud').style.display = 'flex';
+  document.getElementById('controls').style.display = 'flex';
+  document.getElementById('analog-base').style.display = 'block';
+  document.getElementById('btn-pause').style.display = 'block';
+});
+document.getElementById('btn-gameover-exit').addEventListener('click', () => {
+  showMenu('main');
+});
+
+// === OPACIDAD DE CONTROLES ===
+const opacitySlider = document.getElementById('opacity-slider');
+const opacityValue = document.getElementById('opacity-value');
+if (opacitySlider) {
+  opacitySlider.addEventListener('input', (e) => {
+    const v = parseInt(e.target.value);
+    if (opacityValue) opacityValue.textContent = v + '%';
+    const opacity = v / 100;
+    const controls = document.getElementById('controls');
+    const analog = document.getElementById('analog-base');
+    if (controls) controls.style.opacity = opacity;
+    if (analog) analog.style.opacity = opacity;
+    try { localStorage.setItem('sz_controls_opacity', v); } catch (e) {}
+  });
+}
+// Cargar opacidad guardada
+try {
+  const saved = localStorage.getItem('sz_controls_opacity');
+  if (saved && opacitySlider) {
+    opacitySlider.value = saved;
+    opacitySlider.dispatchEvent(new Event('input'));
+  }
+} catch (e) {}
+
+// === ARRANQUE ===
+document.addEventListener('DOMContentLoaded', () => {
+  // Version badges
+  ['vb-main', 'vb-how'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = GAME_VERSION;
+  });
+  const badge = document.getElementById('version-badge');
+  if (badge) badge.textContent = 'v' + GAME_VERSION + ' CLEAN';
+  document.title = "Sub-Zero's v" + GAME_VERSION;
+  showMenu('main');
+  initWinterMenu();
+});
+</script>
+
+<!-- === MARCADOR: GAME CORE (se inyecta en Parte 2) === -->
+<!-- TODO: Z1 completa (SPRITE_CONFIG, ENEMY_SPRITE_CONFIG, ENEMY_CONFIGS, BOSS_CONFIGS, cityBgImg) -->
+<!-- TODO: loop con delta time, render, fisicas, input de combate -->
+<!-- TODO: enemigos, waves, jefe, crates, pickups -->
+<!-- TODO: spritesheets, efectos, Game Over logic -->
+
+</body>
+</html>
