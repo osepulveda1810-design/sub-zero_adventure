@@ -105,10 +105,18 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div class="menu-winter-bg"></div>
 <canvas id="menu-snow-canvas"></canvas>
 <div id="menu-snow-dom" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:hidden"></div>
-<div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div id="menu-version" style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v3.42</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)" data-fixed="1">▶ JUGAR HISTORIA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (8)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-settings" style="min-width:120px" onclick="showMenu('settings')">⚙ AJUSTES</button></div></div>
+<div style="font-size:34px;font-weight:900;background:linear-gradient(180deg,#a0e6ff,#4ecca3);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Sub-Zero's</div><div id="menu-version" style="color:#7ef0ff;letter-spacing:6px;font-size:13px">ADVENTURES v3.42</div><div style="font-size:9px;color:rgba(255,255,255,0.45);margin-top:6px">FIX FINAL</div><button class="btn-premium" id="btn-play" onclick="startLevel(1)" data-fixed="1">▶ JUGAR HISTORIA</button>
+<button id="btn-continue" class="btn-premium primary" style="display:none">▶ CONTINUAR PARTIDA</button><button class="btn-premium" id="btn-levels" onclick="showMenu('levels')">NIVELES (8)</button><div style="display:flex;gap:8px;margin-top:10px"><button class="btn-premium" id="btn-how" style="min-width:120px" onclick="showHowToPlay()">CÓMO JUGAR</button><button class="btn-premium" id="btn-settings" style="min-width:120px" onclick="showMenu('settings')">⚙ AJUSTES</button></div></div>
 <div id="menu-levels" class="menu-overlay" style="display:none"><h2 style="color:#7ef0ff">NIVELES</h2><div id="level-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;max-width:720px;width:100%"></div><button class="btn-premium" onclick="showMenu('main')">VOLVER</button></div>
 <div id="menu-story" class="menu-overlay" style="display:none"><div style="background:rgba(0,0,0,0.4);border:1px solid rgba(126,240,255,0.15);border-radius:14px;padding:14px;max-width:600px"><h3 id="story-title" style="color:#4ecca3"></h3><p id="story-sub" style="font-size:9px;color:#7ef0ff;opacity:0.6"></p><p id="story-text" style="margin-top:10px;font-size:12px"></p><p id="story-boss" style="margin-top:10px;color:#facc15;font-weight:800"></p><p id="story-meta" style="font-size:8px;color:rgba(255,255,255,0.25)"></p></div><button class="btn-premium" style="background:linear-gradient(135deg,#7ef0ff,#4ecca3);color:#000;margin-top:14px" onclick="startGameInit()">▶ COMENZAR</button><button class="btn-premium" onclick="showMenu('levels')">VOLVER</button></div>
-<div id="menu-pause" class="menu-overlay" style="display:none"><div style="text-align:center"><div style="font-size:26px;font-weight:900;color:#7ef0ff">PAUSA</div><div style="margin-top:18px;display:flex;flex-direction:column;gap:8px"><button class="btn-premium" onclick="resumeGame()">▶ CONTINUAR</button><button class="btn-premium" onclick="exitToMenu()">⏏ SALIR</button></div></div></div>
+<div id="menu-pause" class="menu-overlay">
+  <div class="menu-card">
+    <h2>PAUSA</h2>
+    <button id="btn-resume" class="btn-premium">▶ CONTINUAR</button>
+    <button id="btn-save" class="btn-premium">💾 GUARDAR</button>
+    <button id="btn-exit" class="btn-premium">⏏ SALIR AL MENÚ</button>
+  </div>
+</div>
 <div id="menu-gameover" class="menu-overlay" style="display:none">
   <div style="text-align:center">
     <h2 style="color:#ff4444;font-size:28px;margin-bottom:10px">☠ GAME OVER ☠</h2>
@@ -162,7 +170,7 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 </div>
 <script>
 const GAME_VERSION="3.42";
-let buildNum=57; try{ var s=localStorage.getItem('sz_build_v177'); buildNum=(s?parseInt(s):56)+1; localStorage.setItem('sz_build_v177',buildNum); }catch(e){} try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
+let buildNum=57; try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
 
@@ -545,7 +553,7 @@ function updateLiveButtonVisibility(){
     b.style.display='none';
   }
 }
-setInterval(updateLiveButtonVisibility,600);
+
 
 
 
@@ -774,18 +782,21 @@ const keys={right:false,left:false,up:false,down:false};
 
 // PAUSE BUTTON
 var btnPause=document.getElementById('btn-pause');
+function hideOverlays(){
+  var ms=document.querySelectorAll('.menu-overlay');
+  for(var i=0;i<ms.length;i++){ ms[i].style.display='none'; ms[i].classList.remove('active'); }
+}
+function showPauseOverlay(){
+  hideOverlays();
+  var mp=document.getElementById('menu-pause');
+  if(mp){ mp.style.display='flex'; mp.classList.add('active'); }
+}
 if(btnPause){
   btnPause.addEventListener('click', function(){
-    if(currentState!=='PLAYING') return;
-    isPaused=!isPaused;
-    if(isPaused){
-      btnPause.textContent='▶ REANUDAR';
-      btnPause.style.background='rgba(126,240,255,0.2)';
-      spawnText(canvas.width/2, 100, 'PAUSA', '#7ef0ff');
-    } else {
-      btnPause.textContent='⏸ PAUSA';
-      btnPause.style.background='rgba(0,0,0,0.55)';
-    }
+    if(currentState!=='PLAYING'||isPaused) return;
+    isPaused=true;
+    showPauseOverlay();
+    btnPause.textContent='▶ REANUDAR';
   });
 }
 
@@ -1096,25 +1107,7 @@ function drawIceTargeting(){
   ctx.restore();
 }
 
-function getIceCandidates(){
-  var list=[];
-  if(!enemies || enemies.length===0) return list;
-  var px=player.x, py=playerLaneY;
-  var dir=player.facingRight?1:-1;
-  for(var i=0;i<enemies.length;i++){
-    var e=enemies[i];
-    if(e.dead || e.frozen>0) continue;
-    var dx=e.x - px;
-    if(dir>0 && dx<10) continue;
-    if(dir<0 && dx>-10) continue;
-    if(Math.abs(dx)>620) continue;
-    if(Math.abs(e.laneY - py)>90) continue;
-    var dist=Math.abs(dx)+Math.abs(e.laneY-py)*0.6;
-    list.push({e:e, dist:dist});
-  }
-  list.sort(function(a,b){return a.dist-b.dist;});
-  return list.map(function(o){return o.e;});
-}
+
 function findIceTarget(){
   var cands=getIceCandidates();
   return cands.length>0 ? cands[0] : null;
@@ -1129,65 +1122,8 @@ function cycleIceTarget(dir){
   player.iceTarget=cands[idx];
   if(typeof spawnText==='function') spawnText(player.iceTarget.x, player.iceTarget.laneY-50, '❄ TARGET ❄', '#7ef0ff');
 }
-function selectIceTargetAt(worldX, worldY){
-  if(!enemies) return false;
-  var best=null, bestDist=70;
-  for(var i=0;i<enemies.length;i++){
-    var e=enemies[i];
-    if(e.dead || e.frozen>0) continue;
-    var dx=e.x - worldX;
-    var dy=e.laneY - worldY;
-    var d=Math.hypot(dx,dy);
-    if(d<bestDist){ bestDist=d; best=e; }
-  }
-  if(best){
-    player.iceTarget=best;
-    if(typeof spawnText==='function') spawnText(best.x, best.laneY-50, '❄ ELEGIDO ❄', '#e0fbff');
-    return true;
-  }
-  return false;
-}
-function drawIceTargeting(){
-  if(!player.isChargingIce && !player.isIceLoaded) return;
-  var target=player.iceTarget;
-  if(!target || target.dead) return;
-  var tx=target.x - camera.x;
-  var ty=target.laneY;
-  if(tx<-50 || tx>canvas.width+50) return;
-  var t=Date.now()*0.005;
-  var bob=Math.sin(t*2)*6;
-  ctx.save();
-  ctx.translate(tx, ty-95 + bob);
-  ctx.shadowColor='rgba(126,240,255,0.9)'; ctx.shadowBlur=12;
-  ctx.fillStyle='#e0fbff';
-  ctx.beginPath();
-  ctx.moveTo(0,0);
-  ctx.lineTo(-14,-18);
-  ctx.lineTo(14,-18);
-  ctx.closePath();
-  ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,0.9)'; ctx.lineWidth=1.5; ctx.stroke();
-  ctx.shadowBlur=0;
-  ctx.strokeStyle='rgba(126,240,255,0.6)';
-  ctx.lineWidth=2;
-  ctx.setLineDash([4,4]);
-  ctx.beginPath(); ctx.arc(0, -30, 18+Math.sin(t)*2, 0, Math.PI*2); ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.fillStyle='#7ef0ff'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
-  ctx.fillText('❄ LOCK ❄',0,-52);
-  var px=player.x - camera.x;
-  var py=playerLaneY-30;
-  ctx.strokeStyle='rgba(126,240,255,0.35)';
-  ctx.lineWidth=1.5;
-  ctx.setLineDash([6,6]);
-  ctx.beginPath();
-  ctx.moveTo(px,py);
-  var midX=(px+tx)/2;
-  ctx.quadraticCurveTo(midX, py-30, tx, ty-70);
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-}
+
+
 
 function fireIceProjectile(){
   var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
@@ -1705,7 +1641,8 @@ function updatePickups(dt){
     // colision con jugador
     if(player){
       var d=Math.hypot(player.x - p.x, playerLaneY - p.laneY);
-      if(d<48){
+      var pr=30*PLAYER_SCALE;
+      if(d<pr){
         p.collected=true;
         // curar vida
         var heal=28;
@@ -2765,6 +2702,8 @@ function startLevel(idx){
     document.getElementById('story-meta').textContent='Mundo: '+camera.worldWidth+'px • Enemigos: '+lvl.enemyCount+' • Tipos: '+lvl.enemyTypes.join(', ');
     showMenu('story'); setTimeout(function(){ if(typeof spawnWave==='function'){ spawnWave(); } }, 400);
   }catch(e){ alert('Error nivel: '+e.message); }
+
+try{ updateLiveButtonVisibility(); }catch(e){}
 }
 function startGameInit(){
   try{
@@ -2782,8 +2721,17 @@ function startGameInit(){
 function forceStartGame(){ try{ currentState='PLAYING'; isPaused=false; document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; }); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; if(!gameLoopStarted){ gameLoopStarted=true; requestAnimationFrame(loop); } }catch(e){} }
 function pauseGame(){ if(currentState!=='PLAYING') return; isPaused=true; showMenu('pause'); document.getElementById('controls').style.display='none'; }
 function resumeGame(){ isPaused=false; document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; }); document.getElementById('hud').style.display='flex'; document.getElementById('controls').style.display='flex'; lastAnimTime=performance.now(); }
-function saveGameState(){ try{ var data={v:GAME_VERSION,level:currentLevel,score:score,health:player.health,ts:Date.now()}; localStorage.setItem('sz_save_v177',JSON.stringify(data)); var fb=document.getElementById('save-feedback'); if(fb){ fb.textContent='✔ Guardado Nivel '+(currentLevel+1); fb.style.opacity='1'; setTimeout(function(){ fb.style.opacity='0'; },2000); } }catch(e){} }
-function exitToMenu(){ currentState='MENU'; isPaused=false; var topBar=document.getElementById('top-bar'); if(topBar) topBar.style.display='flex'; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); }
+function saveGameState(){
+  try{
+    var data={ level: currentLevel, score: score, health: player.health, wave: currentWave, defeated: enemiesDefeated };
+    localStorage.setItem('sz_save_v177', JSON.stringify(data));
+  }catch(e){}
+}
+function exitToMenu(){ currentState='MENU'; isPaused=false; var topBar=document.getElementById('top-bar'); if(topBar) topBar.style.display='flex'; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); 
+try{ updateLiveButtonVisibility(); }catch(e){}
+
+try{ refreshContinueButton(); }catch(e){}
+}
 function showHowToPlay(){ showMenu('howtoplay'); }
 function checkUpdate(){ var el=document.getElementById('update-result'); var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var mv=document.getElementById('menu-version'); if(mv) mv.textContent='ADVENTURES v'+GAME_VERSION;  if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_charge.png 1F + ice_shoot.png 1F'; }
 
@@ -2998,12 +2946,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSel
   });
 });
 
-document.addEventListener('DOMContentLoaded', function(){
-  var br=document.getElementById('btn-retry');
-  if(br) br.addEventListener('click', function(){ player.health=player.maxHealth||100; score=0; startLevel(currentLevel); });
-  var be=document.getElementById('btn-gameover-exit');
-  if(be) be.addEventListener('click', function(){ exitToMenu(); });
-});
+
 
 </script>
 <script>
@@ -3044,5 +2987,59 @@ document.addEventListener('DOMContentLoaded', function(){
   base.addEventListener('touchend', end, {passive:false});
   }
 })();
+
+
+
+
+
+
+function refreshContinueButton(){
+  var b=document.getElementById('btn-continue'); if(!b) return;
+  var has=false; try{ has=!!localStorage.getItem('sz_save_v177'); }catch(e){}
+  b.style.display=has?'block':'none';
+}
+document.addEventListener('DOMContentLoaded', function(){
+  refreshContinueButton();
+  var b=document.getElementById('btn-continue');
+  if(b) b.addEventListener('click', function(){
+    var s=null; try{ s=JSON.parse(localStorage.getItem('sz_save_v177')); }catch(e){}
+    if(!s) return;
+    startLevel(s.level||1);
+    score=s.score||0;
+    player.health=(s.health!=null?s.health:(player.maxHealth||100));
+    enemiesDefeated=s.defeated||0;
+    currentWave=Math.max(0,(s.wave||1)-1);
+  });
+});
+
+document.addEventListener('DOMContentLoaded', function(){
+  function showPlayUI(){
+    var hud=document.getElementById('hud'); if(hud) hud.style.display='flex';
+    var ct=document.getElementById('controls'); if(ct) ct.style.display='flex';
+    var an=document.getElementById('analog-base'); if(an) an.style.display='block';
+    var bp=document.getElementById('btn-pause'); if(bp){ bp.style.display='block'; bp.textContent='⏸ PAUSA'; }
+  }
+  var br=document.getElementById('btn-resume');
+  if(br) br.addEventListener('click', function(){
+    isPaused=false; currentState='PLAYING';
+    hideOverlays();
+    showPlayUI();
+  });
+  var bs=document.getElementById('btn-save');
+  if(bs) bs.addEventListener('click', function(){
+    try{ saveGameState(); }catch(e){}
+    try{ refreshContinueButton(); }catch(e){}
+    var old=bs.textContent; bs.textContent='✔ GUARDADO';
+    setTimeout(function(){ bs.textContent=old; },1200);
+  });
+  var be=document.getElementById('btn-exit');
+  if(be) be.addEventListener('click', function(){
+    isPaused=false;
+    exitToMenu();
+    var mm=document.getElementById('menu-main');
+    if(mm){ mm.style.display='flex'; mm.classList.add('active'); }
+    var bp=document.getElementById('btn-pause'); if(bp) bp.textContent='⏸ PAUSA';
+  });
+});
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
