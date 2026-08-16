@@ -91,6 +91,9 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 <button id="btn-pause" style="position:absolute;top:12px;right:108px;z-index:25;background:rgba(0,0,0,0.62);border:1px solid rgba(126,240,255,0.35);color:#7ef0ff;padding:7px 12px;border-radius:10px;font-size:11px;font-weight:800;backdrop-filter:blur(6px);display:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4)">⏸ PAUSA</button>
 
+<button id="btn-editor-open" style="display:none;position:fixed;top:60px;left:8px;z-index:60;background:rgba(13,19,32,.85);color:#7ef0ff;border:1px solid rgba(126,240,255,.4);border-radius:6px;padding:6px 12px;font-family:inherit;font-weight:900;cursor:pointer">🎛 EDITOR</button>
+
+
 <div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
 <div id="hud" style="display:none"><div class="hud-box"><div class="label">VIDA</div><div class="value" id="hud-health">100%</div><div style="height:3px;background:rgba(0,0,0,0.5);margin-top:3px"><div id="health-bar" style="height:100%;width:100%;background:linear-gradient(90deg,#4ecca3,#7ef0ff)"></div></div></div><div class="hud-box"><div class="label">NIVEL</div><div class="value" id="hud-level">1/8</div></div><div class="hud-box"><div class="label">PROGRESO</div><div class="value" id="hud-progress">0%</div><div class="value" style="font-size:9px" id="hud-enemies">0/12</div></div><div class="hud-box"><div class="label">SCORE</div><div class="value" id="hud-score">0 pts</div></div></div>
 <div id="controls" style="display:none">
@@ -130,14 +133,21 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 <div id="menu-settings" class="menu-overlay" style="display:none"><div style="text-align:center;max-width:460px;width:100%"><h2 style="color:#7ef0ff;letter-spacing:3px">⚙ AJUSTES</h2>
 <div style="margin-top:18px;display:flex;flex-direction:column;gap:14px;text-align:left">
-  <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
+    <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
     <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎨 EDICIÓN DE SPRITES</div>
     <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Entra al nivel de edición para ajustar posiciones, hitboxes y animaciones de Sub-Zero y enemigos.</div>
-    <button class="btn-premium" style="width:100%;background:linear-gradient(135deg,#4ecca3,#7ef0ff);color:#000;font-weight:900" onclick="startLevel(0)">✏️ ABRIR EDITOR DE SPRITES (NIVEL 0)</button>
-    <button class="btn-premium" style="width:100%;margin-top:8px;background:linear-gradient(135deg,#7ef0ff,#a0e6ff);color:#000;font-weight:800" onclick="localStorage.setItem('sz_last_edit_char','ninja_renegade'); startLevel(0); setTimeout(function(){ try{ changeCharacter('ninja_renegade'); }catch(e){} },800)">🥷 EDITAR NINJA RENEGADO DIRECTO</button>
-    <button class="btn-premium" style="width:100%;margin-top:8px" onclick="toggleLiveEditor()">🎚️ EDITOR RÁPIDO LIVE</button>
+    <button class="btn-premium" style="width:100%" onclick="startLevel(0)">✏️ EDICIÓN DE SPRITES</button>
+    <button id="btn-controls-sub" class="btn-premium" style="width:100%">🎮 CONTROLES</button>
   </div>
-  <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
+  
+</div>
+<button class="btn-premium" style="margin-top:18px;width:100%" onclick="showMenu('main')">VOLVER</button>
+</div></div>
+
+<div id="menu-controls" class="menu-overlay">
+  <div class="menu-card">
+    <h2>🎮 CONTROLES</h2>
+    <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
     <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎮 OPACIDAD DE BOTONES</div>
     <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Ajusta la transparencia de los controles táctiles. 100% totalmente visibles, 20% casi invisibles.</div>
     <div style="display:flex;align-items:center;gap:12px">
@@ -152,12 +162,12 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
       <button onclick="setControlsOpacity(30)" title="30% casi invisible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">👻</span><span style="font-size:9px">30%</span></button>
     </div>
   </div>
+    <button id="btn-controls-back" class="btn-premium">← VOLVER</button>
+  </div>
 </div>
-<button class="btn-premium" style="margin-top:18px;width:100%" onclick="showMenu('main')">VOLVER</button>
-</div></div>
 
 <div id="live-editor" style="display:none">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v3.42</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button class="btn-live" onclick="toggleLiveEditor()">✕</button></div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div><b style="color:#7ef0ff;font-size:13px">EDITOR v3.42</b><div style="font-size:8px;color:rgba(255,255,255,0.4)">FIX FINAL</div></div><button id="btn-editor-close" class="btn-live">✕</button></div>
 <div style="background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;margin-bottom:10px"><label style="font-size:9px;color:#7ef0ff;font-weight:800">PERSONAJE:</label><select id="editor-char-select" onchange="changeCharacter(this.value)"><option value="player">PLAYER - Sub-Zero</option></select></div>
 <div id="live-list"></div>
 <div style="margin-top:12px;background:rgba(0,0,0,0.3);border-radius:8px;padding:8px">
@@ -246,6 +256,11 @@ const SPRITE_STORAGE_KEY = "sz_sprite_config_v3.22_FINAL";
 var SPRITE_DEFAULTS={}; try{ SPRITE_DEFAULTS=JSON.parse(JSON.stringify(SPRITE_CONFIG)); }catch(e){}
 var liveEditorOpen=false, isLocked=false, currentEditChar='player', dummyEnemy=null;
 function toggleLiveEditor(){ var el=document.getElementById('live-editor'); var btn=document.getElementById('btn-open-live'); if(!el) return; liveEditorOpen=!liveEditorOpen; if(liveEditorOpen){ el.classList.add('active'); el.style.display='block'; try{ buildLiveEditor(); }catch(e){} if(btn) btn.textContent='✕ CERRAR'; } else { el.classList.remove('active'); el.style.display='none'; if(btn) btn.textContent='🎚️ EDITOR'; } }
+
+function openLiveEditor(){ var el=document.getElementById('live-editor'); if(!el) return; el.style.display='block'; el.classList.add('active'); liveEditorOpen=true; try{ buildLiveEditor(); }catch(e){} }
+function closeLiveEditor(){ var el=document.getElementById('live-editor'); if(!el) return; el.style.display='none'; el.classList.remove('active'); liveEditorOpen=false; }
+
+
 function toggleLock(){ isLocked=!isLocked; var lb=document.getElementById('btn-lock'); if(lb) lb.textContent=isLocked?'🔒 Bloqueado':'🔓 Libre'; }
 
 function populateEditorSelector(){
@@ -543,12 +558,8 @@ function updateLiveButtonVisibility(){
   if(typeof currentState!=='undefined' && currentState==='PLAYING' && LEVELS[currentLevel] && LEVELS[currentLevel].isEditor){
     b.style.display='block';
     // Auto open editor in editor level if not open
-    if(!liveEditorOpen){
-      var le=document.getElementById('live-editor');
-      if(le && le.style.display==='none'){
-        // Don't auto open every time, just ensure button visible
-      }
-    }
+    // Auto open eliminado - apertura solo via startLevel
+
   } else {
     b.style.display='none';
   }
@@ -918,26 +929,7 @@ function setControlsOpacity(val){
   if(analog){ analog.style.opacity=opacity; }
 }
 
-document.addEventListener('DOMContentLoaded', function(){
-  var origStartLevel = window.startLevel;
-  window.startLevel = function(idx){
-    if(typeof origStartLevel==='function') origStartLevel(idx);
-    if(idx===0){
-      setTimeout(function(){
-        try{
-          var last=localStorage.getItem('sz_last_edit_char');
-          if(last==='ninja_renegade'){
-            changeCharacter('ninja_renegade');
-            var sel=document.getElementById('editor-char-select');
-            if(sel) sel.value='ninja_renegade';
-          }
-          // Auto open live editor in editor mode
-          if(!liveEditorOpen) toggleLiveEditor();
-        }catch(e){}
-      }, 800);
-    }
-  };
-});
+
 
 function loadControlsOpacity(){
   var saved=localStorage.getItem('sz_controls_opacity');
@@ -2690,6 +2682,12 @@ function startLevel(idx){
   }catch(e){ alert('Error nivel: '+e.message); }
 
 try{ updateLiveButtonVisibility(); }catch(e){}
+
+var bo=document.getElementById('btn-editor-open');
+var isEd=!!(LEVELS[currentLevel] && LEVELS[currentLevel].isEditor);
+if(bo) bo.style.display=isEd?'block':'none';
+if(isEd){ openLiveEditor(); } else { closeLiveEditor(); }
+
 }
 function startGameInit(){
   try{
@@ -3027,5 +3025,32 @@ document.addEventListener('DOMContentLoaded', function(){
     var bp=document.getElementById('btn-pause'); if(bp) bp.textContent='⏸ PAUSA';
   });
 });
+
+document.addEventListener('DOMContentLoaded', function(){
+  var bc=document.getElementById('btn-controls-sub');
+  if(bc) bc.addEventListener('click', function(){ showMenu('controls'); });
+  var bb=document.getElementById('btn-controls-back');
+  if(bb) bb.addEventListener('click', function(){ showMenu('settings'); });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', function(){
+  var bx=document.getElementById('btn-editor-close');
+  if(bx) bx.addEventListener('click', closeLiveEditor);
+  var bo=document.getElementById('btn-editor-open');
+  if(bo) bo.addEventListener('click', openLiveEditor);
+});
+
 </script>
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
