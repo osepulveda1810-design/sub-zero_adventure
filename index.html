@@ -212,19 +212,19 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 // Sistema de sprites - carga desde archivos externos
 
 const SPRITE_CONFIG = {
-  idle: { file: "idle.png", frames: 4, speed: 130, scaleX: 0.75, scaleY: 1.00, anchorX: 0, anchorY: 25 },
-  walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 0.85, scaleY: 1.05, anchorX: 1, anchorY: 29, cols: 5, rows: 2 }, // 5x2 alta res, si usas tira 4 frames pon frames:4 y borra cols/rows
-  punch: { file: "punch.png", frames: 4, speed: 100, scaleX: 1.70, scaleY: 1.40, anchorX: 3, anchorY: 47 },
-  kick: { file: "kick.png", frames: 4, speed: 100, scaleX: 1.85, scaleY: 1.45, anchorX: 9, anchorY: 58 },
-  jump: { file: "jump.png", frames: 3, speed: 155, scaleX: 1.20, scaleY: 1.20, anchorX: 0, anchorY: 23 },
-  ice_charge: { file: "ice_charge.png", frames: 1, speed: 300, scaleX: 1.00, scaleY: 0.95, anchorX: 0, anchorY: 25 },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, speed: 300, scaleX: 1.25, scaleY: 1.00, anchorX: 0, anchorY: 29 },
-  punch_air: { file: "punch_air.png", frames: 1, speed: 350, scaleX: 1.15, scaleY: 0.75, anchorX: 0, anchorY: -30 },
-  kick_air: { file: "kick_air.png", frames: 1, speed: 350, scaleX: 1.50, scaleY: 0.85, anchorX: 3, anchorY: -28 },
+  idle: { file: "idle.png", frames: 4, cols: 4, speed: 130, scaleX: 1.55, scaleY: 1.75, anchorX: 0, anchorY: -2 },
+  walk: { file: "walk.png", frames: 10, cols: 10, speed: 70, scaleX: 1.85, scaleY: 1.80, anchorX: 1, anchorY: -1 },
+  punch: { file: "punch.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 14, anchorY: 32 },
+  kick: { file: "kick.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 9, anchorY: 33 },
+  jump: { file: "jump.png", frames: 3, cols: 3, speed: 155, scaleX: 2.15, scaleY: 2.20, anchorX: 0, anchorY: 1 },
+  ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 1.50, scaleY: 1.75, anchorX: 0, anchorY: 5 },
+  ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 1.75, scaleY: 1.80, anchorX: 0, anchorY: 3 },
+  punch_air: { file: "punch_air.png", frames: 1, cols: 1, speed: 350, scaleX: 1.80, scaleY: 1.60, anchorX: 13, anchorY: 5 },
+  kick_air: { file: "kick_air.png", frames: 1, cols: 1, speed: 350, scaleX: 2.00, scaleY: 1.70, anchorX: 15, anchorY: 0 },
 };
 // v2.68 ICE ALIGN - configurado por usuario: charging 20/-28 loaded 21/-45
 const ICE_ALIGN = {
-  charging: { x: 25, y: -41, scale: 1 },
+  charging: { x: 22, y: -67, scale: 1 },
   loaded: { x: 21, y: -80, scale: 1 },
   ballRadius: 13
 };
@@ -237,36 +237,36 @@ window.ICE_SPEED = 7.5;
 const SPRITE_BASE = "assets/sprites/player/";
 const ENEMY_SPRITE_BASE = "assets/sprites/enemies/";
 const ENEMY_SPRITE_CONFIG = {
+  ninja_renegade: {
+    idle: { file: "idle.png", frames: 4, cols: 4, speed: 160, scaleX: 1.90, scaleY: 2.00, anchorX: -80, anchorY: 10 },
+    walk: { file: "walk.png", frames: 10, cols: 5, speed: 70, scaleX: 1.40, scaleY: 1.75, anchorX: -59, anchorY: -4 },
+    punch: { file: "attack.png", frames: 4, cols: 4, speed: 75, scaleX: 1.35, scaleY: 1.28, anchorX: 2, anchorY: -4 },
+    kick: { file: "attack.png", frames: 4, cols: 4, speed: 75, scaleX: 1.50, scaleY: 1.32, anchorX: 1, anchorY: 1 },
+    attack: { file: "attack.png", frames: 4, cols: 4, speed: 75, scaleX: 2.20, scaleY: 2.30, anchorX: -80, anchorY: 26 },
+    hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.05, scaleY: 2.10, anchorX: -80, anchorY: 16 },
+    frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.85, scaleY: 1.90, anchorX: -80, anchorY: -8 },
+    dead: { file: "dead.png", frames: 1, cols: 1, speed: 360, scaleX: 2.30, scaleY: 3.45, anchorX: -80, anchorY: 24 },
+  },
   thug: {
-    idle: { file: "idle.png", frames: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: 0, anchorY: 61, cols: 1, rows: 1 },
-    walk: { file: "walk.png", frames: 8, speed: 90, scaleX: 1.80, scaleY: 1.95, anchorX: -20, anchorY: 43, cols: 4, rows: 2 },
-    punch: { file: "attack.png", frames: 18, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47, cols: 6, rows: 3 },
-    kick: { file: "attack.png", frames: 18, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47, cols: 6, rows: 3 },
-    attack: { file: "attack.png", frames: 18, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -12, anchorY: 65, cols: 6, rows: 3 },
-    hit: { file: "hit.png", frames: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -32, anchorY: 53, cols: 3, rows: 1 },
-    frozen: { file: "frozen.png", frames: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: 0, anchorY: 62, cols: 1, rows: 1 },
-    dead: { file: "dead.png", frames: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -56, anchorY: 88, cols: 3, rows: 2 }
+    idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
+    walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
+    punch: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47 },
+    kick: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47 },
+    attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
+    hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -80, anchorY: -6 },
+    frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: -80, anchorY: 8 },
+    dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
   },
   thug_gun: {
-    idle: { file: "idle.png", frames: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: 0, anchorY: 61, cols: 1, rows: 1 },
-    walk: { file: "walk.png", frames: 8, speed: 90, scaleX: 1.80, scaleY: 1.95, anchorX: -20, anchorY: 43, cols: 4, rows: 2 },
-    punch: { file: "attack.png", frames: 18, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47, cols: 6, rows: 3 },
-    kick: { file: "attack.png", frames: 18, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47, cols: 6, rows: 3 },
-    attack: { file: "attack.png", frames: 18, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -12, anchorY: 65, cols: 6, rows: 3 },
-    hit: { file: "hit.png", frames: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -32, anchorY: 53, cols: 3, rows: 1 },
-    frozen: { file: "frozen.png", frames: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: 0, anchorY: 62, cols: 1, rows: 1 },
-    dead: { file: "dead.png", frames: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -56, anchorY: 88, cols: 3, rows: 2 }
+    idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
+    walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
+    punch: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47 },
+    kick: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 1.55, scaleY: 1.90, anchorX: 0, anchorY: 47 },
+    attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
+    hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -80, anchorY: -6 },
+    frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: -80, anchorY: 8 },
+    dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
   },
-  ninja_renegade: {
-    idle: { file: "idle.png", frames: 4, speed: 160, scaleX: 1.90, scaleY: 2.00, anchorX: 3, anchorY: 65 },
-    walk: { file: "walk.png", frames: 10, speed: 70, scaleX: 1.40, scaleY: 1.75, anchorX: 2, anchorY: 51, cols: 5, rows: 2 },
-    punch: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.35, scaleY: 1.28, anchorX: 2, anchorY: 0 },
-    kick: { file: "attack.png", frames: 4, speed: 75, scaleX: 1.50, scaleY: 1.32, anchorX: 1, anchorY: 1 },
-    attack: { file: "attack.png", frames: 4, speed: 75, scaleX: 2.20, scaleY: 2.30, anchorX: 2, anchorY: 91 },
-    hit: { file: "hit.png", frames: 3, speed: 100, scaleX: 2.05, scaleY: 2.10, anchorX: 0, anchorY: 69 },
-    frozen: { file: "frozen.png", frames: 1, speed: 360, scaleX: 1.85, scaleY: 1.90, anchorX: 0, anchorY: 47 },
-    dead: { file: "dead.png", frames: 1, speed: 360, scaleX: 2.30, scaleY: 3.45, anchorX: -53, anchorY: 65 }
-  }
 };
 
 var playerSprites = {}; var spriteStatus = {}; var enemySprites = {}; var enemyStatus = {}; var spritesReady = false;
@@ -292,19 +292,14 @@ function populateEditorSelector(){
     var sel=document.getElementById('editor-char-select');
     if(!sel) return;
     var currentVal=sel.value || currentEditChar || 'player';
-    // Keep player first
+    var tipos = (typeof ENEMY_SPRITE_CONFIG!=='undefined') ? Object.keys(ENEMY_SPRITE_CONFIG) : (function(){ var s={}; LEVELS.forEach(function(l){ (l.enemyTypes||[]).forEach(function(t){ s[t]=1; }); }); return Object.keys(s); })();
     sel.innerHTML='<option value="player">PLAYER - Sub-Zero</option>';
-    if(typeof ENEMY_SPRITE_CONFIG!=='undefined'){
-      Object.keys(ENEMY_SPRITE_CONFIG).sort().forEach(function(k){
-        var cfg=ENEMY_SPRITE_CONFIG[k];
-        var label='ENEMIGO - '+k.replace(/_/g,' ').toUpperCase();
-        if(k==='ninja_renegade') label='🥷 NINJA RENEGADE';
-        var opt=document.createElement('option');
-        opt.value=k;
-        opt.textContent=label;
-        sel.appendChild(opt);
-      });
-    }
+    tipos.sort().forEach(function(t){
+      var opt=document.createElement('option');
+      opt.value=t;
+      opt.textContent='ENEMIGO - '+t.toUpperCase();
+      sel.appendChild(opt);
+    });
     if(currentVal) sel.value=currentVal;
   }catch(e){ console.error(e); }
 }
@@ -319,7 +314,7 @@ function changeCharacter(c){
   if(typeof createEnemy==='function'){
     try{
       dummyEnemy=createEnemy(c,cx,cy);
-      if(dummyEnemy){ dummyEnemy.health=9999; dummyEnemy.maxHealth=9999; dummyEnemy.isDummy=true; dummyEnemy.laneY=cy; dummyEnemy.x=cx; dummyEnemy.isMoving=false; dummyEnemy.attacking=false; dummyEnemy.frozen=0; dummyEnemy.hitTimer=0; dummyEnemy.previewTimer=0; dummyEnemy.previewAnim=null; dummyEnemy.facingRight=true; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; enemies=[dummyEnemy]; console.log('dummyEnemy created at',cx,cy,'path',ENEMY_SPRITE_BASE+c+'/'); }
+      if(dummyEnemy){ dummyEnemy.health=9999; dummyEnemy.maxHealth=9999; dummyEnemy.isDummy=true; dummyEnemy.laneY=cy; dummyEnemy.x=cx; dummyEnemy.isMoving=false; dummyEnemy.attacking=false; dummyEnemy.frozen=0; dummyEnemy.hitTimer=0; dummyEnemy.previewTimer=0; dummyEnemy.previewAnim=null; dummyEnemy.facingRight=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; enemies=[dummyEnemy]; console.log('dummyEnemy created at',cx,cy,'path',ENEMY_SPRITE_BASE+c+'/'); }
     }catch(e){ console.error(e); }
   }
   buildLiveEditor();
@@ -386,8 +381,8 @@ function exportIceAlign(){
   try{
     var lines=[];
     lines.push('const ICE_ALIGN = {');
-    lines.push('  charging: { x: '+ICE_ALIGN.charging.x+', y: '+ICE_ALIGN.charging.y+', scale: '+(ICE_ALIGN.charging.scale||1)+' },');
-    lines.push('  loaded: { x: '+ICE_ALIGN.loaded.x+', y: '+ICE_ALIGN.loaded.y+', scale: '+(ICE_ALIGN.loaded.scale||1)+' },');
+    lines.push('  charging: { x: '+(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', y: '+(ICE_ALIGN.charging.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', scale: '+(ICE_ALIGN.charging.scale||1)+' },');
+    lines.push('  loaded: { x: '+(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', y: '+(ICE_ALIGN.loaded.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', scale: '+(ICE_ALIGN.loaded.scale||1)+' },');
     lines.push('  ballRadius: '+ICE_ALIGN.ballRadius);
     lines.push('};');
     var a=document.getElementById('live-export');
@@ -754,7 +749,7 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
+let player={x:120,y:0,width:HITBOX_W,height:HITBOX_H,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0,width:HITBOX_W,height:HITBOX_H, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
@@ -1008,6 +1003,10 @@ var DIST_BODY=50;
 var BG_PARALLAX=0.18;     // fondo lejano (lento)
 var FLOOR_PARALLAX=0.55;  // piso cercano (rápido)
 var DEBUG_MODE=false;
+var HITBOX_W=44, HITBOX_H=96;
+var LANE_BOTTOM_RATIO=0.90;   // dónde queda el piso referencial (0.90 = 90% de la altura del canvas)
+var PLAYER_GLOBAL_SCALE=0.85;   // 1 = tamaño canónico; 0.80 = 20% más chico
+function playerEffY(){ return playerLaneY + (player.jumpOffset||0); }
 if(!DEBUG_MODE){
   console.log=function(){};
   console.warn=function(){};
@@ -1207,10 +1206,10 @@ var baseTop=Math.max(120,baseBottom-200);
 var oldTop=laneTop, oldBottom=laneBottom;
 if(typeof FLOOR_REF_OFFSET!=='undefined'){
   laneTop=baseTop+TOP_LIMIT_OFFSET;
-  laneBottom=baseBottom-FLOOR_REF_OFFSET;
+  laneBottom=Math.floor(h*LANE_BOTTOM_RATIO);
 } else {
   laneTop=baseTop;
-  laneBottom=baseBottom;
+  laneBottom=Math.floor(h*LANE_BOTTOM_RATIO);
 }
 var clampY=function(y){ return Math.max(laneTop, Math.min(laneBottom, y)); };
 if(typeof oldTop==='number' && typeof oldBottom==='number' && oldBottom>oldTop && laneBottom>laneTop){
@@ -1229,7 +1228,7 @@ if(typeof oldTop==='number' && typeof oldBottom==='number' && oldBottom>oldTop &
 function spawnText(x,y,t,c){ floatingTexts.push({x:x,y:y,text:t,color:c||'#fff',timer:0,life:800,vy:-1.2}); }
 function createEnemy(type,x,laneY){
   var cfg=ENEMY_CONFIGS[type]; if(!cfg) return null;
-  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0,facingRight:false,frame:0,frameTime:0,attackTimer:0,isMoving:false,attacking:false};
+  return {type:type,x:x,laneY:laneY,width:HITBOX_W,height:HITBOX_H,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0,facingRight:false,frame:0,frameTime:0,attackTimer:0,isMoving:false,attacking:false};
 }
 function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
@@ -1402,81 +1401,61 @@ function spawnBoss(){
 }
 
 function drawPlayer(time){
-  try{ if(typeof updatePauseButton==='function') updatePauseButton(); var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player'){ return; } }catch(e){}
-  var sc=(1-((laneBottom-playerLaneY)/200)*0.12)*PLAYER_SCALE;
-  var anim=player.anim||'idle';
-  if(anim!=='punch_air' && anim!=='kick_air'){
-    if(player.isShootingIce) anim='ice_shoot';
-    else if(player.isChargingIce||player.isIceLoaded) anim='ice_charge';
-    else if(player.isPunching) anim='punch';
-    else if(player.isKicking) anim='kick';
-    else if(!player.grounded) anim='jump';
-    else if(keys.right||keys.left||keys.up||keys.down) anim='walk';
-  }
-  var cfg=SPRITE_CONFIG[anim]||SPRITE_CONFIG.idle;
-  var sprite=playerSprites[anim];
-  var useSprite=spritesReady && sprite && sprite.complete && sprite.naturalWidth>10 && spriteStatus[anim]==='ok';
-  var total=cfg.frames||4;
-  // FIX v3.39: reset frame al cambiar de anim (walk 10 frames -> idle 4 frames causaba frame 8 fuera de rango = sprite desaparecido)
-  if(player._lastAnim!==anim){
-    player.frame=0;
-    player.frameTime=0;
-    player._lastAnim=anim;
-  }
-  if(typeof player.frame==='undefined') player.frame=0;
-  if(player.frame>=total) player.frame=0; // clamp si viene de anim mas larga
-  if(!player.frameTime) player.frameTime=0;
-  if(anim==='idle'||anim==='walk'){ player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
-  else if(anim==='punch'||anim==='kick'){ player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame++; player.frameTime=0; if(player.frame>=4){ player.frame=0; player.anim='idle'; player.isPunching=false; player.isKicking=false; } } }
-  else if(anim==='jump'){ player.frame=player.grounded?0:(player.vy<0?0:1); }
-  else { player.frameTime += 16; if(player.frameTime>cfg.speed){ player.frame=(player.frame+1)%total; player.frameTime=0; } }
-  if(useSprite){
-    try{
-      // v3.38: auto-deteccion grilla 5x2 universal
-      var cols = cfg.cols || (total===10 ? 5 : total);
-      var rows = cfg.rows || (total===10 ? 2 : 1);
-      // si total=4 pero imagen es ancha tipo 5x2, forzar 5x2
-      if(!cfg.cols && sprite.naturalWidth > sprite.naturalHeight*1.8 && total===10){
-        cols=5; rows=2;
-      }
-      var sw, sh, sx, sy;
-      if(rows>1 || cols!==total){
-        sw = Math.floor(sprite.naturalWidth / cols);
-        sh = Math.floor(sprite.naturalHeight / rows);
-        var col = Math.floor((player.frame||0) % cols);
-        var row = Math.floor((player.frame||0) / cols);
-        sx = col * sw;
-        sy = row * sh;
-      } else {
-        sw=Math.floor(sprite.naturalWidth/total);
-        sh=sprite.naturalHeight;
-        sx=Math.floor((player.frame||0)*sw);
-        sy=0;
-      }
-      var tw=Math.round(100*sc*(cfg.scaleX||1)), th=Math.round(110*sc*(cfg.scaleY||1));
-      var ax=(cfg.anchorX||0)*sc;
-      var dx=Math.round(player.x-camera.x)-Math.round(tw/2)+Math.round(ax);
-      var dy=Math.round(playerLaneY-th+10+(cfg.anchorY||0)*sc+(player.jumpOffset||0));
-      ctx.save(); ctx.imageSmoothingEnabled=false;
-      if(typeof sy==='undefined'){ sy=0; }
-      if(!player.facingRight){ ctx.scale(-1,1); ctx.drawImage(sprite,sx,sy,sw,sh,-dx-tw,dy,tw,th); } else { ctx.drawImage(sprite,sx,sy,sw,sh,dx,dy,tw,th); }
-      ctx.restore(); return;
-    }catch(e){}
-  }
-  var w=Math.round(90*sc), h=Math.round(110*sc); ctx.fillStyle='#7ef0ff'; ctx.fillRect(player.x-camera.x-w/2, playerLaneY-h, w, h);
-
-  if(player.hurtFlash>0){
-    ctx.globalAlpha=(player.hurtFlash/220)*0.45;
-    ctx.fillStyle='#ff4444';
-    ctx.fillRect(px-28, py-62, 56, 66);
-    ctx.globalAlpha=1;
-  }
-
+  try{
+    if(typeof player.frame==='undefined') player.frame=0;
+    if(typeof player.frameTime==='undefined') player.frameTime=0;
+    var wanted=player.anim||'idle';
+    var spriteSet=playerSprites;
+    function ok(a){ return spriteSet && spriteSet[a] && spriteSet[a].complete && spriteSet[a].naturalWidth>0; }
+    var animToUse=wanted;
+    if(!ok(animToUse)){
+      if(ok('idle')) animToUse='idle';
+      else animToUse=null;
+    }
+    if(animToUse && spriteSet && spriteSet[animToUse]){
+      var sprite=spriteSet[animToUse];
+      var cfg=SPRITE_CONFIG[animToUse]||{frames:1,cols:1};
+      var total=cfg.frames||1;
+      var cols=cfg.cols||cfg.frames;
+      var rows=Math.ceil(cfg.frames/cols);
+      var fw=sprite.naturalWidth/cols;
+      var fh=sprite.naturalHeight/rows;
+      var f=(player.frame%cfg.frames);
+      var sxSheet=(f%cols)*fw;
+      var sySheet=Math.floor(f/cols)*fh;
+      // CAMBIO 2 — perilla global NO modifica config canónica
+      var gScale = (typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1);
+      var sx=cfg.scaleX*gScale;
+      var sy=cfg.scaleY*gScale;
+      var ax=cfg.anchorX*gScale;
+      var ay=cfg.anchorY*gScale;
+      var sc=1.15;
+      var tw=Math.round(90*sc*sx), th=Math.round(110*sc*sy);
+      var pyEff=playerEffY();
+      var dy=Math.round(pyEff-th+12+ay);
+      try{
+        ctx.save(); ctx.imageSmoothingEnabled=false;
+        var drawX=Math.round(player.x-camera.x+ax-tw/2);
+        if(!player.facingRight){
+          ctx.translate(drawX+tw/2, 0);
+          ctx.scale(-1, 1);
+          ctx.translate(-(drawX+tw/2), 0);
+        }
+        ctx.drawImage(sprite,sxSheet,sySheet,fw,fh,drawX,dy,tw,th);
+        ctx.restore();
+        return true;
+      }catch(err){}
+    }
+    ctx.fillStyle='#4ecca3';
+    ctx.fillRect(player.x-camera.x-20, playerEffY()-60, 40, 60);
+    return true;
+  }catch(e){ return false; }
 }
+
+
 function drawEnemy(e){
   var ex=Math.round(e.x-camera.x);
   if(ex<-250||ex>canvas.width+250) return false;
-  // Ensure frame/frameTime exist
   if(typeof e.frame==='undefined') e.frame=0;
   if(typeof e.frameTime==='undefined') e.frameTime=0;
   if(typeof e.facingRight==='undefined') e.facingRight=false;
@@ -1491,39 +1470,28 @@ function drawEnemy(e){
   var spriteSet=enemySprites[type];
   function ok(a){ return spriteSet && spriteSet[a] && spriteSet[a].complete && spriteSet[a].naturalWidth>0; }
   var animToUse=wanted;
-  // Map punch/kick to attack.png since enemies only have attack.png
   if(animToUse==='punch' || animToUse==='kick'){
     if(ok('attack')) animToUse='attack';
   }
   if(!ok(animToUse)){
     if(ok('idle')) animToUse='idle';
     else if(ok('walk')) animToUse='walk';
-    else if(wanted==='walk' && ok('attack')) animToUse='attack'; // v2.59: fallback walk→attack
+    else if(wanted==='walk' && ok('attack')) animToUse='attack';
     else if(ok('attack')) animToUse='attack';
     else animToUse=null;
   }
   if(animToUse && spriteSet && spriteSet[animToUse]){
     var sprite=spriteSet[animToUse];
-    var cfg=(ENEMY_SPRITE_CONFIG[type]&&ENEMY_SPRITE_CONFIG[type][animToUse])||{frames:1};
+    var cfg=(ENEMY_SPRITE_CONFIG[type]&&ENEMY_SPRITE_CONFIG[type][animToUse])||{frames:1,cols:1};
     var total=cfg.frames||1;
-    var frame=Math.floor(e.frame||0)%total;
-    // v3.38: auto-deteccion grilla universal 5x2
-    var cols = cfg.cols || (total===10 ? 5 : total);
-    var rows = cfg.rows || (total===10 ? 2 : 1);
-    var sw, sh, sx, sy;
-    if(rows>1 || cols!==total || total===10){
-      sw = Math.floor(sprite.naturalWidth / cols);
-      sh = Math.floor(sprite.naturalHeight / rows);
-      var col = frame % cols;
-      var row = Math.floor(frame / cols);
-      sx = col * sw;
-      sy = row * sh;
-    } else {
-      sw=Math.floor(sprite.naturalWidth/total);
-      sx=Math.floor(frame*sw);
-      sy=0;
-      sh=sprite.naturalHeight;
-    }
+    // PASO 2 — grid-aware
+    var cols=cfg.cols||cfg.frames;
+    var rows=Math.ceil(cfg.frames/cols);
+    var fw=sprite.naturalWidth/cols;
+    var fh=sprite.naturalHeight/rows;
+    var f=(e.frame%cfg.frames);
+    var sx=(f%cols)*fw;
+    var sy=Math.floor(f/cols)*fh;
     var sc=(1-((laneBottom-e.laneY)/200)*0.12)*1.15;
     var tw=Math.round(90*sc*(cfg.scaleX||1)), th=Math.round(110*sc*(cfg.scaleY||1));
     var ax=(cfg.anchorX||0)*sc, ay=(cfg.anchorY||0)*sc;
@@ -1532,24 +1500,18 @@ function drawEnemy(e){
       ctx.save(); ctx.imageSmoothingEnabled=false;
       if(e.hitTimer>0){ ctx.translate(Math.sin(e.hitTimer*0.6)*2.5,0); }
       var drawX=ex+Math.round(ax);
-      // v3.05 FIX: Flip sprite based on facing direction
-      // walk.png points RIGHT, so:
-      // - facingRight=true (moving right) → draw NORMAL
-      // - facingRight=false (moving left) → draw MIRRORED (scaleX=-1)
       if(!e.facingRight){
         ctx.translate(drawX+tw/2, 0);
         ctx.scale(-1, 1);
         ctx.translate(-(drawX+tw/2), 0);
       }
-      // v3.29: dibujar con sy,sh si es grilla
-      if(typeof sy==='undefined'){ sy=0; sh=sprite.naturalHeight; }
-      ctx.drawImage(sprite,sx,sy,sw,sh,drawX,dy,tw,th);
+      ctx.drawImage(sprite,sx,sy,fw,fh,drawX,dy,tw,th);
       ctx.restore();
       if(!e.dead && e.health<e.maxHealth){
         ctx.fillStyle='rgba(0,0,0,0.5)';
-        ctx.fillRect(ex, e.laneY-66, tw, 4);
+        ctx.fillRect(ex, e.laneY-66, 70, 4);
         ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444';
-        ctx.fillRect(ex, e.laneY-66, tw*(e.health/e.maxHealth), 4);
+        ctx.fillRect(ex, e.laneY-66, 70*(e.health/e.maxHealth), 4);
       }
       return true;
     }catch(err){}
@@ -1563,6 +1525,8 @@ function drawEnemy(e){
   ctx.fillStyle='white'; ctx.font='9px monospace'; ctx.fillText('MISS:'+wanted+' @ '+ENEMY_SPRITE_BASE+type+'/'+wanted+'.png', ex-20, e.laneY-th2-8);
   return true;
 }
+
+
 
 
 
@@ -1937,8 +1901,8 @@ ts=frameDt/16;
 
       var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
       if(attachedIce){
-        attachedIce.x=player.x+(player.facingRight?ICE_ALIGN.charging.x:-ICE_ALIGN.charging.x)*_sc;
-        attachedIce.y=playerLaneY+ICE_ALIGN.charging.y*_sc + (player.jumpOffset||0);
+        attachedIce.x=player.x+(player.facingRight?(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)):-(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)))*_sc;
+        attachedIce.y=playerLaneY+(ICE_ALIGN.charging.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))*_sc + (player.jumpOffset||0);
         attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
       }
       if(player.iceChargeTimer>=ICE_CHARGE_TIME){
@@ -1958,8 +1922,8 @@ ts=frameDt/16;
     if(player.isIceLoaded && attachedIce){
       attachedIce.holdTimer+=16;
       var _sc2=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
-      attachedIce.x=player.x+(player.facingRight?ICE_ALIGN.loaded.x:-ICE_ALIGN.loaded.x)*_sc2;
-      attachedIce.y=playerLaneY + ICE_ALIGN.loaded.y + (player.jumpOffset||0);
+      attachedIce.x=player.x+(player.facingRight?(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)):-(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)))*_sc2;
+      attachedIce.y=playerLaneY + (ICE_ALIGN.loaded.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)) + (player.jumpOffset||0);
       if(attachedIce.holdTimer>=ICE_HOLD_MAX){ fireIceProjectile(); }
     }
 
@@ -1981,9 +1945,10 @@ ts=frameDt/16;
       if(enemies && enemies.length>0){
         for(var _ci=0; _ci<enemies.length; _ci++){
           var _ce = enemies[_ci];
+          if(_ce.isDummy) continue;
           if(!_ce || _ce.dead) continue;
           var _dx = player.x - _ce.x;
-          var _dy = playerLaneY - _ce.laneY;
+          var _dy = _ce.laneY - playerEffY();
           var _absDx = Math.abs(_dx);
           var _absDy = Math.abs(_dy);
           var _minX = 64;
@@ -2057,7 +2022,7 @@ ts=frameDt/16;
           var he = enemies[hi];
           if(he.dead) continue;
           var dx = he.x - player.x;
-          var dy = he.laneY - playerLaneY;
+          var dy = he.laneY - playerEffY();
           if(Math.abs(dy)>rangeY) continue;
           var inFront = player.facingRight ? (dx>8 && dx<rangeX) : (dx<-8 && dx>-rangeX);
           if(inFront){
@@ -2102,7 +2067,7 @@ ts=frameDt/16;
           }
         }
         if(boss && !boss.dead){
-          var bdx = boss.x - player.x; var bdy = boss.laneY - playerLaneY;
+          var bdx = boss.x - player.x; var bdy = boss.laneY - playerEffY();
           if(Math.abs(bdy)<=rangeY+8){
             var bInFront = player.facingRight ? (bdx>10 && bdx<rangeX+12) : (bdx<-10 && bdx>-(rangeX+12));
             if(bInFront && !alreadyHit){
@@ -2280,6 +2245,16 @@ ts=frameDt/16;
 // --- UPDATE ENEMIGOS ---
     for(var ei=0;ei<enemies.length;ei++){
       var e=enemies[ei];
+      if(e.isDummy){
+        if(e.previewTimer>0){ e.previewTimer-=16; if(e.previewTimer<=0){ e.previewTimer=0; e.previewAnim=null; } }
+        e.anim=e.previewAnim||(e.isMoving?'walk':'idle');
+        e.frameTime=(e.frameTime||0)+16;
+        var dcfg=(ENEMY_SPRITE_CONFIG[e.type]||{})[e.anim]||{};
+        var dframes=dcfg.frames||4;
+        var dspeed=dcfg.frameSpeed||dcfg.speed||100;
+        if(e.frameTime>dspeed){ e.frameTime=0; e.frame=(e.frame+1)%dframes; }
+        continue;
+      }
       if(e.dead){
         if(e.deathTimer>0) e.deathTimer-=16;
         continue;
@@ -2312,7 +2287,7 @@ ts=frameDt/16;
         // daño al player si cerca (1 golpe por ataque)
         if(e.attackTimer>250 && e.attackTimer<350 && !e.hitApplied){
           var dx=Math.abs(e.x-player.x);
-          var dy=Math.abs(e.laneY-playerLaneY);
+          var dy=Math.abs(e.laneY - playerEffY());
           if(dx<DIST_DMG && dy<35){
             if(player.health>0){
               e.hitApplied=true;
@@ -2329,7 +2304,7 @@ ts=frameDt/16;
       }
       // IA movimiento
       var dxp=player.x-e.x;
-      var dyp=playerLaneY-e.laneY;
+      var dyp=e.laneY-playerEffY();
       var dist=Math.hypot(dxp,dyp);
       var inRange=Math.abs(dxp)<DIST_STOP && Math.abs(dyp)<35;
       if(dist>400){
@@ -2340,7 +2315,7 @@ ts=frameDt/16;
         e.anim='walk';
         var sp=e.speed||2;
         e.x+= (dxp/dist)*sp;
-        e.laneY+= (dyp/dist)*sp*0.7;
+        e.laneY+= (-dyp/dist)*sp*0.7;
         if(dxp>0) e.facingRight=true; else e.facingRight=false;
       } else {
         e.isMoving=false;
@@ -2358,6 +2333,7 @@ ts=frameDt/16;
     // --- SEPARACION ENEMIGOS (evita superposicion) ---
     for(var ai=0;ai<enemies.length;ai++){
       var ea=enemies[ai];
+      if(ea.isDummy) continue;
       if(ea.dead) continue;
       for(var bi=ai+1;bi<enemies.length;bi++){
         var eb=enemies[bi];
@@ -2378,8 +2354,9 @@ ts=frameDt/16;
     }
     for(var ci=0;ci<enemies.length;ci++){
       var ec=enemies[ci];
+      if(ec.isDummy) continue;
       if(ec.dead || ec.frozen>0) continue;
-      var bxp=ec.x-player.x, byp=ec.laneY-playerLaneY;
+      var bxp=ec.x-player.x, byp=ec.laneY-playerEffY();
       if(Math.abs(bxp)<DIST_BODY && Math.abs(byp)<30){
         ec.x=player.x+(bxp>=0?DIST_BODY:-DIST_BODY);
       }
@@ -2392,9 +2369,11 @@ ts=frameDt/16;
     try{
       for(var _s1=0; _s1<enemies.length; _s1++){
         var _e1 = enemies[_s1];
+        if(_e1.isDummy) continue;
         if(!_e1 || _e1.dead || _e1.frozen>0) continue;
         for(var _s2=_s1+1; _s2<enemies.length; _s2++){
           var _e2 = enemies[_s2];
+          if(_e2.isDummy) continue;
           if(!_e2 || _e2.dead || _e2.frozen>0) continue;
           var _edx = _e1.x - _e2.x;
           var _edy = _e1.laneY - _e2.laneY;
@@ -2417,7 +2396,7 @@ ts=frameDt/16;
       }
     }catch(e){}
     if(boss && !boss.dead && boss.frozen<=0){
-      var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
+      var dx=player.x-boss.x; var dy=playerEffY()-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
       boss.isMoving=false; boss.attacking=false;
       if(d>DIST_STOP+20){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; boss.isMoving=true; if(dx>0) boss.facingRight=true; else if(dx<0) boss.facingRight=false; }
       if(Math.abs(dx)<DIST_DMG+20 && Math.abs(dy)<40){ boss.attacking=true; player.health-=0.25; }
@@ -2600,6 +2579,34 @@ ts=frameDt/16;
         ctx.font='8px monospace';
         ctx.fillText('anchorY ajusta respecto a esta linea', 10, refY+14);
         ctx.restore();
+      // DEBUG HITBOX PLAYER en playerEffY()
+      try{
+        if(typeof currentEditChar!=='undefined' && currentEditChar!=='player' && typeof dummyEnemy!=='undefined' && dummyEnemy){
+          // Solo dummy, UN rect pegado al cuerpo vivo
+          var bx = dummyEnemy.x - camera.x - dummyEnemy.width/2;
+          var by = dummyEnemy.laneY - dummyEnemy.height;
+          ctx.save();
+          ctx.strokeStyle='rgba(0,255,0,0.9)';
+          ctx.lineWidth=2;
+          ctx.strokeRect(bx, by, dummyEnemy.width, dummyEnemy.height);
+          ctx.fillStyle='rgba(0,255,0,0.15)';
+          ctx.fillRect(bx, by, dummyEnemy.width, dummyEnemy.height);
+          ctx.restore();
+        } else {
+          // Solo player
+          if(typeof playerEffY==='function'){
+            var pyEff = playerEffY();
+            ctx.save();
+            ctx.strokeStyle='rgba(0,255,0,0.9)';
+            ctx.lineWidth=2;
+            ctx.strokeRect(player.x-camera.x-HITBOX_W/2, pyEff-HITBOX_H, HITBOX_W, HITBOX_H);
+            ctx.fillStyle='rgba(0,255,0,0.15)';
+            ctx.fillRect(player.x-camera.x-HITBOX_W/2, pyEff-HITBOX_H, HITBOX_W, HITBOX_H);
+            ctx.restore();
+          }
+        }
+      }catch(e){}
+
       }
     }catch(e){}
     if(typeof drawIceTargeting==='function') drawIceTargeting();
@@ -2984,6 +2991,8 @@ document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSel
         if(typeof LEVELS!=='undefined' && LEVELS[currentLevel] && LEVELS[currentLevel].isEditor){
           if(Math.abs(v.x)>0.12 || Math.abs(v.y)>0.12){
             dummyEnemy.isMoving=true;
+            dummyEnemy.previewAnim='walk';
+            dummyEnemy.facingRight=(v.x>0);
             dummyEnemy.x+=v.x*6;
             dummyEnemy.laneY+=v.y*3;
             if(v.x>0.1) dummyEnemy.facingRight=true;
@@ -2993,6 +3002,7 @@ document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSel
             if(typeof camera!=='undefined' && camera) camera.targetX=dummyEnemy.x-canvas.width/2;
           } else {
             dummyEnemy.isMoving=false;
+            dummyEnemy.previewAnim='idle';
           }
         }
       }
