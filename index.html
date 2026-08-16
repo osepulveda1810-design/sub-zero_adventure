@@ -91,7 +91,43 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 
 <button id="btn-pause" style="position:absolute;top:12px;right:108px;z-index:25;background:rgba(0,0,0,0.62);border:1px solid rgba(126,240,255,0.35);color:#7ef0ff;padding:7px 12px;border-radius:10px;font-size:11px;font-weight:800;backdrop-filter:blur(6px);display:none;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.4)">⏸ PAUSA</button>
 
-<button id="btn-editor-open" style="display:none;position:fixed;top:60px;left:8px;z-index:60;background:rgba(13,19,32,.85);color:#7ef0ff;border:1px solid rgba(126,240,255,.4);border-radius:6px;padding:6px 12px;font-family:inherit;font-weight:900;cursor:pointer">🎛 EDITOR</button>
+<button id="btn-editor-open" style="display:none;position:fixed;top:60px;left:110px;z-index:60;background:rgba(13,19,32,.85);color:#7ef0ff;border:1px solid rgba(126,240,255,.4);border-radius:6px;padding:6px 12px;font-family:inherit;font-weight:900;cursor:pointer">🎛 EDI<button id="btn-ctrl-reopen" style="display:none;position:fixed;top:8px;left:8px;z-index:300;background:rgba(13,19,32,.85);color:#7ef0ff;border:1px solid rgba(126,240,255,.4);border-radius:6px;padding:6px 10px;font-family:inherit;font-weight:900;cursor:pointer">🕹</button>
+TOR</button>
+
+
+<div id="ctrl-editor-panel" style="display:none;position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:300;background:rgba(10,14,24,.95);border:1px solid rgba(126,240,255,.4);border-radius:10px;padding:12px;width:250px;color:#e0fbff;font-family:inherit;font-size:10px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="color:#7ef0ff;font-size:12px">🕹 EDITOR DE CONTROLES</b><button id="btn-ctrl-close" class="btn-live">✕</button></div>
+  <label>Cluster Y: <span id="ce-cy-val">0px</span></label>
+  <input type="range" id="ce-cluster-y" min="-150" max="150" value="0" style="width:100%">
+  <label>Análogo Y: <span id="ce-ay-val">0px</span></label>
+  <input type="range" id="ce-analog-y" min="-150" max="150" value="0" style="width:100%">
+  <label>Tamaño cluster: <span id="ce-cs-val">100%</span></label>
+  <input type="range" id="ce-cluster-s" min="60" max="160" value="100" style="width:100%">
+  <label>Tamaño análogo: <span id="ce-as-val">100%</span></label>
+  <input type="range" id="ce-analog-s" min="60" max="160" value="100" style="width:100%">
+  
+<label>Opacidad botones:</label>
+<div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
+    <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎮 OPACIDAD DE BOTONES</div>
+    <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Ajusta la transparencia de los controles táctiles. 100% totalmente visibles, 20% casi invisibles.</div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="font-size:10px;color:rgba(255,255,255,0.5)">20%</span>
+      <input id="opacity-slider" type="range" min="20" max="100" value="85" style="flex:1;accent-color:#7ef0ff" oninput="setControlsOpacity(this.value)">
+
+
+      <span style="font-size:10px;color:rgba(255,255,255,0.5)">100%</span>
+      <span id="opacity-value" style="font-size:12px;font-weight:800;color:#7ef0ff;min-width:38px;text-align:center">85%</span>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center">
+      <button onclick="setControlsOpacity(100)" title="100% visible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(126,240,255,0.25);color:#e0fbff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🔆</span><span style="font-size:9px">100%</span></button>
+      <button onclick="setControlsOpacity(60)" title="60% medio" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(126,240,255,0.18);color:#c8f4ff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🌙</span><span style="font-size:9px">60%</span></button>
+      <button onclick="setControlsOpacity(30)" title="30% casi invisible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">👻</span><span style="font-size:9px">30%</span></button>
+    </div>
+  </div>
+<div style="display:flex;gap:6px;margin-top:8px"><button id="ce-save" class="btn-live" style="flex:1">💾 GUARDAR</button><button id="ce-reset" class="btn-live" style="flex:1">♻ RESET</button><button id="ce-done" class="btn-live" style="flex:1">✔ LISTO / SALIR</button></div>
+</div>
+
+
 
 
 <div id="wave-arrow" style="position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);z-index:40;display:none;text-align:center;flex-direction:column;align-items:center"><canvas id="winterArrowCanvas" width="320" height="150" style="filter:drop-shadow(0 0 12px rgba(126,240,255,0.6))"></canvas><div id="wave-arrow-text" style="font-family:monospace;background:linear-gradient(90deg,rgba(0,20,40,0.85),rgba(0,40,80,0.85));border:1.5px solid #7ef0ff;color:#e0fbff;padding:6px 18px;border-radius:20px;font-weight:900;font-size:13px;letter-spacing:3px;box-shadow:0 0 12px rgba(126,240,255,0.5)">AVANZA</div></div>
@@ -147,22 +183,10 @@ body{background:#050a14;color:#fff;font-family:sans-serif;overflow:hidden;positi
 <div id="menu-controls" class="menu-overlay">
   <div class="menu-card">
     <h2>🎮 CONTROLES</h2>
-    <div style="background:rgba(0,0,0,0.35);border:1px solid rgba(126,240,255,0.15);border-radius:12px;padding:14px">
-    <div style="font-size:12px;font-weight:800;color:#7ef0ff;margin-bottom:8px">🎮 OPACIDAD DE BOTONES</div>
-    <div style="font-size:10px;color:rgba(255,255,255,0.6);margin-bottom:10px">Ajusta la transparencia de los controles táctiles. 100% totalmente visibles, 20% casi invisibles.</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span style="font-size:10px;color:rgba(255,255,255,0.5)">20%</span>
-      <input id="opacity-slider" type="range" min="20" max="100" value="85" style="flex:1;accent-color:#7ef0ff" oninput="setControlsOpacity(this.value)">
-      <span style="font-size:10px;color:rgba(255,255,255,0.5)">100%</span>
-      <span id="opacity-value" style="font-size:12px;font-weight:800;color:#7ef0ff;min-width:38px;text-align:center">85%</span>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:12px;justify-content:center">
-      <button onclick="setControlsOpacity(100)" title="100% visible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.08);border:1.5px solid rgba(126,240,255,0.25);color:#e0fbff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🔆</span><span style="font-size:9px">100%</span></button>
-      <button onclick="setControlsOpacity(60)" title="60% medio" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.06);border:1.5px solid rgba(126,240,255,0.18);color:#c8f4ff;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">🌙</span><span style="font-size:9px">60%</span></button>
-      <button onclick="setControlsOpacity(30)" title="30% casi invisible" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;cursor:pointer;backdrop-filter:blur(4px)"><span style="font-size:14px">👻</span><span style="font-size:9px">30%</span></button>
-    </div>
-  </div>
-    <button id="btn-controls-back" class="btn-premium">← VOLVER</button>
+    
+    
+<button id="btn-ctrl-live" class="btn-premium" style="width:100%">🕹 EDICIÓN EN VIVO DE CONTROLES</button>
+<button id="btn-controls-back" class="btn-premium">← VOLVER</button>
   </div>
 </div>
 
@@ -2654,7 +2678,14 @@ ts=frameDt/16;
   }
 }
 
+
+function hideAllMenus(){
+  var ids=['menu-main','menu-levels','menu-controls','menu-settings','menu-sprites','menu-story'];
+  for(var i=0;i<ids.length;i++){ var el=document.getElementById(ids[i]); if(el) el.style.display='none'; }
+}
+
 function showMenu(id){
+
   try{
     document.querySelectorAll('.menu-overlay').forEach(function(m){ m.style.display='none'; });
     var el=document.getElementById('menu-'+id);
@@ -2687,6 +2718,8 @@ var bo=document.getElementById('btn-editor-open');
 var isEd=!!(LEVELS[currentLevel] && LEVELS[currentLevel].isEditor);
 if(bo) bo.style.display=isEd?'block':'none';
 if(isEd){ openLiveEditor(); } else { closeLiveEditor(); }
+var an=document.getElementById('analog-base'); if(an) an.style.display='';
+
 
 }
 function startGameInit(){
@@ -2711,7 +2744,9 @@ function saveGameState(){
     localStorage.setItem('sz_save_v177', JSON.stringify(data));
   }catch(e){}
 }
-function exitToMenu(){ currentState='MENU'; isPaused=false; var topBar=document.getElementById('top-bar'); if(topBar) topBar.style.display='flex'; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); 
+function exitToMenu(){
+  var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='none';
+ currentState='MENU'; isPaused=false; var topBar=document.getElementById('top-bar'); if(topBar) topBar.style.display='flex'; showMenu('main'); document.getElementById('hud').style.display='none'; document.getElementById('controls').style.display='none'; enemies=[]; boss=null; projectiles=[]; iceTrails=[]; iceShatters=[]; frostDecals=[]; attachedIce=null; if(typeof resetWaves==='function') resetWaves(); 
 try{ updateLiveButtonVisibility(); }catch(e){}
 
 try{ refreshContinueButton(); }catch(e){}
@@ -3000,7 +3035,7 @@ document.addEventListener('DOMContentLoaded', function(){
   function showPlayUI(){
     var hud=document.getElementById('hud'); if(hud) hud.style.display='flex';
     var ct=document.getElementById('controls'); if(ct) ct.style.display='flex';
-    var an=document.getElementById('analog-base'); if(an) an.style.display='block';
+    var an=document.getElementById('analog-base'); if(an) an.style.display='';
     var bp=document.getElementById('btn-pause'); if(bp){ bp.style.display='block'; bp.textContent='⏸ PAUSA'; }
   }
   var br=document.getElementById('btn-resume');
@@ -3050,6 +3085,90 @@ document.addEventListener('DOMContentLoaded', function(){
   if(bx) bx.addEventListener('click', closeLiveEditor);
   var bo=document.getElementById('btn-editor-open');
   if(bo) bo.addEventListener('click', openLiveEditor);
+});
+
+
+
+var CTRL_CFG={clusterY:0,analogY:0,clusterS:1,analogS:1};
+function applyCtrlCfg(){
+  var ids=['btn-ice','btn-punch','btn-kick','btn-jump'];
+  for(var i=0;i<ids.length;i++){
+    var b=document.getElementById(ids[i]);
+    if(b) b.style.transform='translateY('+CTRL_CFG.clusterY+'px) scale('+CTRL_CFG.clusterS+')';
+  }
+  var an=document.getElementById('analog-base');
+  if(an) an.style.transform='translateY('+CTRL_CFG.analogY+'px) scale('+CTRL_CFG.analogS+')';
+}
+function syncCtrlSliders(){
+  function set(id,v){ var el=document.getElementById(id); if(el) el.value=v; }
+  set('ce-cluster-y',CTRL_CFG.clusterY); set('ce-analog-y',CTRL_CFG.analogY);
+  set('ce-cluster-s',Math.round(CTRL_CFG.clusterS*100)); set('ce-analog-s',Math.round(CTRL_CFG.analogS*100));
+  var t;
+  t=document.getElementById('ce-cy-val'); if(t) t.textContent=CTRL_CFG.clusterY+'px';
+  t=document.getElementById('ce-ay-val'); if(t) t.textContent=CTRL_CFG.analogY+'px';
+  t=document.getElementById('ce-cs-val'); if(t) t.textContent=Math.round(CTRL_CFG.clusterS*100)+'%';
+  t=document.getElementById('ce-as-val'); if(t) t.textContent=Math.round(CTRL_CFG.analogS*100)+'%';
+}
+function loadCtrlCfg(){
+  try{ var s=localStorage.getItem('sz_ctrl_cfg_v1'); if(s){ var o=JSON.parse(s);
+    CTRL_CFG.clusterY=o.clusterY||0; CTRL_CFG.analogY=o.analogY||0;
+    CTRL_CFG.clusterS=o.clusterS||1; CTRL_CFG.analogS=o.analogS||1; } }catch(e){}
+  applyCtrlCfg(); syncCtrlSliders();
+}
+function saveCtrlCfg(){ try{ localStorage.setItem('sz_ctrl_cfg_v1', JSON.stringify(CTRL_CFG)); }catch(e){} }
+document.addEventListener('DOMContentLoaded', function(){
+  loadCtrlCfg();
+  function bind(id,fn){ var el=document.getElementById(id); if(el) el.addEventListener('input',fn); }
+  bind('ce-cluster-y',function(e){ CTRL_CFG.clusterY=parseInt(e.target.value); applyCtrlCfg(); syncCtrlSliders(); });
+  bind('ce-analog-y',function(e){ CTRL_CFG.analogY=parseInt(e.target.value); applyCtrlCfg(); syncCtrlSliders(); });
+  bind('ce-cluster-s',function(e){ CTRL_CFG.clusterS=parseInt(e.target.value)/100; applyCtrlCfg(); syncCtrlSliders(); });
+  bind('ce-analog-s',function(e){ CTRL_CFG.analogS=parseInt(e.target.value)/100; applyCtrlCfg(); syncCtrlSliders(); });
+  var sv=document.getElementById('ce-save');
+  if(sv) sv.addEventListener('click', function(){ saveCtrlCfg(); var o=sv.textContent; sv.textContent='✔ GUARDADO'; setTimeout(function(){ sv.textContent=o; },1000); });
+  var rs=document.getElementById('ce-reset');
+  if(rs) rs.addEventListener('click', function(){ CTRL_CFG={clusterY:0,analogY:0,clusterS:1,analogS:1}; applyCtrlCfg(); syncCtrlSliders(); saveCtrlCfg(); });
+  var op=document.getElementById('btn-ctrl-editor');
+  if(op) op.addEventListener('click', function(){ var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display=(p.style.display==='block')?'none':'block'; });
+  var cl=document.getElementById('btn-ctrl-close');
+  if(cl) cl.addEventListener('click', function(){ var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='none'; });
+});
+
+
+
+var bl=document.getElementById('btn-ctrl-live');
+if(bl) bl.addEventListener('click', function(){
+  hideAllMenus();
+  var ct=document.getElementById('controls'); if(ct) ct.style.display='flex';
+    var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='block';
+});
+var dn=document.getElementById('ce-done');
+if(dn) dn.addEventListener('click', function(){
+  saveCtrlCfg();
+  var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='none';
+  var ct=document.getElementById('controls'); if(ct) ct.style.display='none';
+    showMenu('controls');
+});
+
+
+
+var ro=document.getElementById('btn-ctrl-reopen');
+if(ro) ro.addEventListener('click', function(){ var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='block'; ro.style.display='none'; });
+var cl=document.getElementById('btn-ctrl-close');
+if(cl) cl.addEventListener('click', function(){ if(ro) ro.style.display='block'; });
+var bl=document.getElementById('btn-ctrl-live');
+if(bl) bl.addEventListener('click', function(){ if(ro) ro.style.display='none'; });
+var dn=document.getElementById('ce-done');
+if(dn) dn.addEventListener('click', function(){ if(ro) ro.style.display='none'; });
+
+
+
+var dn=document.getElementById('ce-done');
+if(dn) dn.addEventListener('click', function(){
+  saveCtrlCfg();
+  var p=document.getElementById('ctrl-editor-panel'); if(p) p.style.display='none';
+  var ro=document.getElementById('btn-ctrl-reopen'); if(ro) ro.style.display='none';
+  var ct=document.getElementById('controls'); if(ct) ct.style.display='none';
+    showMenu('controls');
 });
 
 </script>
