@@ -754,7 +754,7 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
+let player={x:120,y:0,width:HITBOX_W,height:HITBOX_H,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0,width:HITBOX_W,height:HITBOX_H, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
 let ICE_CHARGE_TIME=750;
 let ICE_HOLD_MAX=2500;
 let GRAVITY=0.78; let JUMP_FORCE=-14.5;
@@ -1008,6 +1008,8 @@ var DIST_BODY=50;
 var BG_PARALLAX=0.18;     // fondo lejano (lento)
 var FLOOR_PARALLAX=0.55;  // piso cercano (rápido)
 var DEBUG_MODE=false;
+var HITBOX_W=44, HITBOX_H=96;
+function playerEffY(){ return playerLaneY + (player.jumpOffset||0); }
 if(!DEBUG_MODE){
   console.log=function(){};
   console.warn=function(){};
@@ -1229,7 +1231,7 @@ if(typeof oldTop==='number' && typeof oldBottom==='number' && oldBottom>oldTop &
 function spawnText(x,y,t,c){ floatingTexts.push({x:x,y:y,text:t,color:c||'#fff',timer:0,life:800,vy:-1.2}); }
 function createEnemy(type,x,laneY){
   var cfg=ENEMY_CONFIGS[type]; if(!cfg) return null;
-  return {type:type,x:x,laneY:laneY,width:cfg.width,height:cfg.height,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0,facingRight:false,frame:0,frameTime:0,attackTimer:0,isMoving:false,attacking:false};
+  return {type:type,x:x,laneY:laneY,width:HITBOX_W,height:HITBOX_H,color:cfg.color,health:cfg.health,maxHealth:cfg.health,speed:cfg.speed,damage:cfg.damage,dead:false,frozen:0,facingRight:false,frame:0,frameTime:0,attackTimer:0,isMoving:false,attacking:false};
 }
 function createBoss(type,x,laneY){
   var cfg=BOSS_CONFIGS[type]; if(!cfg) return null;
@@ -1547,9 +1549,9 @@ function drawEnemy(e){
       ctx.restore();
       if(!e.dead && e.health<e.maxHealth){
         ctx.fillStyle='rgba(0,0,0,0.5)';
-        ctx.fillRect(ex, e.laneY-66, tw, 4);
+        ctx.fillRect(ex, e.laneY-66, 70, 4);
         ctx.fillStyle=e.frozen>0?'#7ef0ff':'#ff4444';
-        ctx.fillRect(ex, e.laneY-66, tw*(e.health/e.maxHealth), 4);
+        ctx.fillRect(ex, e.laneY-66, 70*(e.health/e.maxHealth), 4);
       }
       return true;
     }catch(err){}
@@ -1983,7 +1985,7 @@ ts=frameDt/16;
           var _ce = enemies[_ci];
           if(!_ce || _ce.dead) continue;
           var _dx = player.x - _ce.x;
-          var _dy = playerLaneY - _ce.laneY;
+          var _dy = _ce.laneY - playerEffY();
           var _absDx = Math.abs(_dx);
           var _absDy = Math.abs(_dy);
           var _minX = 64;
@@ -2057,7 +2059,7 @@ ts=frameDt/16;
           var he = enemies[hi];
           if(he.dead) continue;
           var dx = he.x - player.x;
-          var dy = he.laneY - playerLaneY;
+          var dy = he.laneY - playerEffY();
           if(Math.abs(dy)>rangeY) continue;
           var inFront = player.facingRight ? (dx>8 && dx<rangeX) : (dx<-8 && dx>-rangeX);
           if(inFront){
@@ -2102,7 +2104,7 @@ ts=frameDt/16;
           }
         }
         if(boss && !boss.dead){
-          var bdx = boss.x - player.x; var bdy = boss.laneY - playerLaneY;
+          var bdx = boss.x - player.x; var bdy = boss.laneY - playerEffY();
           if(Math.abs(bdy)<=rangeY+8){
             var bInFront = player.facingRight ? (bdx>10 && bdx<rangeX+12) : (bdx<-10 && bdx>-(rangeX+12));
             if(bInFront && !alreadyHit){
@@ -2312,7 +2314,7 @@ ts=frameDt/16;
         // daño al player si cerca (1 golpe por ataque)
         if(e.attackTimer>250 && e.attackTimer<350 && !e.hitApplied){
           var dx=Math.abs(e.x-player.x);
-          var dy=Math.abs(e.laneY-playerLaneY);
+          var dy=Math.abs(e.laneY - playerEffY());
           if(dx<DIST_DMG && dy<35){
             if(player.health>0){
               e.hitApplied=true;
@@ -2329,7 +2331,7 @@ ts=frameDt/16;
       }
       // IA movimiento
       var dxp=player.x-e.x;
-      var dyp=playerLaneY-e.laneY;
+      var dyp=e.laneY-playerEffY();
       var dist=Math.hypot(dxp,dyp);
       var inRange=Math.abs(dxp)<DIST_STOP && Math.abs(dyp)<35;
       if(dist>400){
@@ -2379,7 +2381,7 @@ ts=frameDt/16;
     for(var ci=0;ci<enemies.length;ci++){
       var ec=enemies[ci];
       if(ec.dead || ec.frozen>0) continue;
-      var bxp=ec.x-player.x, byp=ec.laneY-playerLaneY;
+      var bxp=ec.x-player.x, byp=ec.laneY-playerEffY();
       if(Math.abs(bxp)<DIST_BODY && Math.abs(byp)<30){
         ec.x=player.x+(bxp>=0?DIST_BODY:-DIST_BODY);
       }
@@ -2417,7 +2419,7 @@ ts=frameDt/16;
       }
     }catch(e){}
     if(boss && !boss.dead && boss.frozen<=0){
-      var dx=player.x-boss.x; var dy=playerLaneY-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
+      var dx=player.x-boss.x; var dy=playerEffY()-boss.laneY; var d=Math.sqrt(dx*dx+dy*dy);
       boss.isMoving=false; boss.attacking=false;
       if(d>DIST_STOP+20){ boss.x+=(dx/d)*0.8; boss.laneY+=(dy/d)*0.4; boss.isMoving=true; if(dx>0) boss.facingRight=true; else if(dx<0) boss.facingRight=false; }
       if(Math.abs(dx)<DIST_DMG+20 && Math.abs(dy)<40){ boss.attacking=true; player.health-=0.25; }
@@ -2600,6 +2602,20 @@ ts=frameDt/16;
         ctx.font='8px monospace';
         ctx.fillText('anchorY ajusta respecto a esta linea', 10, refY+14);
         ctx.restore();
+      // DEBUG HITBOX PLAYER en playerEffY()
+      try{
+        if(typeof playerEffY==='function'){
+          var pyEff = playerEffY();
+          ctx.save();
+          ctx.strokeStyle='rgba(0,255,0,0.9)';
+          ctx.lineWidth=2;
+          ctx.strokeRect(player.x-camera.x-HITBOX_W/2, pyEff-HITBOX_H, HITBOX_W, HITBOX_H);
+          ctx.fillStyle='rgba(0,255,0,0.15)';
+          ctx.fillRect(player.x-camera.x-HITBOX_W/2, pyEff-HITBOX_H, HITBOX_W, HITBOX_H);
+          ctx.restore();
+        }
+      }catch(e){}
+
       }
     }catch(e){}
     if(typeof drawIceTargeting==='function') drawIceTargeting();
