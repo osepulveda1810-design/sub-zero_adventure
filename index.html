@@ -217,16 +217,16 @@ const SPRITE_CONFIG = {
   punch: { file: "punch.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 14, anchorY: 32 },
   kick: { file: "kick.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 9, anchorY: 33 },
   jump: { file: "jump.png", frames: 3, cols: 3, speed: 155, scaleX: 2.15, scaleY: 2.20, anchorX: 0, anchorY: 1 },
-  ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 1.50, scaleY: 1.75, anchorX: 0, anchorY: 5 },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 1.75, scaleY: 1.80, anchorX: 0, anchorY: 3 },
+  ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 1.70, scaleY: 1.75, anchorX: 0, anchorY: 5 },
+  ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 2.00, scaleY: 1.80, anchorX: 0, anchorY: 3 },
   punch_air: { file: "punch_air.png", frames: 1, cols: 1, speed: 350, scaleX: 1.80, scaleY: 1.60, anchorX: 13, anchorY: 5 },
   kick_air: { file: "kick_air.png", frames: 1, cols: 1, speed: 350, scaleX: 2.00, scaleY: 1.70, anchorX: 15, anchorY: 0 },
 };
 // v2.68 ICE ALIGN - configurado por usuario: charging 20/-28 loaded 21/-45
 const ICE_ALIGN = {
-  charging: { x: 22, y: -67, scale: 1 },
-  loaded: { x: 21, y: -80, scale: 1 },
-  ballRadius: 13
+  charging: { x: 15.895,  y: -55.25,  scale: 1 },
+  loaded:   { x: 15.1725, y: -105.4,  scale: 1 },
+  ballRadius: 14
 };
 var FLOOR_REF_OFFSET = 32; // abajo 32 fijo
 var TOP_LIMIT_OFFSET = 0; // arriba 0 fijo
@@ -333,10 +333,10 @@ function buildIceEditor(){
       '<div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:8px">Ajusta posicion de la bola de hielo sobre manos. charging=cargando, loaded=lista</div>'+
       '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px"><div style="font-size:9px;color:#4ecca3;font-weight:800">CHARGING (cargando)</div>'+
       '<div class="live-control"><label>X</label><input type="range" min="-40" max="60" step="1" value="'+ca.x+'" oninput="onIceAlign(\'charging\',\'x\',this.value,this)"><input type="number" value="'+ca.x+'" oninput="onIceAlign(\'charging\',\'x\',this.value,this)"></div>'+
-      '<div class="live-control"><label>Y</label><input type="range" min="-80" max="20" step="1" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"><input type="number" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"></div></div>'+
+      '<div class="live-control"><label>Y</label><input type="range" min="-150" max="50" step="1" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"><input type="number" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"></div></div>'+
       '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px"><div style="font-size:9px;color:#4ecca3;font-weight:800">LOADED (lista para disparar)</div>'+
       '<div class="live-control"><label>X</label><input type="range" min="-40" max="60" step="1" value="'+la.x+'" oninput="onIceAlign(\'loaded\',\'x\',this.value,this)"><input type="number" value="'+la.x+'" oninput="onIceAlign(\'loaded\',\'x\',this.value,this)"></div>'+
-      '<div class="live-control"><label>Y</label><input type="range" min="-80" max="20" step="1" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"><input type="number" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"></div></div>'+
+      '<div class="live-control"><label>Y</label><input type="range" min="-150" max="50" step="1" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"><input type="number" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"></div></div>'+
       '<div class="live-control"><label>RADIO BOLA</label><input type="range" min="5" max="30" step="1" value="'+rad+'" oninput="onIceRadius(this.value,this)"><input type="number" value="'+rad+'" oninput="onIceRadius(this.value,this)"></div>'+
       '<div style="display:flex;gap:6px;margin-top:8px"><button class="btn-live-sm" onclick="tryIce()" style="flex:1">❄️ PROBAR HIELO</button><button class="btn-live-sm" onclick="exportIceAlign()" style="flex:1">📋 EXPORT ICE</button></div>';
     return div;
@@ -1143,13 +1143,26 @@ function cycleIceTarget(dir){
 
 
 function fireIceProjectile(){
-  var sx = attachedIce ? attachedIce.x : player.x + (player.facingRight?52:-12);
-  var sy = attachedIce ? attachedIce.y : playerLaneY-28;
-    var target=player.iceTarget;
+  var gScale=(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1);
+  var pScale=(typeof PLAYER_SCALE!=='undefined'?PLAYER_SCALE:1);
+  var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*pScale;
+  var al=ICE_ALIGN.loaded;
+  // CAMBIO 1 — MISMA fórmula que preview de bola LOADED en editor
+  var px, py;
+  if(attachedIce && typeof attachedIce.x==='number' && typeof attachedIce.y==='number'){
+    // WYSIWYG exacto: donde el editor muestra la bola
+    px=attachedIce.x;
+    py=attachedIce.y;
+  } else {
+    // Fallback idéntico a preview loaded: x con _sc, y con playerEffY + al.y*GLOBAL
+    px=player.x + (player.facingRight?1:-1)*(al.x*gScale)*_sc;
+    py=playerEffY() + (al.y*gScale);
+  }
+  var target=player.iceTarget;
   var vx=(player.facingRight?1:-1)*7.5, vy=0;
   if(target && !target.dead && target.frozen<=0){
-    var dx=(target.x - sx);
-    var dy=(target.laneY - sy);
+    var dx=(target.x - px);
+    var dy=(target.laneY - py);
     var dist=Math.hypot(dx,dy);
     if(dist>0 && dist<560){
       var speed=(window.ICE_SPEED||7.5);
@@ -1157,7 +1170,10 @@ function fireIceProjectile(){
       vy=(dy/dist)*speed*0.55;
     }
   }
-  projectiles.push({x:sx,y:sy,vx:vx,vy:vy,type:'ice',life:3000, homing: target?true:false, target: target});
+  // CAMBIO 2 — radio = ballRadius escalado por GLOBAL
+  var baseR=(typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.ballRadius)?ICE_ALIGN.ballRadius:13;
+  var r=baseR*gScale;
+  projectiles.push({x:px,y:py,vx:vx,vy:vy,type:'ice',life:3000, homing: target?true:false, target: target, r:r, trail:[]});
   attachedIce=null;
   player.isChargingIce=false;
   player.isIceLoaded=false;
@@ -1172,6 +1188,8 @@ function fireIceProjectile(){
   player.frameTime=0;
   spawnText(player.x,playerLaneY-20,'HIELO DISPARADO!','#7ef0ff');
 }
+
+
 function tryIce(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.hitTimer=90; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='hit'; dummyEnemy.previewTimer=600; return; } }catch(e){}
 
   if(player.isChargingIce || player.isShootingIce) return;
@@ -1883,7 +1901,7 @@ ts=frameDt/16;
     // --- ICE CHARGE LOGIC v2.10: bloquea caminata mientras carga, libera al disparar ---
     if(player.isShootingIce){
       player.shootIceTimer+=16;
-      if(player.shootIceTimer>450){
+      if(player.shootIceTimer>300){
         player.isShootingIce=false;
         player.anim='idle';
         player.shootIceTimer=0;
@@ -2215,8 +2233,14 @@ ts=frameDt/16;
           } else {
             e.frozen=3500; e.health-=12; spawnText(e.x,e.laneY-20,'CONGELADO','#7ef0ff');
             camera.shake=6;
-            // impacto normal: 6 cristales
-            for(var s=0;s<6;s++){
+            // CAMBIO 3 — burst de 8 esquirlas cian MK11
+            for(var s=0;s<8;s++){
+              var ang=(s/8)*6.28318;
+              var sp=3+Math.random()*3;
+              iceShatters.push({x:e.x, y:e.laneY-18, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp - Math.random()*2, life:400, maxLife:400, rot:Math.random()*6.28, vr:(Math.random()*0.4-0.2), size:2.5+Math.random()*2.5, gold:false, cyan:true});
+            }
+            // cristales extra legacy
+            for(var s2=0;s2<6;s2++){
               iceShatters.push({x:p.x, y:p.y, vx:(Math.random()*7-3.5), vy:(Math.random()*-4-1), life:380, maxLife:380, rot:Math.random()*6.28, vr:(Math.random()*0.3-0.15), size:2+Math.random()*3, gold:Math.random()>0.7});
             }
             frostDecals.push({x:e.x, y:e.laneY, life:2800, maxLife:2800, size:36+Math.random()*18});
@@ -2509,6 +2533,28 @@ ts=frameDt/16;
       ctx.restore();
     }
 
+function drawIceBall(p){
+  p.trail=p.trail||[];
+  p.trail.push({x:p.x,y:p.y}); if(p.trail.length>8) p.trail.shift();
+  var r=p.r||13;
+  r=r*(1+0.08*Math.sin((p.life||0)*0.05));
+  for(var i=0;i<p.trail.length;i++){
+    var t=p.trail[i]; var a=(i/p.trail.length)*0.22;
+    ctx.fillStyle='rgba(126,240,255,'+a.toFixed(3)+')';
+    ctx.beginPath(); ctx.arc(t.x-camera.x,t.y,r*(0.35+0.6*i/p.trail.length),0,7); ctx.fill();
+  }
+  var sx=p.x-camera.x;
+  var g=ctx.createRadialGradient(sx,p.y,r*0.2,sx,p.y,r*2.2);
+  g.addColorStop(0,'rgba(200,250,255,0.9)');
+  g.addColorStop(0.4,'rgba(126,240,255,0.5)');
+  g.addColorStop(1,'rgba(126,240,255,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(sx,p.y,r*2.2,0,7); ctx.fill();
+  ctx.fillStyle='#eaffff'; ctx.beginPath(); ctx.arc(sx,p.y,r*0.55,0,7); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,0.7)'; ctx.lineWidth=1.5;
+  for(var s2=0;s2<3;s2++){ var ang=(p.life||0)*0.02+s2*2.09; ctx.beginPath(); ctx.arc(sx,p.y,r*0.8,ang,ang+0.9); ctx.stroke(); }
+}
+
+
     // v2.72: dibujar trails detrás
     for(var ti=0; ti<iceTrails.length; ti++){
       var tr=iceTrails[ti];
@@ -2521,9 +2567,7 @@ ts=frameDt/16;
     }
     for(var pi=0;pi<projectiles.length;pi++){
       var p=projectiles[pi]; if(p.type!=='ice') continue;
-      var psx=Math.round(p.x-camera.x);
-      var dir = p.vx>=0 ? 1 : -1;
-      drawIceShard(ctx, psx, p.y, dir);
+      if(typeof drawIceBall==='function') drawIceBall(p); else { var psx=Math.round(p.x-camera.x); var dir = p.vx>=0 ? 1 : -1; drawIceShard(ctx, psx, p.y, dir); }
     }
     // v2.72: dibujar cristales de shatter
     for(var si=0; si<iceShatters.length; si++){
@@ -2532,7 +2576,7 @@ ts=frameDt/16;
       var sa=(sh.life/sh.maxLife);
       ctx.save(); ctx.translate(sdx, sh.y); ctx.rotate(sh.rot);
       ctx.globalAlpha=sa;
-      ctx.fillStyle=sh.gold ? '#d4af37' : '#a5f3ff';
+      ctx.fillStyle=sh.cyan ? '#7ef0ff' : (sh.gold ? '#d4af37' : '#a5f3ff');
       ctx.beginPath(); ctx.moveTo(-sh.size,0); ctx.lineTo(0,-sh.size*0.6); ctx.lineTo(sh.size,0); ctx.lineTo(0,sh.size*0.6); ctx.closePath(); ctx.fill();
       if(!sh.gold){ ctx.fillStyle='rgba(255,255,255,0.8)'; ctx.beginPath(); ctx.arc(0,0,sh.size*0.25,0,Math.PI*2); ctx.fill(); }
       ctx.restore();
