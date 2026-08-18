@@ -202,6 +202,16 @@ TOR</button>
 <div id="live-export" style="display:none;background:#000;color:#0f0;font-size:8px;padding:8px;white-space:pre-wrap;max-height:180px;overflow:auto;margin-top:8px;border-radius:6px"></div>
 </div>
 </div>
+<div id="load-overlay" style="display:none;position:fixed;inset:0;background:rgba(5,10,20,0.95);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#e0fbff;font-family:inherit">
+  <b style="color:#7ef0ff;font-size:16px">❄ CARGANDO NIVEL 1...</b>
+  <div style="width:70%;max-width:420px;height:10px;background:rgba(126,240,255,0.15);border-radius:6px;overflow:hidden">
+    <div id="load-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#7ef0ff,#6ee7b7);transition:width 0.2s"></div>
+  </div>
+  <span id="load-status" style="font-size:11px;opacity:0.7">0/0</span>
+  <button id="load-skip" style="display:none;margin-top:8px;background:rgba(126,240,255,0.2);color:#7ef0ff;border:1px solid rgba(126,240,255,0.4);border-radius:8px;padding:8px 18px;font-weight:800">CONTINUAR SIN SPRITES</button>
+</div>
+
+
 <script>
 const GAME_VERSION="3.42";
 let buildNum=57; try{ document.getElementById('build-num').textContent=buildNum; }catch(e){}
@@ -2243,18 +2253,23 @@ ts=frameDt/16;
 
 // --- ANIMACION PLAYER ---
     if(player.frameTime===undefined) player.frameTime=0;
-    player.frameTime+=16;
-    var cfg=SPRITE_CONFIG[player.anim];
-    var spd=cfg?cfg.speed:120;
-    if(player.frameTime>spd){
-      player.frameTime=0;
-      player.frame++;
-      var frames=cfg?cfg.frames:4;
-      if(player.frame>=frames){
-        if(player.anim==='punch' || player.anim==='kick' || player.anim==='punch_air' || player.anim==='kick_air' || player.anim==='ice_shoot'){
-          player.frame=frames-1;
-        } else {
-          player.frame=0;
+    if(player.anim==='jump'){
+      var jv=(typeof player.jumpVel!=='undefined'?player.jumpVel:(player.vy||0));
+      player.frame=(jv<-1)?0:(jv>1?2:1);
+    } else {
+      player.frameTime+=16;
+      var cfg=SPRITE_CONFIG[player.anim];
+      var spd=cfg?cfg.speed:120;
+      if(player.frameTime>spd){
+        player.frameTime=0;
+        player.frame++;
+        var frames=cfg?cfg.frames:4;
+        if(player.frame>=frames){
+          if(player.anim==='punch' || player.anim==='kick' || player.anim==='punch_air' || player.anim==='kick_air' || player.anim==='ice_shoot'){
+            player.frame=frames-1;
+          } else {
+            player.frame=0;
+          }
         }
       }
     }
@@ -2929,6 +2944,72 @@ function showMenu(id){
     if(id==='sprites') updateSpriteUI();
   }catch(e){}
 }
+
+function preloadStatus(idx){
+  var list=[];
+  function push(img){ if(img) list.push(img); }
+  var lvl=LEVELS[idx]; if(!lvl) return {done:true,total:0,ok:0};
+  try{
+    // player: recorre SPRITE_CONFIG
+    if(typeof SPRITE_CONFIG!=='undefined'){
+      for(var k in SPRITE_CONFIG){
+        var c=SPRITE_CONFIG[k];
+        // try to get from playerSprites or playerImgs or similar
+        var store = (typeof playerSprites!=='undefined'?playerSprites:(typeof playerImgs!=='undefined'?playerImgs:null));
+        if(store){
+          if(store[k] && store[k].complete!==undefined) push(store[k]);
+          else if(store[k] && store[k].img) push(store[k].img);
+        }
+        // fallback: try global cache
+        if(typeof getPlayerSprite==='function'){
+          try{ var im=getPlayerSprite(k); if(im) push(im); }catch(e){}
+        }
+      }
+    }
+    // enemigos: por cada tipo en lvl.enemyTypes
+    if(lvl.enemyTypes && typeof ENEMY_SPRITE_CONFIG!=='undefined' && typeof enemySprites!=='undefined'){
+      for(var ti=0;ti<lvl.enemyTypes.length;ti++){
+        var t=lvl.enemyTypes[ti];
+        var cfgSet=ENEMY_SPRITE_CONFIG[t];
+        var spriteSet=enemySprites[t];
+        if(!cfgSet || !spriteSet) continue;
+        for(var ak in cfgSet){
+          var im=spriteSet[ak];
+          if(im) push(im);
+        }
+      }
+    }
+    // jefe: si lvl.boss==='Kano'
+    if(lvl.boss==='Kano' && typeof KANO_SPRITE_CONFIG!=='undefined' && typeof kanoSprites!=='undefined'){
+      for(var ak2 in KANO_SPRITE_CONFIG){
+        var im2=kanoSprites[ak2];
+        if(im2) push(im2);
+      }
+    }
+    // fondo: si el nivel usa imagen de fondo
+    if(lvl.bgImage && lvl.bgImage.complete!==undefined) push(lvl.bgImage);
+    if(typeof bgImages!=='undefined'){
+      var bg=bgImages[idx]||bgImages[lvl.id];
+      if(bg) push(bg);
+    }
+  }catch(e){ console.error('preloadStatus', e); }
+  // dedup list (same img may be pushed twice)
+  var seen=[];
+  var uniq=[];
+  for(var i=0;i<list.length;i++){
+    var im=list[i];
+    if(!im) continue;
+    var already=false;
+    for(var j=0;j<seen.length;j++){ if(seen[j]===im){ already=true; break; } }
+    if(!already){ seen.push(im); uniq.push(im); }
+  }
+  list=uniq;
+  var ok=0;
+  for(var i=0;i<list.length;i++){ var im=list[i]; if(im.complete&&im.naturalWidth>0) ok++; else if(!im.__retry){ im.__retry=1; try{ var s=im.src; im.src=s; }catch(e){} } }
+  return {total:list.length, ok:ok, done:ok>=list.length};
+}
+
+
 function startLevel(idx){
   try{
     currentLevel=idx; camera.worldWidth=getWorldWidthForLevel(idx);
@@ -2953,6 +3034,29 @@ var an=document.getElementById('analog-base'); if(an) an.style.display='';
 
 
 }
+
+var NEED_PRELOAD=[1];
+var _realStartLevel=startLevel;
+startLevel=function(idx){
+  if(NEED_PRELOAD.indexOf(idx)<0){ _realStartLevel(idx); return; }
+  var ov=document.getElementById('load-overlay'); var bar=document.getElementById('load-bar'); var stt=document.getElementById('load-status'); var skip=document.getElementById('load-skip');
+  if(ov){ ov.style.display='flex'; var title=ov.querySelector('b'); if(title) title.textContent='❄ CARGANDO NIVEL '+(idx+1)+'...'; }
+  if(skip) skip.style.display='none';
+  if(bar) bar.style.width='0%';
+  if(stt) stt.textContent='0/0';
+  var t0=Date.now(); var started=false;
+  function go(){ if(started) return; started=true; if(ov) ov.style.display='none'; _realStartLevel(idx); }
+  var iv=setInterval(function(){
+    var st=preloadStatus(idx);
+    if(bar&&st.total) bar.style.width=Math.round(100*st.ok/st.total)+'%';
+    if(stt) stt.textContent=st.ok+'/'+st.total;
+    if(st.done){ clearInterval(iv); go(); }
+    else if(Date.now()-t0>15000){ clearInterval(iv); if(skip) skip.style.display='block'; }
+  },200);
+  if(skip) skip.onclick=function(){ clearInterval(iv); go(); };
+};
+
+
 function startGameInit(){
   try{
     setupCanvas();
@@ -3198,8 +3302,9 @@ document.addEventListener('DOMContentLoaded', function(){ try{ populateEditorSel
 
 
 
-</script>
-<script>
+
+
+
 (function(){
   var base=document.getElementById('analog-base');
   var stick=document.getElementById('analog-stick');
@@ -3406,4 +3511,7 @@ if(dn) dn.addEventListener('click', function(){
 });
 
 </script>
+
+
+
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body></html>
