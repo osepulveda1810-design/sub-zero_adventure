@@ -271,13 +271,13 @@ const ENEMY_SPRITE_CONFIG = {
 
 var KANO_SPRITE_BASE='assets/sprites/enemies/kano/';
 var KANO_SPRITE_CONFIG={
-  idle:   { file:'idle.png',   frames:1,  cols:1, speed:300, scaleX:0.95, scaleY:0.80, anchorX:0,  anchorY:18 },
-  walk:   { file:'walk.png',   frames:8,  cols:4, speed:120, scaleX:4.00, scaleY:2.60, anchorX:0,  anchorY:15 },
-  hit:    { file:'hit.png',    frames:4,  cols:4, speed:90,  scaleX:4.00, scaleY:3.80, anchorX:0,  anchorY:0 },
-  attack: { file:'attack.png', frames:6, cols:6, speed:70, scaleX:1.0, scaleY:1.0, anchorX:0, anchorY:0 },
-  laser:  { file:'laser.png',  frames:4,  cols:4, speed:120, scaleX:4.00, scaleY:2.60, anchorX:0,  anchorY:0 },
-  frozen: { file:'frozen.png', frames:1,  cols:1, speed:300, scaleX:0.75, scaleY:0.62, anchorX:0,  anchorY:17 },
-  dead:   { file:'dead.png',   frames:1,  cols:1, speed:300, scaleX:1.35, scaleY:1.60, anchorX:19, anchorY:180 }
+  idle:   { file:'idle.png',   frames:1,  cols:1, speed:300, scaleX:0.95, scaleY:0.80, anchorX:0,   anchorY:18 },
+  walk:   { file:'walk.png',   frames:8,  cols:4, speed:120, scaleX:4.00, scaleY:2.75, anchorX:0,   anchorY:15 },
+  hit:    { file:'hit.png',    frames:4,  cols:4, speed:90,  scaleX:4.00, scaleY:3.80, anchorX:0,   anchorY:0  },
+  attack: { file:'attack.png', frames:6,  cols:6, speed:70,  scaleX:3.40, scaleY:3.45, anchorX:0,   anchorY:0  },
+  laser:  { file:'laser.png',  frames:4,  cols:4, speed:120, scaleX:4.00, scaleY:2.70, anchorX:0,   anchorY:0  },
+  frozen: { file:'frozen.png', frames:1,  cols:1, speed:300, scaleX:0.75, scaleY:0.62, anchorX:0,   anchorY:17 },
+  dead:   { file:'dead.png',   frames:1,  cols:1, speed:300, scaleX:1.35, scaleY:1.60, anchorX:19,  anchorY:180}
 };
 
 function spriteConfigFor(t){ return (t==='kano')?KANO_SPRITE_CONFIG:(ENEMY_SPRITE_CONFIG[t]||null); }
@@ -496,7 +496,7 @@ function previewAnim(anim){
 }
 function onLiveWH(k,wh,v, el){ 
   if(isLocked) return; 
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   v=parseFloat(v); 
   if(wh==='w') cfg.scaleX=v; else cfg.scaleY=v;
@@ -510,7 +510,7 @@ function onLiveWH(k,wh,v, el){
 }
 function onLiveY(k,v, el){ 
   if(isLocked) return; 
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   cfg.anchorY=parseInt(v);
   try{
@@ -523,7 +523,7 @@ function onLiveY(k,v, el){
 }
 function onLiveX(k,v, el){ 
   if(isLocked) return; 
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   cfg.anchorX=parseInt(v);
   try{
@@ -536,7 +536,7 @@ function onLiveX(k,v, el){
 }
 function onLiveWHNumber(k,wh,v, el){
   if(isLocked) return;
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   v=parseFloat(v); 
   if(wh==='w') cfg.scaleX=v; else cfg.scaleY=v;
@@ -550,14 +550,14 @@ function onLiveWHNumber(k,wh,v, el){
 }
 function onLiveXNumber(k,v, el){
   if(isLocked) return;
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   cfg.anchorX=parseInt(v);
   try{ var parent=el.parentElement; var range=parent.querySelector('input[type="range"]'); if(range) range.value=v; }catch(e){}
 }
 function onLiveYNumber(k,v, el){
   if(isLocked) return;
-  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:ENEMY_SPRITE_CONFIG[currentEditChar][k]; 
+  var cfg=currentEditChar==='player'?SPRITE_CONFIG[k]:(spriteConfigFor(currentEditChar)||{})[k]; 
   if(!cfg) return; 
   cfg.anchorY=parseInt(v);
   try{ var parent=el.parentElement; var range=parent.querySelector('input[type="range"]'); if(range) range.value=v; }catch(e){}
@@ -956,8 +956,6 @@ function initWinterMenu(){
     }
   }
   function animateSnow(){
-window.__rf=(window.__rf||0)+1;
-
     if(!menuSnowRunning) return;
     ctx.clearRect(0,0,canvas.width,canvas.height);
     // canvas dots
@@ -1611,8 +1609,6 @@ if(b.__rf===window.__rf) return; b.__rf=window.__rf;
 
 
 function drawEnemy(e){
-if(e.__rf===window.__rf) return; e.__rf=window.__rf;
-
   try{ if(e.type==='kano' || e.name==='Kano'){ drawBossSprite(e); return; } }catch(err){}
 
   var ex=Math.round(e.x-camera.x);
@@ -2627,8 +2623,6 @@ if(boss && boss.dead){ boss.anim='dead'; boss.frameTime=(boss.frameTime||0)+16; 
     // --- RENDER ---
 // --- DEPTH SORTING POR Y v3.22 - FIX PISADA + 8 NIVELES + NIEVE ---
     try{
-window.__rf=(window.__rf||0)+1;
-
       var drawList = [];
       if(typeof player!=='undefined' && player){
         drawList.push({type:'player', y: (typeof playerLaneY!=='undefined'?playerLaneY: laneBottom), obj: player});
