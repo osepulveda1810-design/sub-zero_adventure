@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURACIÓN GLOBAL - Solo configuraciones, sin variables de estado
+// CONFIGURACIÓN GLOBAL - Solo configuraciones
 // ============================================================
 
 // --- SPRITES DEL JUGADOR ---
@@ -48,14 +48,14 @@ const ICE_SPEED = 7.5;
 // --- NIVELES ---
 const LEVELS = [
     { id: 0, name: "🎨 MODO EDICION", subtitle: "Laboratorio sin enemigos", boss: "Ninguno", bossTitle: "Modo Seguro", story: "Dojo privado para probar sprites sin enemigos.", bgColor: [12, 14, 28], groundColor: [35, 40, 55], enemyTypes: [], enemyCount: 0, isEditor: true },
-{ id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug', 'thug_gun', 'ninja_renegade'], enemyCount: 12 },
-{ id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic', 'technician', 'sektor_miniboss'], enemyCount: 13 },
-{ id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade', 'tarkatan', 'priest_quan'], enemyCount: 14 },
-{ id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio", story: "Sigues el rastro del mapa robado hasta un pantano tenebroso.", bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie', 'reptile_mutant', 'shadow_ghost'], enemyCount: 14 },
-{ id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico", story: "Descubres que Kano no actuaba solo.", bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite', 'cyborg_upgrade', 'assassin_lk'], enemyCount: 14 },
-{ id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan', 'sindel_priest', 'shadow_knight'], enemyCount: 15 },
-{ id: 7, name: "Templo de la Oscuridad", subtitle: "Alma Corrupta", boss: "Shang Tsung", bossTitle: "Hechicero de Almas", story: "Shang Tsung roba almas para abrir el portal.", bgColor: [20, 10, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre', 'demon_quan', 'statue'], enemyCount: 15 },
-{ id: 8, name: "Infierno de Quan Chi", subtitle: "El Final del Linaje", boss: "Noob Saibot", bossTitle: "La Sombra de Bi-Han", story: "Tu hermano ha vuelto como espectro. Debes liberarlo.", bgColor: [30, 10, 10], groundColor: [50, 15, 10], enemyTypes: ['demon_lord', 'shadow_clone', 'hell_beast'], enemyCount: 16 }
+    { id: 1, name: "Calles de la Ciudad", subtitle: "El Frio Amanece", boss: "Kano", bossTitle: "Lider del Dragon Negro", story: "Tras la muerte de tu hermano Bi-Han, descubres que mercenarios del Dragon Negro secuestran civiles para experimentos del clan Lin Kuei. Debes detenerlos.", bgColor: [15, 20, 35], groundColor: [40, 45, 60], enemyTypes: ['thug', 'thug_gun', 'ninja_renegade'], enemyCount: 12 },
+    { id: 2, name: "Fabrica Abandonada", subtitle: "El Frio de la Maquina", boss: "Sektor", bossTitle: "Ciborg del Lin Kuei", story: "Rastreas los secuestros hasta una fabrica donde el Lin Kuei transforma a sus miembros en ciborgs asesinos. Sektor te espera.", bgColor: [25, 20, 15], groundColor: [55, 50, 40], enemyTypes: ['cyborg_basic', 'technician', 'sektor_miniboss'], enemyCount: 13 },
+    { id: 3, name: "Templo Shaolin", subtitle: "Sangre sobre los Sagrados", boss: "Baraka", bossTitle: "Guerrero Tarkatano", story: "Los monjes shaolin son masacrados por Tarkatanos de Outworld.", bgColor: [30, 25, 20], groundColor: [80, 70, 50], enemyTypes: ['monk_renegade', 'tarkatan', 'priest_quan'], enemyCount: 14 },
+    { id: 4, name: "El Pantano", subtitle: "Niebla Traicionera", boss: "Reptile", bossTitle: "Espia Saurio", story: "Sigues el rastro del mapa robado hasta un pantano tenebroso.", bgColor: [15, 25, 15], groundColor: [35, 55, 30], enemyTypes: ['zombie', 'reptile_mutant', 'shadow_ghost'], enemyCount: 14 },
+    { id: 5, name: "Fortaleza del Dragon Negro", subtitle: "Corazon de la Traicion", boss: "Cyrax", bossTitle: "Ciborg Tragico", story: "Descubres que Kano no actuaba solo.", bgColor: [35, 15, 10], groundColor: [60, 30, 20], enemyTypes: ['soldier_elite', 'cyborg_upgrade', 'assassin_lk'], enemyCount: 14 },
+    { id: 6, name: "Costa de Outworld", subtitle: "Puerta al Infierno", boss: "Goro", bossTitle: "Principe Shokan", story: "Cruzas a Outworld para enfrentar al verdadero villano.", bgColor: [45, 20, 35], groundColor: [70, 40, 55], enemyTypes: ['shokan', 'sindel_priest', 'shadow_knight'], enemyCount: 15 },
+    { id: 7, name: "Templo de la Oscuridad", subtitle: "Alma Corrupta", boss: "Shang Tsung", bossTitle: "Hechicero de Almas", story: "Shang Tsung roba almas para abrir el portal.", bgColor: [20, 10, 30], groundColor: [50, 40, 60], enemyTypes: ['spectre', 'demon_quan', 'statue'], enemyCount: 15 },
+    { id: 8, name: "Infierno de Quan Chi", subtitle: "El Final del Linaje", boss: "Noob Saibot", bossTitle: "La Sombra de Bi-Han", story: "Tu hermano ha vuelto como espectro. Debes liberarlo.", bgColor: [30, 10, 10], groundColor: [50, 15, 10], enemyTypes: ['demon_lord', 'shadow_clone', 'hell_beast'], enemyCount: 16 }
 ];
 
 // --- CONFIGURACIÓN DE ENEMIGOS ---
@@ -137,36 +137,10 @@ const KANO_SPRITE_CONFIG = {
     dead: { file: 'dead.png', frames: 1, cols: 1, speed: 300, scaleX: 1.35, scaleY: 1.60, anchorX: 19, anchorY: 180 }
 };
 
-// --- FUNCIÓN AUXILIAR PARA OBTENER CONFIG DE SPRITE POR TIPO ---
+// --- FUNCIÓN AUXILIAR ---
 function spriteConfigFor(type) {
     if (type === 'kano') return KANO_SPRITE_CONFIG;
     return ENEMY_SPRITE_CONFIG[type] || null;
 }
 
-// --- CARGA DE CONFIGURACIÓN GUARDADA ---
-(function() {
-    try {
-        const saved = localStorage.getItem('sz_sprite_config_v3.22_FINAL');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            Object.keys(parsed).forEach(key => {
-                if (SPRITE_CONFIG[key]) {
-                    Object.assign(SPRITE_CONFIG[key], parsed[key]);
-                }
-            });
-        }
-        const iceSaved = localStorage.getItem('sz_ice_align');
-        if (iceSaved) {
-            const parsed = JSON.parse(iceSaved);
-            if (parsed) Object.assign(ICE_ALIGN, parsed);
-        }
-        const floorOffset = localStorage.getItem('sz_floor_offset');
-        if (floorOffset) FLOOR_REF_OFFSET = parseInt(floorOffset) || 32;
-        const topLimit = localStorage.getItem('sz_top_limit');
-        if (topLimit) TOP_LIMIT_OFFSET = parseInt(topLimit) || 0;
-    } catch (e) {
-        console.warn('Error cargando configuración guardada:', e);
-    }
-})();
-
-console.log('✅ config.js cargado correctamente');
+console.log('✅ config.js cargado');

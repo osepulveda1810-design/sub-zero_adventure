@@ -1,738 +1,570 @@
 // ============================================================
-// MAIN - Bucle principal, estados del juego, eventos
+// EDITOR EN VIVO - Edición de sprites y controles (SOLO FUNCIONES)
 // ============================================================
 
-// Variables globales del juego
-let canvas, ctx;
-let camera = { x: 0, targetX: 0, worldWidth: 3500, shake: 0 };
-let currentState = 'MENU';
-let currentLevel = 0;
-let score = 0;
-let isPaused = false;
-let gameLoopStarted = false;
-let lastFrameTime = 0;
-let frameDt = 16;
-let keys = { right: false, left: false, up: false, down: false };
+let liveEditorOpen = false;
+let isLocked = false;
+let currentEditChar = 'player';
+let dummyEnemy = null;
 
-// Variables de escena
-let projectiles = [];
-let crates = [];
-let pickups = [];
-let floatingTexts = [];
-let particles = [];
-let iceTrails = [];
-let iceShatters = [];
-let frostDecals = [];
-let bossProjectiles = [];
-let spawnTimer = 0;
-
-// --- Inicialización ---
-
-document.addEventListener('DOMContentLoaded', function() {
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-
-    // Configurar canvas
-    setupCanvas();
-
-    // Inicializar sprites
-    initSprites();
-
-    // Configurar eventos
-    setupEventListeners();
-
-    // Mostrar menú principal
-    showMenu('main');
-
-    // Iniciar menú de nieve
-    setTimeout(() => {
-        const mainMenu = document.getElementById('menu-main');
-        if (mainMenu && mainMenu.style.display !== 'none') {
-            initWinterMenu();
-        }
-    }, 300);
-
-    // Cargar configuración guardada
-    loadCtrlCfg();
-    loadControlsOpacity();
-    refreshContinueButton();
-});
-
-// --- Configuración del canvas ---
-
-function setupCanvas() {
+// --- EDITOR DE SPRITES ---
+function buildLiveEditor() {
     try {
-        const wrapper = document.getElementById('canvas-wrapper');
-        const w = wrapper.clientWidth || window.innerWidth;
-        const h = wrapper.clientHeight || window.innerHeight - 62;
-        canvas.width = w;
-        canvas.height = h;
-        camera.worldWidth = getWorldWidthForLevel(currentLevel);
-
-        const baseBottom = h - 90;
-        const baseTop = Math.max(120, baseBottom - 200);
-        const oldTop = laneTop, oldBottom = laneBottom;
-
-        if (typeof FLOOR_REF_OFFSET !== 'undefined') {
-            laneTop = baseTop + TOP_LIMIT_OFFSET;
-            laneBottom = Math.floor(h * LANE_BOTTOM_RATIO);
-        } else {
-            laneTop = baseTop;
-            laneBottom = Math.floor(h * LANE_BOTTOM_RATIO);
+        populateEditorSelector();
+        const list = document.getElementById('live-list');
+        if (!list) return;
+        list.innerHTML = '';
+        
+        const cfgSet = currentEditChar === 'player' ? SPRITE_CONFIG : spriteConfigFor(currentEditChar);
+        if (!cfgSet) return;
+        
+        if (currentEditChar !== 'player') {
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = 'background:rgba(0,0,0,0.3);border-radius:8px;padding:8px;margin-bottom:10px;font-size:10px;color:#7ef0ff;';
+            const es = enemySprites[currentEditChar] || {};
+            const est = enemyStatus[currentEditChar] || {};
+            let okCount = 0, totalCount = 0;
+            const statusLines = [];
+            Object.keys(cfgSet).forEach(k => {
+                totalCount++;
+                const st = est[k] || 'loading';
+                if (st === 'ok') okCount++;
+                const color = st === 'ok' ? '#4ecca3' : st === 'fail' ? '#ff4444' : '#facc15';
+                statusLines.push('<span style="color:' + color + '">● ' + k + ': ' + st + '</span>');
+            });
+            statusDiv.innerHTML = '<div style="font-weight:800;margin-bottom:4px">SPRITE STATUS: ' + okCount + '/' + totalCount + ' OK</div><div style="display:flex;flex-wrap:wrap;gap:6px">' + statusLines.join(' ') + '</div>';
+            list.appendChild(statusDiv);
         }
-
-        const clampY = function(y) {
-            return Math.max(laneTop, Math.min(laneBottom, y));
-        };
-
-        if (typeof oldTop === 'number' && typeof oldBottom === 'number' && oldBottom > oldTop && laneBottom > laneTop) {
-            const rescaleY = function(y) {
-                return clampY(laneTop + (y - oldTop) * (laneBottom - laneTop) / (oldBottom - oldTop));
-            };
-            playerLaneY = rescaleY(playerLaneY);
-            for (let i = 0; i < enemies.length; i++) enemies[i].laneY = rescaleY(enemies[i].laneY);
-            for (let c = 0; c < crates.length; c++) crates[c].laneY = rescaleY(crates[c].laneY);
-            for (let p = 0; p < pickups.length; p++) pickups[p].laneY = rescaleY(pickups[p].laneY);
-            if (boss && !boss.dead) boss.laneY = rescaleY(boss.laneY);
-        } else {
-            playerLaneY = laneBottom;
+        
+        if (currentEditChar === 'player') {
+            const iceDiv = buildIceEditor();
+            if (iceDiv) list.appendChild(iceDiv);
         }
-
-        if (camera.x > camera.worldWidth - w) camera.x = Math.max(0, camera.worldWidth - w);
+        
+        const order = ['idle', 'walk', 'punch', 'kick', 'hit', 'jump', 'ice_attack', 'punch_air', 'kick_air', 'frozen', 'dead'];
+        const keys = Object.keys(cfgSet).sort((a, b) => {
+            let ia = order.indexOf(a), ib = order.indexOf(b);
+            if (ia === -1) ia = 999;
+            if (ib === -1) ib = 999;
+            return ia - ib;
+        });
+        
+        keys.forEach(k => {
+            const cfg = cfgSet[k];
+            if (!cfg) return;
+            const div = document.createElement('div');
+            div.className = 'live-item';
+            div.dataset.anim = k;
+            const sx = cfg.scaleX != null ? cfg.scaleX : (cfg.scale || 1);
+            const sy = cfg.scaleY != null ? cfg.scaleY : (cfg.scale || 1);
+            const ax = cfg.anchorX || 0;
+            const ay = cfg.anchorY || 0;
+            const frames = cfg.frames || 1;
+            
+            div.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <b style="color:#7ef0ff;font-size:11px">${k.toUpperCase()}</b>
+                        <span style="font-size:8px;background:rgba(126,240,255,0.15);color:#7ef0ff;padding:2px 6px;border-radius:10px">${frames}F</span>
+                        <span style="font-size:8px;opacity:0.4">${cfg.file || ''}</span>
+                    </div>
+                    <button class="btn-live-sm" onclick="previewAnim('${k}')" style="background:rgba(126,240,255,0.25);color:#7ef0ff;font-weight:800">▶ PROBAR</button>
+                </div>
+                <div class="live-control">
+                    <label>ANCHO</label>
+                    <input type="range" min="0.05" max="4" step="0.05" value="${sx}" oninput="onLiveWH('${k}','w',this.value,this)">
+                    <input type="number" value="${sx.toFixed(2)}" step="0.05" oninput="onLiveWHNumber('${k}','w',this.value,this)">
+                </div>
+                <div class="live-control">
+                    <label>ALTO</label>
+                    <input type="range" min="0.05" max="4" step="0.05" value="${sy}" oninput="onLiveWH('${k}','h',this.value,this)">
+                    <input type="number" value="${sy.toFixed(2)}" step="0.05" oninput="onLiveWHNumber('${k}','h',this.value,this)">
+                </div>
+                <div class="live-control">
+                    <label>X</label>
+                    <input type="range" min="-80" max="80" step="1" value="${ax}" oninput="onLiveX('${k}',this.value,this)">
+                    <input type="number" value="${ax}" oninput="onLiveXNumber('${k}',this.value,this)">
+                </div>
+                <div class="live-control">
+                    <label>Y</label>
+                    <input type="range" min="-80" max="180" step="1" value="${ay}" oninput="onLiveY('${k}',this.value,this)">
+                    <input type="number" value="${ay}" oninput="onLiveYNumber('${k}',this.value,this)">
+                </div>
+            `;
+            list.appendChild(div);
+        });
     } catch (e) {
-        console.log(e);
+        console.error('Error en buildLiveEditor:', e);
     }
 }
 
-// --- Eventos ---
+// --- EDITOR DE LA BOLA DE HIELO ---
+function buildIceEditor() {
+    try {
+        if (currentEditChar !== 'player') return null;
+        const div = document.createElement('div');
+        div.className = 'live-item';
+        div.style.border = '1px solid rgba(126,240,255,0.3)';
+        
+        const la = (typeof ICE_ALIGN !== 'undefined' && ICE_ALIGN.loaded) ? ICE_ALIGN.loaded : { x: 15.1725, y: -105.4, scale: 1 };
+        const rad = (typeof ICE_ALIGN !== 'undefined' && ICE_ALIGN.ballRadius) ? ICE_ALIGN.ballRadius : 14;
+        
+        div.innerHTML = `
+            <div style="font-size:11px;font-weight:900;color:#7ef0ff;margin-bottom:10px">❄️ POSICIÓN DE LA BOLA (al lanzar)</div>
+            <div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:8px">Ajusta dónde aparece la bola en el frame de lanzamiento (frame 2)</div>
+            <div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px">
+                <div class="live-control">
+                    <label>X</label>
+                    <input type="range" min="-40" max="60" step="1" value="${la.x}" oninput="onIceAlign('loaded','x',this.value,this)">
+                    <input type="number" value="${la.x}" oninput="onIceAlign('loaded','x',this.value,this)">
+                </div>
+                <div class="live-control">
+                    <label>Y</label>
+                    <input type="range" min="-150" max="50" step="1" value="${la.y}" oninput="onIceAlign('loaded','y',this.value,this)">
+                    <input type="number" value="${la.y}" oninput="onIceAlign('loaded','y',this.value,this)">
+                </div>
+            </div>
+            <div class="live-control">
+                <label>RADIO BOLA</label>
+                <input type="range" min="5" max="30" step="1" value="${rad}" oninput="onIceRadius(this.value,this)">
+                <input type="number" value="${rad}" oninput="onIceRadius(this.value,this)">
+            </div>
+            <div style="display:flex;gap:6px;margin-top:8px">
+                <button class="btn-live-sm" onclick="tryIce()" style="flex:1">❄️ PROBAR HIELO</button>
+                <button class="btn-live-sm" onclick="exportIceAlign()" style="flex:1">📋 EXPORT ICE</button>
+            </div>
+        `;
+        return div;
+    } catch (e) {
+        console.error('Error en buildIceEditor:', e);
+        return null;
+    }
+}
 
-function setupEventListeners() {
-    // Botones del menú principal
-    document.getElementById('btn-play').addEventListener('click', function() {
-        startLevel(1);
-    });
-
-    document.getElementById('btn-levels').addEventListener('click', function() {
-        showMenu('levels');
-    });
-
-    document.getElementById('btn-how').addEventListener('click', function() {
-        showHowToPlay();
-    });
-
-    document.getElementById('btn-settings').addEventListener('click', function() {
-        showMenu('settings');
-    });
-
-    // Botón de inicio del juego
-    document.getElementById('btn-start-game').addEventListener('click', function() {
-        startGameInit();
-    });
-
-    // Botones de pausa
-    document.getElementById('btn-pause').addEventListener('click', function() {
-        if (currentState !== 'PLAYING' || isPaused) return;
-        isPaused = true;
-        showPauseOverlay();
-        document.getElementById('btn-pause').textContent = '▶ REANUDAR';
-    });
-
-    document.getElementById('btn-resume').addEventListener('click', function() {
-        resumeGame();
-    });
-
-    document.getElementById('btn-save').addEventListener('click', function() {
-        saveGameState();
-        const old = document.getElementById('btn-save').textContent;
-        document.getElementById('btn-save').textContent = '✔ GUARDADO';
-        setTimeout(() => {
-            document.getElementById('btn-save').textContent = old;
-        }, 1200);
-    });
-
-    document.getElementById('btn-exit').addEventListener('click', function() {
-        isPaused = false;
-        exitToMenu();
-    });
-
-    // Botón de continuar partida
-    document.getElementById('btn-continue').addEventListener('click', function() {
+// --- FUNCIONES DEL EDITOR ---
+function populateEditorSelector() {
+    try {
+        const sel = document.getElementById('editor-char-select');
+        if (!sel) return;
+        const currentVal = sel.value || currentEditChar || 'player';
+        const tipos = (typeof ENEMY_SPRITE_CONFIG !== 'undefined') ? Object.keys(ENEMY_SPRITE_CONFIG) : [];
+        sel.innerHTML = '<option value="player">PLAYER - Sub-Zero</option>';
+        tipos.sort().forEach(t => {
+            const opt = document.createElement('option');
+            opt.value = t;
+            opt.textContent = 'ENEMIGO - ' + t.toUpperCase();
+            sel.appendChild(opt);
+        });
         try {
-            const s = JSON.parse(localStorage.getItem('sz_save_v177'));
-            if (!s) return;
-            startLevel(s.level || 1);
-            score = s.score || 0;
-            player.health = (s.health != null) ? s.health : (player.maxHealth || 100);
-            enemiesDefeated = s.defeated || 0;
-            currentWave = Math.max(0, (s.wave || 1) - 1);
+            const optK = document.createElement('option');
+            optK.value = 'kano';
+            optK.textContent = 'JEFE - KANO';
+            sel.appendChild(optK);
         } catch (e) {}
-    });
-
-    // Botones de game over
-    document.getElementById('btn-retry').addEventListener('click', function() {
-        startLevel(currentLevel);
-    });
-
-    document.getElementById('btn-gameover-exit').addEventListener('click', function() {
-        exitToMenu();
-    });
-
-    // Editor en vivo
-    document.getElementById('btn-open-live').addEventListener('click', toggleLiveEditor);
-    document.getElementById('btn-editor-close').addEventListener('click', closeLiveEditor);
-    document.getElementById('btn-editor-open').addEventListener('click', openLiveEditor);
-
-    // Controles táctiles
-    document.getElementById('btn-ice').addEventListener('click', tryIce);
-    document.getElementById('btn-punch').addEventListener('click', tryPunch);
-    document.getElementById('btn-kick').addEventListener('click', tryKick);
-    document.getElementById('btn-jump').addEventListener('click', tryJump);
-
-    // Teclado
-    document.addEventListener('keydown', function(e) {
-        if ((e.code === 'KeyJ' || e.key === 'j' || e.key === 'J') && !e.repeat) {
-            e.preventDefault();
-            tryPunch();
-            return;
-        }
-        if ((e.code === 'KeyK' || e.key === 'k' || e.key === 'K') && !e.repeat) {
-            e.preventDefault();
-            tryKick();
-            return;
-        }
-        if (e.key === 'd' || e.key === 'ArrowRight') keys.right = true;
-        if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = true;
-        if (e.key === 'w' || e.key === 'ArrowUp') keys.up = true;
-        if (e.key === 's' || e.key === 'ArrowDown') keys.down = true;
-        if ((e.key === 'i' || e.key === 'I') && !e.repeat) {
-            tryIce();
-        }
-        if (e.code === 'Space') {
-            tryJump();
-        }
-    });
-
-    document.addEventListener('keyup', function(e) {
-        if (e.key === 'd' || e.key === 'ArrowRight') keys.right = false;
-        if (e.key === 'a' || e.key === 'ArrowLeft') keys.left = false;
-        if (e.key === 'w' || e.key === 'ArrowUp') keys.up = false;
-        if (e.key === 's' || e.key === 'ArrowDown') keys.down = false;
-    });
-
-        // Redimensionar
-        window.addEventListener('resize', function() {
-            if (currentState === 'PLAYING') {
-                try { setupCanvas(); } catch (e) {}
-            }
-        });
-
-        // Target de hielo con click/touch en enemigos
-        canvas.addEventListener('click', function(ev) {
-            if (!player.isIceAttacking) return;
-            const rect = canvas.getBoundingClientRect();
-            const sx = ev.clientX - rect.left;
-            const sy = ev.clientY - rect.top;
-            const worldX = camera.x + sx;
-            const worldY = laneTop + (sy / canvas.height) * (laneBottom - laneTop);
-            if (selectIceTargetAt(worldX, worldY)) {
-                player._manualLock = true;
-            }
-        });
-
-        canvas.addEventListener('touchstart', function(ev) {
-            if (!player.isIceAttacking) return;
-            if (ev.touches.length === 0) return;
-            const rect = canvas.getBoundingClientRect();
-            const t = ev.touches[0];
-            const sx = t.clientX - rect.left;
-            const sy = t.clientY - rect.top;
-            const worldX = camera.x + sx;
-            const worldY = laneTop + (sy / canvas.height) * (laneBottom - laneTop);
-            if (selectIceTargetAt(worldX, worldY)) {
-                player._manualLock = true;
-                ev.preventDefault();
-            }
-        }, { passive: false });
-}
-
-// --- Bucle principal ---
-
-function loop(time) {
-    requestAnimationFrame(loop);
-
-    if (currentState !== 'PLAYING') {
-        lastFrameTime = time;
-        return;
-    }
-    if (isPaused) {
-        lastFrameTime = time;
-        return;
-    }
-
-    const rawDt = time - lastFrameTime;
-    lastFrameTime = time;
-    if (!(rawDt > 0)) return;
-    if (rawDt > 50) rawDt = 50;
-    frameDt = rawDt * GAME_SPEED;
-
-    // Actualizar
-    update();
-
-    // Renderizar
-    render();
-}
-
-// --- Actualización ---
-
-function update() {
-    // Actualizar física del jugador
-    const moving = updatePlayerPhysics();
-
-    // Actualizar animación y combate del jugador
-    updatePlayer();
-
-    // Actualizar cámara
-    updateCamera();
-
-    // Actualizar enemigos
-    updateEnemies();
-
-    // Actualizar jefe
-    updateBoss();
-
-    // Actualizar proyectiles
-    updateProjectiles();
-
-    // Actualizar partículas y efectos
-    updateParticles();
-
-    // Actualizar cajas y pickups
-    updateCrates();
-    updatePickups();
-
-    // Sistema de oleadas
-    if (!bossSpawned && getAliveCount() === 0 && enemiesDefeated < LEVELS[currentLevel].enemyCount) {
-        if (!waitingForAdvance) {
-            prepareNextWaveAdvance();
-            spawnTimer = 0;
-        } else {
-            showWaveArrow(true, 'AVANZA - OLEADA ' + (currentWave + 1) + '/' + totalWaves + ' ➡️');
-            if (player.x >= nextWaveTriggerX - 20) {
-                spawnWave();
-                spawnTimer = 0;
-            }
-        }
-    } else if (getAliveCount() > 0) {
-        showWaveArrow(false);
-        waitingForAdvance = false;
-        spawnTimer = 0;
-    }
-
-    // Spawnear jefe
-    if (!bossSpawned && enemiesDefeated >= LEVELS[currentLevel].enemyCount && getAliveCount() === 0) {
-        spawnBoss();
-    }
-
-    // Game Over
-    if (player.health <= 0 && currentState === 'PLAYING') {
-        currentState = 'GAMEOVER';
-        isPaused = true;
-        try { showWaveArrow(false); } catch (e) {}
-        document.getElementById('hud').style.display = 'none';
-        document.getElementById('controls').style.display = 'none';
-        document.getElementById('btn-pause').style.display = 'none';
-        try {
-            document.getElementById('gameover-score').textContent = 'SCORE FINAL: ' + score + ' pts';
-        } catch (e) {}
-        showMenu('gameover');
-    }
-
-    // Victoria contra jefe
-    if (boss && boss.dead) {
-        spawnText(boss.x, boss.laneY - 30, 'VICTORIA!', '#ffd700');
-        setTimeout(function() {
-            if (currentLevel < LEVELS.length - 1) {
-                currentLevel++;
-                startLevel(currentLevel);
-            } else {
-                currentState = 'MENU';
-                showMenu('main');
-            }
-        }, 1500);
-        boss = null;
-    }
-}
-
-// --- Renderizado ---
-
-function render() {
-    const lvl = LEVELS[currentLevel];
-
-    // Fondo
-    ctx.fillStyle = 'rgb(' + lvl.bgColor[0] + ',' + lvl.bgColor[1] + ',' + lvl.bgColor[2] + ')';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawLevelBackground(lvl);
-
-    // Cajas y pickups
-    drawCrates();
-    drawPickups();
-
-    // Dibujar objetos por profundidad (orden Y)
-    try {
-        const drawList = [];
-        if (typeof player !== 'undefined' && player) {
-            drawList.push({ type: 'player', y: (typeof playerLaneY !== 'undefined' ? playerLaneY : laneBottom), obj: player });
-        }
-        for (let i = 0; i < enemies.length; i++) {
-            const e = enemies[i];
-            if (e.dead) continue;
-            drawList.push({ type: 'enemy', y: e.laneY || 0, obj: e });
-        }
-        if (boss && !boss.dead) {
-            drawList.push({ type: 'boss', y: boss.laneY || 0, obj: boss });
-        }
-        drawList.sort((a, b) => a.y - b.y);
-
-        for (let i = 0; i < drawList.length; i++) {
-            const d = drawList[i];
-            if (d.type === 'player') {
-                drawPlayer(time);
-            } else if (d.type === 'enemy') {
-                drawEnemy(d.obj);
-            } else if (d.type === 'boss') {
-                drawBossSprite(d.obj);
-            }
-        }
-    } catch (err) {
-        // Fallback
-        for (let i = 0; i < enemies.length; i++) {
-            const e = enemies[i];
-            if (e.dead) continue;
-            drawEnemy(e);
-        }
-        if (boss && !boss.dead) drawBossSprite(boss);
-        drawPlayer(time);
-    }
-
-    // Proyectiles
-    for (let i = 0; i < projectiles.length; i++) {
-        const p = projectiles[i];
-        if (p.type !== 'ice') continue;
-        drawIceBall(p);
-    }
-
-    // Láser del jefe
-    for (let i = 0; i < bossProjectiles.length; i++) {
-        drawLaser(bossProjectiles[i]);
-    }
-
-    // Efectos de hielo
-    for (let i = 0; i < iceTrails.length; i++) {
-        const tr = iceTrails[i];
-        const tdx = Math.round(tr.x - camera.x);
-        const ta = (tr.life / tr.maxLife);
-        ctx.globalAlpha = ta * 0.85;
-        if (tr.gold) {
-            ctx.fillStyle = '#d4af37';
-            ctx.shadowColor = '#d4af37';
-            ctx.shadowBlur = 6;
-            ctx.beginPath();
-            ctx.arc(tdx, tr.y, tr.size * ta, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.shadowBlur = 0;
-        } else {
-            ctx.fillStyle = '#7ef0ff';
-            ctx.beginPath();
-            ctx.arc(tdx, tr.y, tr.size * ta, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-    }
-
-    for (let i = 0; i < iceShatters.length; i++) {
-        const sh = iceShatters[i];
-        const sdx = Math.round(sh.x - camera.x);
-        const sa = (sh.life / sh.maxLife);
-        ctx.save();
-        ctx.translate(sdx, sh.y);
-        ctx.rotate(sh.rot);
-        ctx.globalAlpha = sa;
-        ctx.fillStyle = sh.cyan ? '#7ef0ff' : (sh.gold ? '#d4af37' : '#a5f3ff');
-        ctx.beginPath();
-        ctx.moveTo(-sh.size, 0);
-        ctx.lineTo(0, -sh.size * 0.6);
-        ctx.lineTo(sh.size, 0);
-        ctx.lineTo(0, sh.size * 0.6);
-        ctx.closePath();
-        ctx.fill();
-        if (!sh.gold) {
-            ctx.fillStyle = 'rgba(255,255,255,0.8)';
-            ctx.beginPath();
-            ctx.arc(0, 0, sh.size * 0.25, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.restore();
-        ctx.globalAlpha = 1;
-    }
-
-    // Target de hielo
-    drawIceTargeting();
-
-    // Textos flotantes
-    for (let i = floatingTexts.length - 1; i >= 0; i--) {
-        const ft = floatingTexts[i];
-        ft.timer += 16;
-        ft.y += ft.vy;
-        ctx.fillStyle = ft.color;
-        ctx.font = 'bold 12px sans-serif';
-        ctx.fillText(ft.text, ft.x - camera.x, ft.y);
-        if (ft.timer >= ft.life) floatingTexts.splice(i, 1);
-    }
-
-    // Información en pantalla
-    ctx.fillStyle = '#7ef0ff';
-    ctx.font = 'bold 12px monospace';
-    ctx.fillText('NIVEL ' + (currentLevel + 1) + ' - ' + lvl.name, 14, 26);
-    ctx.fillStyle = 'rgba(126,240,255,0.5)';
-    ctx.font = '10px monospace';
-    const okCount = Object.values(spriteStatus).filter(s => s === 'ok').length;
-    ctx.fillText('Sprites: ' + okCount + '/' + Object.keys(spriteStatus).length + ' OK', 14, 42);
-
-    // HUD
-    drawHUD();
-}
-
-// --- Funciones de cámara ---
-
-function updateCamera() {
-    const cw = canvas.width;
-    camera.targetX = player.x - cw * 0.50;
-    camera.x += (camera.targetX - camera.x) * 0.35;
-    camera.x = Math.max(0, Math.min(camera.x, camera.worldWidth - cw));
-    if (camera.shake > 0) camera.shake -= 16;
-}
-
-function getWorldWidthForLevel(i) {
-    return i === 0 ? 3600 : 4800;
-}
-
-// --- Funciones de estado del juego ---
-
-function startLevel(idx) {
-    try {
-        currentLevel = idx;
-        camera.worldWidth = getWorldWidthForLevel(idx);
-        camera.x = 0;
-        camera.targetX = 0;
-
-        // Resetear estado
-        enemies = [];
-        boss = null;
-        projectiles = [];
-        iceTrails = [];
-        iceShatters = [];
-        frostDecals = [];
-        crates = [];
-        bossProjectiles = [];
-        pickups = [];
-        floatingTexts = [];
-        enemiesDefeated = 0;
-        bossSpawned = false;
-        currentWave = 0;
-        waitingForAdvance = false;
-        showWaveArrow(false);
-        resetWaves();
-
-        player.x = 120;
-        player.health = 100;
-        score = 0;
-
-        setupCanvas();
-
-        const lvl = LEVELS[idx];
-        document.getElementById('story-title').textContent = lvl.name;
-        document.getElementById('story-sub').textContent = lvl.subtitle;
-        document.getElementById('story-text').textContent = lvl.story;
-        document.getElementById('story-boss').textContent = 'JEFE: ' + lvl.boss + ' - ' + lvl.bossTitle;
-        document.getElementById('story-meta').textContent = 'Mundo: ' + camera.worldWidth + 'px • Enemigos: ' + lvl.enemyCount + ' • Tipos: ' + lvl.enemyTypes.join(', ');
-
-        showMenu('story');
-        setTimeout(function() {
-            if (typeof spawnWave === 'function') {
-                spawnWave();
-            }
-        }, 400);
-
-        updateLiveButtonVisibility();
-
-        const bo = document.getElementById('btn-editor-open');
-        const isEd = !!(LEVELS[currentLevel] && LEVELS[currentLevel].isEditor);
-        if (bo) bo.style.display = isEd ? 'block' : 'none';
-        if (isEd) {
-            openLiveEditor();
-        } else {
-            closeLiveEditor();
-        }
+        if (currentVal) sel.value = currentVal;
     } catch (e) {
-        alert('Error nivel: ' + e.message);
+        console.error('Error en populateEditorSelector:', e);
     }
 }
 
-function startGameInit() {
-    try {
-        setupCanvas();
-        if (!laneTop) {
-            laneTop = 180;
-            laneBottom = 360;
-            playerLaneY = 360;
-        }
-        currentState = 'PLAYING';
-        isPaused = false;
-
-        document.querySelectorAll('.menu-overlay').forEach(function(m) {
-            m.style.display = 'none';
-        });
-
-        document.getElementById('hud').style.display = 'flex';
-        document.getElementById('top-bar').style.display = 'none';
-        document.getElementById('btn-pause').style.display = 'block';
-        document.getElementById('btn-pause').textContent = '⏸ PAUSA';
-        document.getElementById('controls').style.display = 'flex';
-
-        if (!gameLoopStarted) {
-            gameLoopStarted = true;
-            lastFrameTime = performance.now();
-            requestAnimationFrame(loop);
-        }
-    } catch (e) {
-        alert('Error inicio: ' + e.message);
+function changeCharacter(c) {
+    currentEditChar = c;
+    const sel = document.getElementById('editor-char-select');
+    if (sel) sel.value = c;
+    
+    if (dummyEnemy) {
+        const idx = enemies.indexOf(dummyEnemy);
+        if (idx >= 0) enemies.splice(idx, 1);
+        try { dummyEnemy.dead = true; } catch (e) {}
+        dummyEnemy = null;
     }
-}
-
-function pauseGame() {
-    if (currentState !== 'PLAYING') return;
-    isPaused = true;
-    showMenu('pause');
-    document.getElementById('controls').style.display = 'none';
-}
-
-function resumeGame() {
-    isPaused = false;
-    document.querySelectorAll('.menu-overlay').forEach(function(m) {
-        m.style.display = 'none';
-    });
-    document.getElementById('hud').style.display = 'flex';
-    document.getElementById('controls').style.display = 'flex';
-    lastFrameTime = performance.now();
-}
-
-function saveGameState() {
-    try {
-        const data = {
-            level: currentLevel,
-            score: score,
-            health: player.health,
-            wave: currentWave,
-            defeated: enemiesDefeated
-        };
-        localStorage.setItem('sz_save_v177', JSON.stringify(data));
-        refreshContinueButton();
-    } catch (e) {}
-}
-
-function exitToMenu() {
-    document.getElementById('ctrl-editor-panel').style.display = 'none';
-    currentState = 'MENU';
-    isPaused = false;
-    document.getElementById('top-bar').style.display = 'flex';
-    showMenu('main');
-    document.getElementById('hud').style.display = 'none';
-    document.getElementById('controls').style.display = 'none';
     enemies = [];
-    boss = null;
-    projectiles = [];
-    iceTrails = [];
-    iceShatters = [];
-    frostDecals = [];
-    attachedIce = null;
-    resetWaves();
-    updateLiveButtonVisibility();
-    refreshContinueButton();
+    
+    if (c === 'player') {
+        if (player) {
+            player.x = (camera ? camera.x : 0) + canvas.width / 2 - 100;
+            playerLaneY = (laneTop + laneBottom) / 2;
+        }
+        buildLiveEditor();
+        return;
+    }
+    
+    const cx = canvas.width / 2 + (camera ? camera.x : 0);
+    const cy = (laneTop + laneBottom) / 2;
+    
+    if (c === 'kano') {
+        try {
+            dummyEnemy = createBoss('Kano', cx, cy);
+            if (dummyEnemy) {
+                dummyEnemy.health = 9999;
+                dummyEnemy.maxHealth = 9999;
+                dummyEnemy.isDummy = true;
+                dummyEnemy.type = 'kano';
+                dummyEnemy.laneY = cy;
+                dummyEnemy.x = cx;
+                dummyEnemy.isMoving = false;
+                dummyEnemy.attacking = false;
+                dummyEnemy.frozen = 0;
+                dummyEnemy.previewAnim = null;
+                dummyEnemy.facingRight = false;
+                dummyEnemy.frame = 0;
+                dummyEnemy.frameTime = 0;
+                dummyEnemy.attackTimer = 0;
+                dummyEnemy.anim = 'idle';
+                enemies = [dummyEnemy];
+            }
+        } catch (e) { console.error(e); }
+        buildLiveEditor();
+        return;
+    }
+    
+    if (typeof createEnemy === 'function') {
+        try {
+            dummyEnemy = createEnemy(c, cx, cy);
+            if (dummyEnemy) {
+                dummyEnemy.health = 9999;
+                dummyEnemy.maxHealth = 9999;
+                dummyEnemy.isDummy = true;
+                dummyEnemy.laneY = cy;
+                dummyEnemy.x = cx;
+                dummyEnemy.isMoving = false;
+                dummyEnemy.attacking = false;
+                dummyEnemy.frozen = 0;
+                dummyEnemy.previewAnim = null;
+                dummyEnemy.facingRight = false;
+                dummyEnemy.frame = 0;
+                dummyEnemy.frameTime = 0;
+                dummyEnemy.attackTimer = 0;
+                enemies = [dummyEnemy];
+            }
+        } catch (e) { console.error(e); }
+    }
+    buildLiveEditor();
 }
 
-function showHowToPlay() {
-    showMenu('howtoplay');
-}
-
-// --- Menús ---
-
-function hideAllMenus() {
-    const ids = ['menu-main', 'menu-levels', 'menu-controls', 'menu-settings', 'menu-sprites', 'menu-story'];
-    for (let i = 0; i < ids.length; i++) {
-        const el = document.getElementById(ids[i]);
-        if (el) el.style.display = 'none';
+function previewAnim(anim) {
+    if (currentEditChar === 'player') {
+        if (!player) return;
+        player.anim = anim;
+        player.frame = 0;
+        player.frameTime = 0;
+        if (anim === 'punch') {
+            player.isPunching = true;
+            player.punchTimer = 0;
+        }
+        if (anim === 'kick') {
+            player.isKicking = true;
+            player.kickTimer = 0;
+        }
+        if (anim === 'jump') {
+            player.grounded = false;
+            player.vy = -12;
+        }
+        if (anim === 'ice_attack') {
+            player.isIceAttacking = true;
+            player.iceAttackTimer = 0;
+            player.iceShotFired = false;
+        }
+    } else {
+        if (!dummyEnemy) return;
+        dummyEnemy.previewAnim = anim;
+        dummyEnemy.previewTimer = 900;
+        dummyEnemy.frame = 0;
+        dummyEnemy.frameTime = 0;
+        if (anim === 'walk') {
+            dummyEnemy.isMoving = true;
+            dummyEnemy.attacking = false;
+        } else if (anim === 'punch' || anim === 'kick') {
+            dummyEnemy.attacking = true;
+            dummyEnemy.isMoving = false;
+            dummyEnemy.attackTimer = 0;
+        } else if (anim === 'hit') {
+            dummyEnemy.hitTimer = 90;
+        } else if (anim === 'frozen') {
+            dummyEnemy.frozen = 900;
+        } else if (anim === 'idle') {
+            dummyEnemy.isMoving = false;
+            dummyEnemy.attacking = false;
+            dummyEnemy.hitTimer = 0;
+            dummyEnemy.frozen = 0;
+        }
     }
 }
 
-function showMenu(id) {
+// --- FUNCIONES DE EDICIÓN DE SPRITES ---
+function onLiveWH(k, wh, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    v = parseFloat(v);
+    if (wh === 'w') cfg.scaleX = v;
+    else cfg.scaleY = v;
     try {
-        document.querySelectorAll('.menu-overlay').forEach(function(m) {
-            m.style.display = 'none';
-        });
-        const el = document.getElementById('menu-' + id);
-        if (el) el.style.display = 'flex';
-        if (id === 'main') {
-            document.getElementById('hud').style.display = 'none';
-            document.getElementById('btn-pause').style.display = 'none';
-            document.getElementById('controls').style.display = 'none';
+        if (el) {
+            const parent = el.parentElement;
+            const num = parent.querySelector('input[type="number"]');
+            if (num) num.value = v.toFixed(2);
         }
-        if (id === 'sprites') updateSpriteUI();
     } catch (e) {}
 }
 
-function showPauseOverlay() {
-    hideAllMenus();
-    const mp = document.getElementById('menu-pause');
-    if (mp) {
-        mp.style.display = 'flex';
-        mp.classList.add('active');
+function onLiveWHNumber(k, wh, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    v = parseFloat(v);
+    if (wh === 'w') cfg.scaleX = v;
+    else cfg.scaleY = v;
+    try {
+        if (el) {
+            const parent = el.parentElement;
+            const range = parent.querySelector('input[type="range"]');
+            if (range) range.value = v;
+        }
+    } catch (e) {}
+}
+
+function onLiveX(k, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    cfg.anchorX = parseInt(v);
+    try {
+        if (el) {
+            const parent = el.parentElement;
+            const num = parent.querySelector('input[type="number"]');
+            if (num) num.value = v;
+        }
+    } catch (e) {}
+}
+
+function onLiveXNumber(k, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    cfg.anchorX = parseInt(v);
+    try {
+        if (el) {
+            const parent = el.parentElement;
+            const range = parent.querySelector('input[type="range"]');
+            if (range) range.value = v;
+        }
+    } catch (e) {}
+}
+
+function onLiveY(k, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    cfg.anchorY = parseInt(v);
+    try {
+        if (el) {
+            const parent = el.parentElement;
+            const num = parent.querySelector('input[type="number"]');
+            if (num) num.value = v;
+        }
+    } catch (e) {}
+}
+
+function onLiveYNumber(k, v, el) {
+    if (isLocked) return;
+    const cfg = currentEditChar === 'player' ? SPRITE_CONFIG[k] : (spriteConfigFor(currentEditChar) || {})[k];
+    if (!cfg) return;
+    cfg.anchorY = parseInt(v);
+    try {
+        if (el) {
+            const parent = el.parentElement;
+            const range = parent.querySelector('input[type="range"]');
+            if (range) range.value = v;
+        }
+    } catch (e) {}
+}
+
+// --- FUNCIONES DE EDICIÓN DE HIELO ---
+function onIceAlign(mode, axis, v, el) {
+    try {
+        v = parseInt(v);
+        if (typeof ICE_ALIGN === 'undefined') window.ICE_ALIGN = { loaded: { x: 15.1725, y: -105.4, scale: 1 }, ballRadius: 14 };
+        if (!ICE_ALIGN[mode]) ICE_ALIGN[mode] = { x: 0, y: 0, scale: 1 };
+        ICE_ALIGN[mode][axis] = v;
+        localStorage.setItem('sz_ice_align', JSON.stringify(ICE_ALIGN));
+        if (el) {
+            const parent = el.parentElement;
+            const num = parent.querySelector('input[type="number"]');
+            if (num) num.value = v;
+        }
+    } catch (e) {}
+}
+
+function onIceRadius(v, el) {
+    try {
+        v = parseInt(v);
+        if (typeof ICE_ALIGN === 'undefined') window.ICE_ALIGN = { loaded: { x: 15.1725, y: -105.4, scale: 1 }, ballRadius: 14 };
+        ICE_ALIGN.ballRadius = v;
+        localStorage.setItem('sz_ice_align', JSON.stringify(ICE_ALIGN));
+        if (el) {
+            const parent = el.parentElement;
+            const num = parent.querySelector('input[type="number"]');
+            if (num) num.value = v;
+        }
+    } catch (e) {}
+}
+
+function exportIceAlign() {
+    try {
+        const lines = [
+            'const ICE_ALIGN = {',
+            '  loaded: { x: ' + (ICE_ALIGN.loaded.x * (typeof PLAYER_GLOBAL_SCALE !== 'undefined' ? PLAYER_GLOBAL_SCALE : 1)) + ', y: ' + (ICE_ALIGN.loaded.y * (typeof PLAYER_GLOBAL_SCALE !== 'undefined' ? PLAYER_GLOBAL_SCALE : 1)) + ', scale: ' + (ICE_ALIGN.loaded.scale || 1) + ' },',
+            '  ballRadius: ' + ICE_ALIGN.ballRadius,
+            '};'
+        ];
+        const a = document.getElementById('live-export');
+        if (a) {
+            a.style.display = 'block';
+            a.textContent = lines.join("\n");
+            try {
+                navigator.clipboard.writeText(lines.join("\n"));
+            } catch (e) {}
+            const fb = document.getElementById('sprite-save-feedback');
+            if (fb) {
+                fb.textContent = '📋 ICE copiado!';
+                fb.style.opacity = '1';
+                setTimeout(function() {
+                    fb.style.opacity = '0';
+                    fb.textContent = '✓ Guardado';
+                }, 2000);
+            }
+        }
+    } catch (e) {}
+}
+
+// --- EXPORTAR E IMPORTAR CONFIGURACIONES ---
+function exportLiveConfig() {
+    try {
+        const char = currentEditChar || 'player';
+        const cfgSet = (char === 'player') ? SPRITE_CONFIG : (spriteConfigFor(char) || {});
+        const lines = [];
+        
+        if (char === 'player') {
+            lines.push('// PLAYER - Sub-Zero');
+            lines.push('player: {');
+            Object.keys(cfgSet).forEach(k => {
+                const c = cfgSet[k];
+                lines.push('  ' + k + ': { file: "' + (c.file || k + '.png') + '", frames: ' + (c.frames || 1) + ', speed: ' + (c.speed || 100) + ', scaleX: ' + ((c.scaleX != null ? c.scaleX : c.scale) || 1).toFixed(2) + ', scaleY: ' + ((c.scaleY != null ? c.scaleY : c.scale) || 1).toFixed(2) + ', anchorX: ' + (c.anchorX || 0) + ', anchorY: ' + (c.anchorY || 0) + ' },');
+            });
+            lines.push('}');
+        } else if (char === 'kano') {
+            lines.push('// JEFE - KANO');
+            lines.push('// COPIA ESTO COMO KANO_SPRITE_CONFIG');
+            lines.push('var KANO_SPRITE_CONFIG={');
+            Object.keys(cfgSet).forEach(k => {
+                const c = cfgSet[k];
+                lines.push('  ' + k + ': { file: \'' + (c.file || k + '.png') + '\', frames: ' + (c.frames || 1) + ', cols: ' + (c.cols || c.frames || 1) + ', speed: ' + (c.speed || 100) + ', scaleX: ' + ((c.scaleX != null ? c.scaleX : c.scale) || 1).toFixed(2) + ', scaleY: ' + ((c.scaleY != null ? c.scaleY : c.scale) || 1).toFixed(2) + ', anchorX: ' + (c.anchorX || 0) + ', anchorY: ' + (c.anchorY || 0) + ' },');
+            });
+            lines.push('};');
+        } else {
+            lines.push('// ENEMIGO - ' + char.toUpperCase());
+            lines.push(char + ': {');
+            Object.keys(cfgSet).forEach(k => {
+                const c = cfgSet[k];
+                lines.push('  ' + k + ': { file: "' + (c.file || k + '.png') + '", frames: ' + (c.frames || 1) + ', speed: ' + (c.speed || 100) + ', scaleX: ' + ((c.scaleX != null ? c.scaleX : c.scale) || 1).toFixed(2) + ', scaleY: ' + ((c.scaleY != null ? c.scaleY : c.scale) || 1).toFixed(2) + ', anchorX: ' + (c.anchorX || 0) + ', anchorY: ' + (c.anchorY || 0) + ' },');
+            });
+            lines.push('},');
+            lines.push('');
+            lines.push('// COPIA ESTO DENTRO DE ENEMY_SPRITE_CONFIG');
+        }
+        
+        const a = document.getElementById('live-export');
+        if (a) {
+            a.style.display = 'block';
+            a.style.whiteSpace = 'pre-wrap';
+            a.style.fontSize = '10px';
+            a.style.maxHeight = '300px';
+            a.textContent = lines.join("\n");
+            try {
+                navigator.clipboard.writeText(lines.join("\n"));
+            } catch (e) {}
+        }
+    } catch (e) {
+        console.error('Error en exportLiveConfig:', e);
     }
 }
 
-function hideOverlays() {
-    const ms = document.querySelectorAll('.menu-overlay');
-    for (let i = 0; i < ms.length; i++) {
-        ms[i].style.display = 'none';
-        ms[i].classList.remove('active');
+function saveSpriteConfig() {
+    try {
+        const char = currentEditChar || 'player';
+        const cfgObj = (char === 'player') ? SPRITE_CONFIG : (spriteConfigFor(char) || null);
+        if (!cfgObj) return;
+        
+        if (char === 'kano') {
+            localStorage.setItem('kano_sprite_config', JSON.stringify(cfgObj));
+        } else if (char === 'player') {
+            localStorage.setItem('player_sprite_config', JSON.stringify(cfgObj));
+        } else {
+            localStorage.setItem('enemy_sprite_config_' + char, JSON.stringify(cfgObj));
+            if (ENEMY_SPRITE_CONFIG[char]) ENEMY_SPRITE_CONFIG[char] = cfgObj;
+        }
+        
+        const fb = document.getElementById('sprite-save-feedback');
+        if (fb) {
+            fb.textContent = '✓ Guardado';
+            fb.style.opacity = '1';
+            setTimeout(() => { fb.style.opacity = '0'; }, 2000);
+        }
+    } catch (e) {
+        console.error('Error en saveSpriteConfig:', e);
     }
 }
 
-// --- Utilidades del menú ---
-
-function refreshContinueButton() {
-    const b = document.getElementById('btn-continue');
-    if (!b) return;
-    let has = false;
-    try { has = !!localStorage.getItem('sz_save_v177'); } catch (e) {}
-    b.style.display = has ? 'block' : 'none';
+function moveLive(d) {
+    if (d === 'left') {
+        keys.left = true;
+        setTimeout(() => keys.left = false, 300);
+    }
+    if (d === 'right') {
+        keys.right = true;
+        setTimeout(() => keys.right = false, 300);
+    }
 }
 
-function updateLiveButtonVisibility() {
-    const b = document.getElementById('btn-open-live');
-    if (!b) return;
-    if (typeof currentState !== 'undefined' && currentState === 'PLAYING' && LEVELS[currentLevel] && LEVELS[currentLevel].isEditor) {
-        b.style.display = 'block';
+function toggleLiveEditor() {
+    const el = document.getElementById('live-editor');
+    const btn = document.getElementById('btn-open-live');
+    if (!el) return;
+    liveEditorOpen = !liveEditorOpen;
+    if (liveEditorOpen) {
+        el.classList.add('active');
+        el.style.display = 'block';
+        try { buildLiveEditor(); } catch (e) {}
+        if (btn) btn.textContent = '✕ CERRAR';
     } else {
-        b.style.display = 'none';
+        el.classList.remove('active');
+        el.style.display = 'none';
+        if (btn) btn.textContent = '🎚️ EDITOR';
     }
 }
 
-function updatePauseButton() {
-    const bp = document.getElementById('btn-pause');
-    if (!bp) return;
-    if (currentState === 'PLAYING') {
-        bp.style.display = 'block';
-    } else {
-        bp.style.display = 'none';
-    }
+function openLiveEditor() {
+    const el = document.getElementById('live-editor');
+    if (!el) return;
+    el.style.display = 'block';
+    el.classList.add('active');
+    liveEditorOpen = true;
+    try { buildLiveEditor(); } catch (e) {}
 }
+
+function closeLiveEditor() {
+    const el = document.getElementById('live-editor');
+    if (!el) return;
+    el.style.display = 'none';
+    el.classList.remove('active');
+    liveEditorOpen = false;
+}
+
+function toggleLock() {
+    isLocked = !isLocked;
+    const lb = document.getElementById('btn-lock');
+    if (lb) lb.textContent = isLocked ? '🔒 Bloqueado' : '🔓 Libre';
+}
+
+console.log('✅ editor.js cargado');

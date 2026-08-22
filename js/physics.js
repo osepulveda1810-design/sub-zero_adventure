@@ -1,19 +1,14 @@
 // ============================================================
-// FÍSICA - Gravedad, colisiones, movimiento
+// FÍSICA - Gravedad, colisiones, movimiento (SOLO FUNCIONES)
 // ============================================================
 
-// Variables globales de física
-let GRAVITY = 0.78;
-let JUMP_FORCE = -14.5;
-let JUMP_POWER = 1.25;
 let GAME_SPEED = 0.4;
 let DIST_STOP = 45;
 let DIST_DMG = 45;
 let DIST_BODY = 50;
 
-// Actualizar física del jugador
+// --- ACTUALIZAR FÍSICA DEL JUGADOR ---
 function updatePlayerPhysics() {
-    // Gravedad
     if (!player.grounded) {
         player.vy += GRAVITY;
         player.jumpOffset += player.vy;
@@ -26,8 +21,7 @@ function updatePlayerPhysics() {
     } else if (player.landingTimer > 0) {
         player.landingTimer -= 16;
     }
-
-    // Movimiento horizontal
+    
     let moving = false;
     if (!player.isIceAttacking && !player.isPunching && !player.isKicking) {
         if (keys.right) {
@@ -51,24 +45,22 @@ function updatePlayerPhysics() {
             }
         }
     }
-
-    // Guardar posición previa para colisiones
+    
     const prevX = player.x;
     const prevY = playerLaneY;
-
-    // Colisiones con enemigos
+    
     if (enemies && enemies.length > 0) {
         for (let i = 0; i < enemies.length; i++) {
             const e = enemies[i];
             if (e.isDummy || !e || e.dead) continue;
-
+            
             const dx = player.x - e.x;
             const dy = e.laneY - playerEffY();
             const absDx = Math.abs(dx);
             const absDy = Math.abs(dy);
             const minX = 64;
             const minY = 32;
-
+            
             if (absDx < minX && absDy < minY) {
                 if (e.attacking || e.hitTimer > 0 || e.frozen > 0) {
                     if (absDx < minX && absDx >= minY) {
@@ -98,8 +90,7 @@ function updatePlayerPhysics() {
             }
         }
     }
-
-    // Limitar movimiento dentro del mundo
+    
     const cw = canvas.width;
     const minX = camera.x + 55;
     const maxX = camera.x + cw - 75;
@@ -107,19 +98,18 @@ function updatePlayerPhysics() {
     if (player.x > maxX) player.x = maxX;
     if (player.x < 20) player.x = 20;
     if (player.x > camera.worldWidth - 60) player.x = camera.worldWidth - 60;
-
+    
     return moving;
 }
 
-// Detectar colisión entre dos objetos
+// --- COLISIONES ---
 function rectCollision(a, b) {
-    return a.x - a.width/2 < b.x + b.width/2 &&
-    a.x + a.width/2 > b.x - b.width/2 &&
-    a.y - a.height/2 < b.y + b.height/2 &&
-    a.y + a.height/2 > b.y - b.height/2;
+    return a.x - a.width / 2 < b.x + b.width / 2 &&
+        a.x + a.width / 2 > b.x - b.width / 2 &&
+        a.y - a.height / 2 < b.y + b.height / 2 &&
+        a.y + a.height / 2 > b.y - b.height / 2;
 }
 
-// Detectar colisión circular
 function circleCollision(x1, y1, r1, x2, y2, r2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
@@ -127,8 +117,9 @@ function circleCollision(x1, y1, r1, x2, y2, r2) {
     return dist < r1 + r2;
 }
 
-// Detectar si un punto está dentro de un rectángulo
 function pointInRect(px, py, rect) {
     return px >= rect.x && px <= rect.x + rect.w &&
-    py >= rect.y && py <= rect.y + rect.h;
+        py >= rect.y && py <= rect.y + rect.h;
 }
+
+console.log('✅ physics.js cargado');

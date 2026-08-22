@@ -1,40 +1,8 @@
 // ============================================================
-// JUGADOR - Movimiento, combate, habilidades
+// JUGADOR - Movimiento, combate, habilidades (SOLO FUNCIONES)
 // ============================================================
 
-// Definición del jugador
-let player = {
-    x: 120,
-    y: 0,
-    width: 44,
-    height: 96,
-    speed: 5.0,
-    facingRight: true,
-    health: 100,
-    maxHealth: 100,
-    anim: 'idle',
-    frame: 0,
-    frameTime: 0,
-    scale: 1.8,
-    jumpOffset: 0,
-    vy: 0,
-    grounded: true,
-    landingTimer: 0,
-    isPunching: false,
-    punchTimer: 0,
-    attackHit: false,
-    isKicking: false,
-    kickTimer: 0,
-    kickHit: false,
-    hurtFlash: 0,
-    isIceAttacking: false,
-    iceAttackTimer: 0,
-    iceShotFired: false,
-    iceTarget: null
-};
-
-// --- Funciones de combate ---
-
+// --- FUNCIONES DE COMBATE ---
 function tryPunch() {
     if (player.isIceAttacking || player.isPunching || player.isKicking) return;
     if (!player.grounded) {
@@ -95,8 +63,7 @@ function tryIce() {
     if (!player.iceTarget) player.iceTarget = findIceTarget();
 }
 
-// --- Hielo ---
-
+// --- HIELO ---
 function findIceTarget() {
     const candidates = getIceCandidates();
     return candidates.length > 0 ? candidates[0] : null;
@@ -108,7 +75,7 @@ function getIceCandidates() {
     const px = player.x;
     const py = playerLaneY;
     const dir = player.facingRight ? 1 : -1;
-
+    
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
         if (e.dead || e.frozen > 0) continue;
@@ -160,28 +127,28 @@ function fireIceProjectile() {
     const pScale = typeof PLAYER_SCALE !== 'undefined' ? PLAYER_SCALE : 1;
     const sc = (1 - ((laneBottom - playerLaneY) / Math.max(1, laneBottom - laneTop)) * 0.12) * pScale;
     const al = ICE_ALIGN.loaded;
-
+    
     const px = player.x + (player.facingRight ? 1 : -1) * (al.x * gScale) * sc;
     const py = playerEffY() + (al.y * gScale);
-
+    
     const target = player.iceTarget || null;
-    let vx = (player.facingRight ? 1 : -1) * (window.ICE_SPEED || 7.5);
+    let vx = (player.facingRight ? 1 : -1) * (typeof ICE_SPEED !== 'undefined' ? ICE_SPEED : 7.5);
     let vy = 0;
-
+    
     if (target && !target.dead && target.frozen <= 0) {
         const dx = target.x - px;
         const dy = target.laneY - py;
         const dist = Math.hypot(dx, dy);
         if (dist > 0 && dist < 560) {
-            const speed = window.ICE_SPEED || 7.5;
+            const speed = typeof ICE_SPEED !== 'undefined' ? ICE_SPEED : 7.5;
             vx = (dx / dist) * speed;
             vy = (dy / dist) * speed * 0.55;
         }
     }
-
+    
     const baseR = (typeof ICE_ALIGN !== 'undefined' && ICE_ALIGN.ballRadius) ? ICE_ALIGN.ballRadius : 13;
     const r = baseR * gScale;
-
+    
     projectiles.push({
         x: px,
         y: py,
@@ -194,14 +161,12 @@ function fireIceProjectile() {
         r: r,
         trail: []
     });
-
+    
     spawnText(player.x, playerLaneY - 20, 'HIELO!', '#7ef0ff');
 }
 
-// --- Actualización del jugador ---
-
+// --- ACTUALIZAR JUGADOR ---
 function updatePlayer() {
-    // Reset de puñetazo
     if (player.isPunching) {
         player.punchTimer = (player.punchTimer || 0) + 16;
         if (player.punchTimer > 400) {
@@ -215,7 +180,6 @@ function updatePlayer() {
         player.punchTimer = 0;
     }
 
-    // Reset de patada
     if (player.isKicking) {
         player.kickTimer = (player.kickTimer || 0) + 16;
         if (player.kickTimer > 450) {
@@ -229,7 +193,6 @@ function updatePlayer() {
         player.kickTimer = 0;
     }
 
-    // Ataque de hielo
     if (player.isIceAttacking) {
         const iceCfg = SPRITE_CONFIG['ice_attack'];
         const iceSpd = iceCfg ? iceCfg.speed : 120;
@@ -249,7 +212,6 @@ function updatePlayer() {
         }
     }
 
-    // Actualizar animación (excepto ice_attack que se maneja arriba)
     if (!player.isIceAttacking) {
         if (player.anim === 'jump') {
             player.frameTime = (player.frameTime || 0) + 16;
@@ -266,47 +228,46 @@ function updatePlayer() {
                 player.frame++;
                 const frames = cfg ? cfg.frames : 4;
                 if (player.frame >= frames) {
-                    if (player.anim === 'punch' || player.anim === 'kick' ||
+                    if (player.anim === 'punch' || player.anim === 'kick' || 
                         player.anim === 'punch_air' || player.anim === 'kick_air') {
                         player.frame = frames - 1;
-                        } else {
-                            player.frame = 0;
-                        }
+                    } else {
+                        player.frame = 0;
+                    }
                 }
             }
         }
     }
 
-    // Detección de golpes (puñetazo/patada)
     detectHits();
 }
 
 function detectHits() {
     if (!player.isPunching && !player.isKicking) return;
-
+    
     const isPunch = player.isPunching;
     const alreadyHit = isPunch ? player.attackHit : player.kickHit;
     const timer = isPunch ? (player.punchTimer || 0) : (player.kickTimer || 0);
-
+    
     if (!alreadyHit && timer > 80 && timer < 420) {
         const rangeX = isPunch ? 100 : 115;
         const rangeY = isPunch ? 80 : 95;
         const dmg = isPunch ? 14 : 20;
-
+        
         for (let i = 0; i < enemies.length; i++) {
             const e = enemies[i];
             if (e.dead) continue;
-
+            
             const dx = e.x - player.x;
             const dy = e.laneY - playerEffY();
             if (Math.abs(dy) > rangeY) continue;
-
+            
             const inFront = player.facingRight ? (dx > 8 && dx < rangeX) : (dx < -8 && dx > -rangeX);
             if (!inFront) continue;
-
+            
             const isFrozen = e.frozen > 0;
             const finalDmg = isFrozen ? (dmg + 50) : dmg;
-
+            
             if (isFrozen) {
                 if (e.health > 0 && e.maxHealth > 0 && e.health / e.maxHealth < 0.55) {
                     e.health = 0;
@@ -322,16 +283,16 @@ function detectHits() {
             } else {
                 spawnText(e.x, e.laneY - 22, '-' + finalDmg, '#ff4444');
             }
-
+            
             e.health -= finalDmg;
             e.hitTimer = isFrozen ? 140 : 320;
             e.frame = 0;
             e.frameTime = 0;
             e.x += player.facingRight ? (isFrozen ? 28 : 14) : (isFrozen ? -28 : -14);
-
+            
             if (isPunch) player.attackHit = true;
             else player.kickHit = true;
-
+            
             if (e.health <= 0) {
                 e.dead = true;
                 e.deadTimer = 0;
@@ -344,8 +305,7 @@ function detectHits() {
             }
             break;
         }
-
-        // Golpe a jefe
+        
         if (boss && !boss.dead) {
             const bdx = boss.x - player.x;
             const bdy = boss.laneY - playerEffY();
@@ -366,3 +326,36 @@ function detectHits() {
         }
     }
 }
+
+// --- INICIALIZAR JUGADOR ---
+player = {
+    x: 120,
+    y: 0,
+    width: HITBOX_W || 44,
+    height: HITBOX_H || 96,
+    speed: 5.0,
+    facingRight: true,
+    health: 100,
+    maxHealth: 100,
+    anim: 'idle',
+    frame: 0,
+    frameTime: 0,
+    scale: 1.8,
+    jumpOffset: 0,
+    vy: 0,
+    grounded: true,
+    landingTimer: 0,
+    isPunching: false,
+    punchTimer: 0,
+    attackHit: false,
+    isKicking: false,
+    kickTimer: 0,
+    kickHit: false,
+    hurtFlash: 0,
+    isIceAttacking: false,
+    iceAttackTimer: 0,
+    iceShotFired: false,
+    iceTarget: null
+};
+
+console.log('✅ player.js cargado');

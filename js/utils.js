@@ -1,13 +1,6 @@
 // ============================================================
-// UTILIDADES - Funciones auxiliares para todo el juego
+// UTILIDADES - Funciones auxiliares (SOLO FUNCIONES)
 // ============================================================
-
-// Variables globales para efectos visuales
-let floatingTexts = [];
-let particles = [];
-let iceTrails = [];
-let iceShatters = [];
-let frostDecals = [];
 
 // Spawn de texto flotante
 function spawnText(x, y, text, color) {
@@ -27,14 +20,14 @@ function spawnParticles(x, y, color, count = 6) {
     for (let i = 0; i < count; i++) {
         particles.push({
             x: x + (Math.random() - 0.5) * 10,
-                       y: y + (Math.random() - 0.5) * 10,
-                       vx: (Math.random() - 0.5) * 6,
-                       vy: (Math.random() - 0.5) * 6 - 1,
-                       life: 300 + Math.random() * 300,
-                       maxLife: 600,
-                       color: color || '#7ef0ff',
-                       size: 2 + Math.random() * 4,
-                       decay: 0.95 + Math.random() * 0.04
+            y: y + (Math.random() - 0.5) * 10,
+            vx: (Math.random() - 0.5) * 6,
+            vy: (Math.random() - 0.5) * 6 - 1,
+            life: 300 + Math.random() * 300,
+            maxLife: 600,
+            color: color || '#7ef0ff',
+            size: 2 + Math.random() * 4,
+            decay: 0.95 + Math.random() * 0.04
         });
     }
 }
@@ -46,16 +39,16 @@ function spawnIceShatter(x, y, count = 8, gold = false, cyan = false) {
         const speed = 2 + Math.random() * 4;
         iceShatters.push({
             x: x + (Math.random() - 0.5) * 10,
-                         y: y + (Math.random() - 0.5) * 10,
-                         vx: Math.cos(angle) * speed,
-                         vy: Math.sin(angle) * speed - Math.random() * 2,
-                         life: 300 + Math.random() * 300,
-                         maxLife: 600,
-                         rot: Math.random() * Math.PI * 2,
-                         vr: (Math.random() - 0.5) * 0.3,
-                         size: 2 + Math.random() * 4,
-                         gold: gold || false,
-                         cyan: cyan || false
+            y: y + (Math.random() - 0.5) * 10,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - Math.random() * 2,
+            life: 300 + Math.random() * 300,
+            maxLife: 600,
+            rot: Math.random() * Math.PI * 2,
+            vr: (Math.random() - 0.5) * 0.3,
+            size: 2 + Math.random() * 4,
+            gold: gold || false,
+            cyan: cyan || false
         });
     }
 }
@@ -64,13 +57,13 @@ function spawnIceShatter(x, y, count = 8, gold = false, cyan = false) {
 function spawnIceTrail(x, y, gold = false) {
     iceTrails.push({
         x: x + (Math.random() - 0.5) * 6,
-                   y: y + (Math.random() - 0.5) * 6,
-                   vx: (Math.random() - 0.5) * 1.5,
-                   vy: (Math.random() - 0.5) * 1.5 - 0.5,
-                   life: 200 + Math.random() * 200,
-                   maxLife: 400,
-                   size: 2 + Math.random() * 3,
-                   gold: gold || false
+        y: y + (Math.random() - 0.5) * 6,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5 - 0.5,
+        life: 200 + Math.random() * 200,
+        maxLife: 400,
+        size: 2 + Math.random() * 3,
+        gold: gold || false
     });
 }
 
@@ -87,7 +80,6 @@ function spawnFrostDecal(x, y, size = 36) {
 
 // Actualizar partículas
 function updateParticles() {
-    // Actualizar textos flotantes
     for (let i = floatingTexts.length - 1; i >= 0; i--) {
         const ft = floatingTexts[i];
         ft.timer += 16;
@@ -96,8 +88,7 @@ function updateParticles() {
             floatingTexts.splice(i, 1);
         }
     }
-
-    // Actualizar partículas
+    
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.x += p.vx;
@@ -110,8 +101,7 @@ function updateParticles() {
             particles.splice(i, 1);
         }
     }
-
-    // Actualizar trails de hielo
+    
     for (let i = iceTrails.length - 1; i >= 0; i--) {
         const t = iceTrails[i];
         t.x += t.vx;
@@ -122,8 +112,7 @@ function updateParticles() {
             iceTrails.splice(i, 1);
         }
     }
-
-    // Actualizar esquirlas de hielo
+    
     for (let i = iceShatters.length - 1; i >= 0; i--) {
         const sh = iceShatters[i];
         sh.x += sh.vx;
@@ -135,8 +124,7 @@ function updateParticles() {
             iceShatters.splice(i, 1);
         }
     }
-
-    // Actualizar decals de escarcha
+    
     for (let i = frostDecals.length - 1; i >= 0; i--) {
         const f = frostDecals[i];
         f.life -= 16;
@@ -146,32 +134,4 @@ function updateParticles() {
     }
 }
 
-// Función para obtener la posición efectiva del jugador (con salto)
-function playerEffY() {
-    return playerLaneY + (player.jumpOffset || 0);
-}
-
-// Función para obtener el mundo X a partir de la cámara
-function worldToScreenX(worldX) {
-    return worldX - camera.x;
-}
-
-// Función para obtener el mundo Y a partir de la cámara
-function worldToScreenY(worldY) {
-    return worldY;
-}
-
-// Helper para dibujar un rectángulo con esquinas redondeadas
-function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-}
+console.log('✅ utils.js cargado');

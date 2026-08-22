@@ -1,26 +1,17 @@
 // ============================================================
-// RENDERIZADO - Dibujo de sprites, fondos, HUD
+// RENDERIZADO - Dibujo de sprites, fondos, HUD (SOLO FUNCIONES)
 // ============================================================
 
-// Variables de renderizado
-let playerSprites = {};
-let spriteStatus = {};
-let enemySprites = {};
-let enemyStatus = {};
-let kanoSprites = {};
-let spritesReady = false;
-
-// --- Inicialización de sprites ---
-
+// --- INICIALIZAR SPRITES ---
 function initSprites() {
     const keys = Object.keys(SPRITE_CONFIG);
     let loaded = 0;
-
+    
     function checkDone() {
         loaded++;
         if (loaded >= keys.length) spritesReady = true;
     }
-
+    
     keys.forEach(key => {
         const cfg = SPRITE_CONFIG[key];
         spriteStatus[key] = "loading";
@@ -28,16 +19,17 @@ function initSprites() {
         img.onload = function() {
             spriteStatus[key] = "ok";
             checkDone();
+            console.log('✅ Sprite cargado:', key);
         };
         img.onerror = function() {
             spriteStatus[key] = "fail";
             checkDone();
+            console.warn('❌ Sprite falló:', key, SPRITE_BASE + cfg.file);
         };
         img.src = SPRITE_BASE + cfg.file;
         playerSprites[key] = img;
     });
-
-    // Sprites de enemigos
+    
     Object.keys(ENEMY_SPRITE_CONFIG).forEach(et => {
         enemySprites[et] = {};
         enemyStatus[et] = {};
@@ -49,73 +41,57 @@ function initSprites() {
             img.onload = (function(t, a) {
                 return function() {
                     enemyStatus[t][a] = "ok";
+                    console.log('✅ Enemigo sprite:', t, a);
                 };
             })(et, anim);
             img.onerror = (function(t, a) {
                 return function() {
                     enemyStatus[t][a] = "fail";
+                    console.warn('❌ Enemigo sprite falló:', t, a);
                 };
             })(et, anim);
             img.src = ENEMY_SPRITE_BASE + et + "/" + cfg.file;
             enemySprites[et][anim] = img;
         });
     });
-
-    // Sprites de Kano
-    Object.keys(KANO_SPRITE_CONFIG).forEach(key => {
-        const img = new Image();
-        img.onload = function() {
-            img.ok = true;
-            if (!__kanoNormSet && key === 'idle') {
-                KANO_NORM = 280 / img.height;
-                __kanoNormSet = true;
-            }
-        };
-        img.onerror = function() {
-            img.ok = false;
-        };
-        img.src = KANO_SPRITE_BASE + KANO_SPRITE_CONFIG[key].file;
-        kanoSprites[key] = img;
-    });
-
+    
     setTimeout(() => {
         if (!spritesReady) spritesReady = true;
     }, 6000);
 }
 
-// --- Dibujo del jugador ---
-
+// --- DIBUJAR JUGADOR ---
 function drawPlayer(time) {
     if (typeof player.frame === 'undefined') player.frame = 0;
     if (typeof player.frameTime === 'undefined') player.frameTime = 0;
-
+    
     const wanted = player.anim || 'idle';
     const spriteSet = playerSprites;
-
+    
     function ok(a) {
         return spriteSet && spriteSet[a] && spriteSet[a].complete && spriteSet[a].naturalWidth > 0;
     }
-
+    
     let animToUse = wanted;
     if (!ok(animToUse)) {
         if (ok('idle')) animToUse = 'idle';
         else animToUse = null;
     }
-
+    
     if (animToUse && spriteSet && spriteSet[animToUse]) {
         const sprite = spriteSet[animToUse];
         const cfg = SPRITE_CONFIG[animToUse] || { frames: 1, cols: 1 };
         const total = cfg.frames || 1;
         const cols = cfg.cols || cfg.frames;
         const rows = cfg.rows || Math.ceil(cfg.frames / cols);
-
+        
         const useIntegerFrames = (animToUse === 'jump' || cfg.integerFrames === true);
         const fw = useIntegerFrames ? Math.floor(sprite.naturalWidth / cols) : sprite.naturalWidth / cols;
         const fh = useIntegerFrames ? Math.floor(sprite.naturalHeight / rows) : sprite.naturalHeight / rows;
         const f = (player.frame % total);
         const sx = (f % cols) * fw;
         const sy = Math.floor(f / cols) * fh;
-
+        
         const gScale = typeof PLAYER_GLOBAL_SCALE !== 'undefined' ? PLAYER_GLOBAL_SCALE : 1;
         const sx2 = cfg.scaleX * gScale;
         const sy2 = cfg.scaleY * gScale;
@@ -126,7 +102,7 @@ function drawPlayer(time) {
         const th = Math.round(110 * sc * sy2);
         const pyEff = playerEffY();
         const dy = Math.round(pyEff - th + 12 + ay);
-
+        
         try {
             ctx.save();
             ctx.imageSmoothingEnabled = false;
@@ -139,30 +115,30 @@ function drawPlayer(time) {
             ctx.drawImage(sprite, sx, sy, fw, fh, drawX, dy, tw, th);
             ctx.restore();
             return true;
-        } catch (err) {}
+        } catch (err) {
+            console.warn('Error dibujando sprite:', err);
+        }
     }
-
-    // Fallback: rectángulo simple
+    
     ctx.fillStyle = '#4ecca3';
     ctx.fillRect(player.x - camera.x - 20, playerEffY() - 60, 40, 60);
     return true;
 }
 
-// --- Dibujo de enemigos ---
-
+// --- DIBUJAR ENEMIGO ---
 function drawEnemy(e) {
     if (e.type === 'kano' || e.name === 'Kano') {
         drawBossSprite(e);
         return;
     }
-
+    
     const ex = Math.round(e.x - camera.x);
     if (ex < -250 || ex > canvas.width + 250) return false;
-
+    
     if (typeof e.frame === 'undefined') e.frame = 0;
     if (typeof e.frameTime === 'undefined') e.frameTime = 0;
     if (typeof e.facingRight === 'undefined') e.facingRight = false;
-
+    
     const type = e.type || 'thug';
     let wanted = 'idle';
     if (e.previewAnim && e.previewTimer > 0) wanted = e.previewAnim;
@@ -171,12 +147,12 @@ function drawEnemy(e) {
     else if (e.hitTimer > 0) wanted = 'hit';
     else if (e.attacking) wanted = e.previewAnim || 'punch';
     else if (e.isMoving) wanted = 'walk';
-
+    
     const spriteSet = enemySprites[type];
     function ok(a) {
         return spriteSet && spriteSet[a] && spriteSet[a].complete && spriteSet[a].naturalWidth > 0;
     }
-
+    
     let animToUse = wanted;
     if (animToUse === 'punch' || animToUse === 'kick') {
         if (ok('attack')) animToUse = 'attack';
@@ -188,7 +164,7 @@ function drawEnemy(e) {
         else if (ok('attack')) animToUse = 'attack';
         else animToUse = null;
     }
-
+    
     if (animToUse && spriteSet && spriteSet[animToUse]) {
         const sprite = spriteSet[animToUse];
         const cfg = (ENEMY_SPRITE_CONFIG[type] && ENEMY_SPRITE_CONFIG[type][animToUse]) || { frames: 1, cols: 1 };
@@ -199,14 +175,14 @@ function drawEnemy(e) {
         const f = (e.frame % cfg.frames);
         const sx = (f % cols) * fw;
         const sy = Math.floor(f / cols) * fh;
-
+        
         const sc = (1 - ((laneBottom - e.laneY) / 200) * 0.12) * 1.15;
         const tw = Math.round(90 * sc * (cfg.scaleX || 1));
         const th = Math.round(110 * sc * (cfg.scaleY || 1));
         const ax = (cfg.anchorX || 0) * sc;
         const ay = (cfg.anchorY || 0) * sc;
         const dy = Math.round(e.laneY - th + 12 + ay);
-
+        
         try {
             ctx.save();
             ctx.imageSmoothingEnabled = false;
@@ -221,8 +197,7 @@ function drawEnemy(e) {
             }
             ctx.drawImage(sprite, sx, sy, fw, fh, drawX, dy, tw, th);
             ctx.restore();
-
-            // Barra de vida
+            
             if (!e.dead && e.health < e.maxHealth) {
                 ctx.fillStyle = 'rgba(0,0,0,0.5)';
                 ctx.fillRect(ex, e.laneY - 66, 70, 4);
@@ -230,10 +205,11 @@ function drawEnemy(e) {
                 ctx.fillRect(ex, e.laneY - 66, 70 * (e.health / e.maxHealth), 4);
             }
             return true;
-        } catch (err) {}
+        } catch (err) {
+            console.warn('Error dibujando enemigo:', err);
+        }
     }
-
-    // Fallback: rectángulo simple
+    
     const sc2 = (1 - ((laneBottom - e.laneY) / 200) * 0.12) * 1.15;
     const tw2 = Math.round(80 * sc2);
     const th2 = Math.round(100 * sc2);
@@ -247,17 +223,16 @@ function drawEnemy(e) {
     return true;
 }
 
-// --- Dibujo del jefe Kano ---
-
+// --- DIBUJAR JEFE ---
 function drawBossSprite(b) {
     if (b.__rf === window.__rf) return;
     b.__rf = window.__rf;
-
+    
     const cfg = KANO_SPRITE_CONFIG[b.anim] || KANO_SPRITE_CONFIG.idle;
     const img = kanoSprites[b.anim];
     const bx = Math.round(b.x - camera.x);
     let Hdraw = b.height;
-
+    
     if (img && img.ok) {
         const cols = cfg.cols || cfg.frames;
         const rows = Math.ceil(cfg.frames / cols);
@@ -279,7 +254,7 @@ function drawBossSprite(b) {
         ctx.fillRect(bx, b.laneY - 60, b.width, b.height);
         Hdraw = b.height;
     }
-
+    
     if (!b.isDummy) {
         const barY = b.laneY - Hdraw - 12;
         const nameY = b.laneY - Hdraw - 18;
@@ -295,13 +270,11 @@ function drawBossSprite(b) {
     }
 }
 
-// --- Dibujo de fondos ---
-
+// --- DIBUJAR FONDOS ---
 function drawCityBackground(lvl) {
     const w = canvas.width;
     const h = canvas.height;
-
-    // Cargar textura de piso
+    
     if (typeof floorTextureImg === 'undefined') {
         window.floorTextureImg = new Image();
         floorTextureImg.src = "assets/backgrounds/floor_city.jpg";
@@ -314,19 +287,17 @@ function drawCityBackground(lvl) {
             floorTextureImg.failed = true;
         };
     }
-
+    
     if (typeof cityBgImg !== 'undefined' && cityBgImg && cityBgImg.loaded) {
         const imgW = cityBgImg.width;
         const imgH = cityBgImg.height;
-
-        // Cielo
+        
         const skyGrad = ctx.createLinearGradient(0, 0, 0, laneTop);
         skyGrad.addColorStop(0, '#0a0e1e');
         skyGrad.addColorStop(1, '#1a2440');
         ctx.fillStyle = skyGrad;
         ctx.fillRect(0, 0, w, laneTop);
-
-        // Skyline lejano
+        
         const skylineSrcH = imgH * 0.32;
         const skylineDestH = laneTop * 0.85;
         const skylineScale = w * 1.2 / imgW;
@@ -337,8 +308,7 @@ function drawCityBackground(lvl) {
         }
         ctx.fillStyle = 'rgba(20,30,60,0.35)';
         ctx.fillRect(0, laneTop - skylineDestH * 0.5, w, skylineDestH * 0.5);
-
-        // Edificios medios
+        
         const midSrcY = imgH * 0.28;
         const midSrcH = imgH * 0.50;
         const buildingsDestH = laneTop * 0.95;
@@ -349,11 +319,10 @@ function drawCityBackground(lvl) {
             const mdx = midOffsetX + mi * buildingsW * 0.6;
             ctx.drawImage(cityBgImg, 0, midSrcY, imgW, midSrcH, mdx, laneTop - buildingsDestH, buildingsW, buildingsDestH);
         }
-
-        // Piso
+        
         const streetDestY = laneTop;
         const streetDestH = h - laneTop;
-
+        
         if (typeof floorTextureImg !== 'undefined' && floorTextureImg.loaded && !floorTextureImg.failed) {
             const texW = 380;
             const texH = 380;
@@ -372,12 +341,10 @@ function drawCityBackground(lvl) {
             ctx.fillStyle = floorGrad;
             ctx.fillRect(0, streetDestY, w, streetDestH);
         }
-
-        // Velo oscuro
+        
         ctx.fillStyle = 'rgba(5,8,14,0.35)';
         ctx.fillRect(0, streetDestY, w, streetDestH);
-
-        // Línea central
+        
         const midLaneY = laneTop + (laneBottom - laneTop) * 0.58;
         ctx.strokeStyle = 'rgba(255,220,90,0.32)';
         ctx.lineWidth = 1.8;
@@ -387,16 +354,14 @@ function drawCityBackground(lvl) {
         ctx.lineTo(w + 60, midLaneY);
         ctx.stroke();
         ctx.setLineDash([]);
-
-        // Sombras de suelo
+        
         ctx.fillStyle = 'rgba(180,200,220,0.12)';
         ctx.fillRect(0, laneTop, w, 3);
         ctx.fillStyle = 'rgba(0,0,0,0.45)';
         ctx.fillRect(0, laneBottom - 3, w, 3);
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(0, laneTop, w, 10);
-
-        // Viñeta
+        
         const vignette = ctx.createRadialGradient(w / 2, streetDestY + streetDestH * 0.4, w * 0.25, w / 2, streetDestY + streetDestH * 0.5, w * 0.9);
         vignette.addColorStop(0, 'rgba(0,0,0,0)');
         vignette.addColorStop(1, 'rgba(0,0,0,0.38)');
@@ -404,8 +369,7 @@ function drawCityBackground(lvl) {
         ctx.fillRect(0, streetDestY, w, streetDestH);
         return;
     }
-
-    // Fallback
+    
     ctx.fillStyle = 'rgb(' + lvl.groundColor[0] + ',' + lvl.groundColor[1] + ',' + lvl.groundColor[2] + ')';
     ctx.fillRect(0, laneTop, canvas.width, canvas.height - laneTop);
 }
@@ -433,16 +397,15 @@ function drawLevelBackground(lvl) {
     ctx.fillRect(canvas.width * 0.22, 8, canvas.width * 0.56 * prog, 4);
 }
 
-// --- Dibujo de proyectiles ---
-
+// --- DIBUJAR PROYECTILES ---
 function drawIceBall(p) {
     p.trail = p.trail || [];
     p.trail.push({ x: p.x, y: p.y });
     if (p.trail.length > 8) p.trail.shift();
-
+    
     let r = p.r || 13;
     r = r * (1 + 0.08 * Math.sin((p.life || 0) * 0.05));
-
+    
     for (let i = 0; i < p.trail.length; i++) {
         const t = p.trail[i];
         const a = (i / p.trail.length) * 0.22;
@@ -451,7 +414,7 @@ function drawIceBall(p) {
         ctx.arc(t.x - camera.x, t.y, r * (0.35 + 0.6 * i / p.trail.length), 0, Math.PI * 2);
         ctx.fill();
     }
-
+    
     const sx = p.x - camera.x;
     const g = ctx.createRadialGradient(sx, p.y, r * 0.2, sx, p.y, r * 2.2);
     g.addColorStop(0, 'rgba(200,250,255,0.9)');
@@ -461,12 +424,12 @@ function drawIceBall(p) {
     ctx.beginPath();
     ctx.arc(sx, p.y, r * 2.2, 0, Math.PI * 2);
     ctx.fill();
-
+    
     ctx.fillStyle = '#eaffff';
     ctx.beginPath();
     ctx.arc(sx, p.y, r * 0.55, 0, Math.PI * 2);
     ctx.fill();
-
+    
     ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth = 1.5;
     for (let i = 0; i < 3; i++) {
@@ -492,10 +455,8 @@ function drawLaser(p) {
     ctx.fillRect(sx - 10, p.y - 1.5, 20, 3);
 }
 
-// --- Dibujo de HUD ---
-
+// --- DIBUJAR HUD ---
 function drawHUD() {
-    // Actualizar elementos del HUD
     try {
         document.getElementById('hud-health').textContent = Math.round(player.health) + '%';
         document.getElementById('health-bar').style.width = player.health + '%';
@@ -504,5 +465,14 @@ function drawHUD() {
         document.getElementById('hud-progress').textContent = Math.round(iceProgDisplay * 100) + '%';
         document.getElementById('hud-enemies').textContent = enemiesDefeated + '/' + LEVELS[currentLevel].enemyCount;
         document.getElementById('hud-score').textContent = score + ' pts';
-    } catch (e) {}
+    } catch (e) {
+        // HUD no disponible aún
+    }
 }
+
+// --- INICIALIZAR IMÁGENES DE FONDO ---
+cityBgImg.src = "assets/backgrounds/city_bg.webp";
+cityBgImg.loaded = false;
+cityBgImg.onload = function() { cityBgImg.loaded = true; console.log('City BG loaded'); };
+
+console.log('✅ rendering.js cargado');
