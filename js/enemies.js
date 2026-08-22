@@ -2,6 +2,13 @@
 // ENEMIGOS - IA, oleadas, jefes (SOLO FUNCIONES)
 // ============================================================
 
+// --- FUNCIÓN TEMPORAL (será sobrescrita por main.js) ---
+function showWaveArrow(show, text) {
+    // Esta función será reemplazada por la de main.js
+    // Mientras tanto, no hace nada para evitar errores
+}
+window.showWaveArrow = showWaveArrow;
+
 // --- FUNCIONES DE ENEMIGOS ---
 function createEnemy(type, x, laneY) {
     const cfg = ENEMY_CONFIGS[type];
@@ -88,19 +95,18 @@ function spawnWave() {
     if (enemiesDefeated >= lvl.enemyCount) return;
     if (getAliveCount() > 0) return;
     if (currentWave >= totalWaves) return;
-    
+
     const remaining = lvl.enemyCount - enemiesDefeated;
     if (remaining <= 0) return;
-    
+
     let toSpawn = Math.min(waveSize, remaining);
     if (remaining >= 5 && Math.random() > 0.5) toSpawn = 4;
     else toSpawn = Math.min(3, remaining);
     if (currentWave === totalWaves - 1) toSpawn = remaining;
-    
+
     const cw = canvas.width;
     const spawnCenterX = camera.x + cw + 280 + currentWave * 90 + Math.random() * 120;
-    
-    // Distribuir en Y sin solaparse
+
     const ySlots = [];
     const yRange = Math.max(30, laneBottom - laneTop - 30);
     for (let i = 0; i < toSpawn; i++) {
@@ -108,13 +114,12 @@ function spawnWave() {
         baseY += (Math.random() * 24 - 12);
         ySlots.push(baseY);
     }
-    
-    // Shuffle Y
+
     for (let i = ySlots.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [ySlots[i], ySlots[j]] = [ySlots[j], ySlots[i]];
     }
-    
+
     for (let i = 0; i < toSpawn; i++) {
         const type = lvl.enemyTypes[Math.floor(Math.random() * lvl.enemyTypes.length)];
         const fromFront = Math.random() > 0.35 || player.x < 450;
@@ -128,14 +133,14 @@ function spawnWave() {
         let laneY = ySlots[i] || (laneTop + 20 + Math.random() * (laneBottom - laneTop - 40));
         if (laneY < laneTop + 10) laneY = laneTop + 10;
         if (laneY > laneBottom - 10) laneY = laneBottom - 10;
-        
+
         const e = createEnemy(type, x, laneY);
         if (e) {
             e.fromFront = fromFront;
             enemies.push(e);
         }
     }
-    
+
     currentWave++;
     waveInProgress = true;
     waitingForAdvance = false;
@@ -150,7 +155,7 @@ function prepareNextWaveAdvance() {
     if (waitingForAdvance) return;
     if (currentWave >= totalWaves) return;
     if (enemiesDefeated >= LEVELS[currentLevel].enemyCount) return;
-    
+
     waitingForAdvance = true;
     nextWaveTriggerX = player.x + 380 + currentWave * 120;
     if (nextWaveTriggerX > camera.worldWidth - 250) nextWaveTriggerX = camera.worldWidth - 280;
@@ -187,7 +192,7 @@ function fireKanoLaser() {
 function updateEnemies() {
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
-        
+
         if (e.isDummy) {
             if (e.previewTimer > 0) {
                 e.previewTimer -= 16;
@@ -207,12 +212,12 @@ function updateEnemies() {
             }
             continue;
         }
-        
+
         if (e.dead) {
             if (e.deadTimer > 0) e.deadTimer -= 16;
             continue;
         }
-        
+
         if (e.frozen > 0) {
             e.frozen -= 16;
             if (e.frozen <= 0) {
@@ -222,7 +227,7 @@ function updateEnemies() {
             }
             continue;
         }
-        
+
         if (e.hitTimer > 0) {
             e.hitTimer -= 16;
             if (e.hitTimer <= 0) {
@@ -231,7 +236,7 @@ function updateEnemies() {
             }
             continue;
         }
-        
+
         if (e.attacking) {
             e.attackTimer += 16;
             if (e.attackTimer > 600) {
@@ -257,12 +262,12 @@ function updateEnemies() {
             }
             continue;
         }
-        
+
         const dxp = player.x - e.x;
         const dyp = e.laneY - playerEffY();
         const dist = Math.hypot(dxp, dyp);
         const inRange = Math.abs(dxp) < DIST_STOP && Math.abs(dyp) < 35;
-        
+
         if (dist > 400) {
             e.isMoving = false;
             e.anim = 'idle';
@@ -282,12 +287,11 @@ function updateEnemies() {
             e.attackTimer = 0;
             e.hitApplied = false;
         }
-        
+
         if (e.laneY < laneTop) e.laneY = laneTop;
         if (e.laneY > laneBottom) e.laneY = laneBottom;
     }
-    
-    // Separación de enemigos
+
     for (let i = 0; i < enemies.length; i++) {
         const e1 = enemies[i];
         if (e1.isDummy || e1.dead) continue;
@@ -308,7 +312,7 @@ function updateEnemies() {
             }
         }
     }
-    
+
     for (let i = 0; i < enemies.length; i++) {
         const e = enemies[i];
         if (e.isDummy || e.dead || e.frozen > 0) continue;
@@ -334,7 +338,7 @@ function updateBoss() {
         }
         return;
     }
-    
+
     if (boss.hitTimer > 0) {
         boss.hitTimer -= 16;
         boss.anim = 'hit';
@@ -359,7 +363,7 @@ function updateBoss() {
         const d = Math.sqrt(dx * dx + dy * dy);
         boss.isMoving = false;
         boss.attacking = false;
-        
+
         if (Math.abs(dx) > 260 && boss.laserCooldown <= 0) {
             boss.laserTimer = 900;
             boss.laserFired = false;
@@ -373,18 +377,18 @@ function updateBoss() {
             if (dx > 0) boss.facingRight = true;
             else if (dx < 0) boss.facingRight = false;
         }
-        
+
         if (Math.abs(dx) < DIST_DMG + 20 && Math.abs(dy) < 40) {
             boss.attacking = true;
             boss.anim = 'attack';
             player.health -= 0.25;
         }
-        
+
         if (!boss.isMoving && !boss.attacking && boss.laserTimer <= 0) {
             boss.anim = 'idle';
         }
     }
-    
+
     boss.frameTime = (boss.frameTime || 0) + 16;
     const bcfg = KANO_SPRITE_CONFIG[boss.anim] || KANO_SPRITE_CONFIG.idle;
     if (boss.frameTime > bcfg.speed) {
@@ -395,7 +399,7 @@ function updateBoss() {
             boss.frame = (boss.frame + 1) % bcfg.frames;
         }
     }
-    
+
     if (boss.laneY < laneTop) boss.laneY = laneTop;
     if (boss.laneY > laneBottom) boss.laneY = laneBottom;
 }
@@ -404,7 +408,7 @@ function updateBoss() {
 function updateProjectiles() {
     for (let i = projectiles.length - 1; i >= 0; i--) {
         const p = projectiles[i];
-        
+
         if (p.type === 'ice' && p.homing && p.target && !p.target.dead) {
             const dx = p.target.x - p.x;
             const dy = p.target.laneY - p.y;
@@ -421,7 +425,7 @@ function updateProjectiles() {
                 }
             }
         }
-        
+
         p.x += p.vx;
         p.y += p.vy;
         p.life -= 16;
@@ -429,21 +433,21 @@ function updateProjectiles() {
             projectiles.splice(i, 1);
             continue;
         }
-        
+
         if (p.type === 'ice' && Math.random() > 0.3) {
             spawnIceTrail(p.x - (p.vx > 0 ? 12 : -12), p.y + (Math.random() * 10 - 5), Math.random() > 0.6);
         }
-        
+
         let hit = false;
         for (let j = 0; j < enemies.length; j++) {
             const e = enemies[j];
             if (e.dead) continue;
-            
+
             const isTarget = p.target && p.target === e;
             const radX = isTarget ? 95 : 60;
             const radY = isTarget ? 75 : 50;
             let canHit = false;
-            
+
             if (isTarget) {
                 const d = Math.hypot(p.x - e.x, p.y - e.laneY);
                 if (d < 90) canHit = true;
@@ -451,7 +455,7 @@ function updateProjectiles() {
             } else {
                 if (Math.abs(p.y - e.laneY) < radY && Math.abs(p.x - e.x) < radX) canHit = true;
             }
-            
+
             if (canHit) {
                 const wasFrozen = e.frozen > 0;
                 if (wasFrozen) {
@@ -493,7 +497,7 @@ function updateProjectiles() {
                 break;
             }
         }
-        
+
         if (!hit && boss && !boss.dead) {
             if (Math.abs(p.y - boss.laneY) < 60 && Math.abs(p.x - boss.x) < 70) {
                 const wasFrozen = boss.frozen > 0;
@@ -519,22 +523,22 @@ function updateProjectiles() {
                 hit = true;
             }
         }
-        
+
         if (hit) {
             projectiles.splice(i, 1);
             continue;
         }
-        
+
         if (p.x < camera.x - 100 || p.x > camera.x + canvas.width + 100) {
             projectiles.splice(i, 1);
         }
     }
-    
+
     for (let i = bossProjectiles.length - 1; i >= 0; i--) {
         const bp = bossProjectiles[i];
         bp.x += bp.vx * (typeof GAME_SPEED !== 'undefined' ? GAME_SPEED : 1);
         bp.life -= 16;
-        
+
         if (!bp.hit && Math.abs(bp.x - player.x) < 24 && Math.abs(bp.y - (playerEffY() - 45)) < 34) {
             bp.hit = true;
             player.health -= 10;
@@ -543,7 +547,7 @@ function updateProjectiles() {
             spawnText(player.x, playerLaneY - 40, '-10', '#ff4444');
             camera.shake = 8;
         }
-        
+
         if (bp.life <= 0 || bp.x < camera.x - 150 || bp.x > camera.x + canvas.width + 150) {
             bossProjectiles.splice(i, 1);
         }

@@ -1,5 +1,5 @@
 // ============================================================
-// CONFIGURACIÓN GLOBAL - Solo configuraciones
+// CONFIGURACIÓN GLOBAL + VARIABLES GLOBALES
 // ============================================================
 
 // --- SPRITES DEL JUGADOR ---
@@ -39,11 +39,61 @@ let laneTop = 180;
 let laneBottom = 360;
 let playerLaneY = 360;
 
-// --- CONSTANTES FÍSICAS ---
-const GRAVITY = 0.78;
-const JUMP_FORCE = -14.5;
-const JUMP_POWER = 1.25;
-const ICE_SPEED = 7.5;
+// --- CONSTANTES FÍSICAS (TODAS como var para evitar errores) ---
+var GRAVITY = 0.78;
+var JUMP_FORCE = -14.5;
+var JUMP_POWER = 1.25;
+var ICE_SPEED = 7.5;
+var GAME_SPEED = 0.4;
+var DIST_STOP = 45;
+var DIST_DMG = 45;
+var DIST_BODY = 50;
+
+// --- VARIABLES GLOBALES (window) para que estén disponibles desde el inicio ---
+window.keys = { right: false, left: false, up: false, down: false };
+window.player = null;
+window.enemies = [];
+window.projectiles = [];
+window.boss = null;
+window.camera = { x: 0, targetX: 0, worldWidth: 3500, shake: 0 };
+window.canvas = null;
+window.ctx = null;
+window.score = 0;
+window.currentLevel = 0;
+window.currentState = 'MENU';
+window.isPaused = false;
+window.gameLoopStarted = false;
+window.enemiesDefeated = 0;
+window.bossSpawned = false;
+window.attachedIce = null;
+window.bossProjectiles = [];
+window.kanoSprites = {};
+window.playerSprites = {};
+window.spriteStatus = {};
+window.enemySprites = {};
+window.enemyStatus = {};
+window.spritesReady = false;
+window.floatingTexts = [];
+window.particles = [];
+window.iceTrails = [];
+window.iceShatters = [];
+window.frostDecals = [];
+window.currentWave = 0;
+window.totalWaves = 3;
+window.waveSize = 5;
+window.waveInProgress = false;
+window.nextWaveTriggerX = 0;
+window.waitingForAdvance = false;
+window.spawnTimer = 0;
+window.crates = [];
+window.pickups = [];
+window.cityBgImg = new Image();
+window.floorTextureImg = new Image();
+window.menuSnowRunning = false;
+window.menuSnowRaf = 0;
+window.winterArrowAnim = null;
+window.lastFrameTime = 0;
+window.frameDt = 16;
 
 // --- NIVELES ---
 const LEVELS = [
@@ -98,7 +148,7 @@ const BOSS_CONFIGS = {
     "Noob Saibot": { health: 750, damage: 20, speed: 30.4, color: '#000000', height: 85, width: 54 }
 };
 
-// --- SPRITES DE ENEMIGOS ---
+// --- SPRITES DE ENEMIGOS (completo para evitar errores 404) ---
 const ENEMY_SPRITE_CONFIG = {
     ninja_renegade: {
         idle: { file: "idle.png", frames: 4, cols: 4, speed: 160, scaleX: 1.90, scaleY: 2.00, anchorX: -80, anchorY: 10 },
@@ -117,6 +167,30 @@ const ENEMY_SPRITE_CONFIG = {
         dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
     },
     thug_gun: {
+        idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
+        walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
+        attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
+        hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -80, anchorY: -6 },
+        frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: -80, anchorY: 8 },
+        dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
+    },
+    cyborg_basic: {
+        idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
+        walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
+        attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
+        hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -80, anchorY: -6 },
+        frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: -80, anchorY: 8 },
+        dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
+    },
+    technician: {
+        idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
+        walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
+        attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
+        hit: { file: "hit.png", frames: 3, cols: 3, speed: 100, scaleX: 2.75, scaleY: 1.95, anchorX: -80, anchorY: -6 },
+        frozen: { file: "frozen.png", frames: 1, cols: 1, speed: 360, scaleX: 1.60, scaleY: 2.15, anchorX: -80, anchorY: 8 },
+        dead: { file: "dead.png", frames: 6, cols: 6, speed: 120, scaleX: 3.50, scaleY: 2.75, anchorX: -80, anchorY: 17 },
+    },
+    sektor_miniboss: {
         idle: { file: "idle.png", frames: 1, cols: 1, speed: 315, scaleX: 1.70, scaleY: 2.15, anchorX: -80, anchorY: 2 },
         walk: { file: "walk.png", frames: 8, cols: 4, speed: 90, scaleX: 1.80, scaleY: 2.05, anchorX: -80, anchorY: 3 },
         attack: { file: "attack.png", frames: 18, cols: 6, speed: 55, scaleX: 2.20, scaleY: 2.25, anchorX: -80, anchorY: 0 },
@@ -143,4 +217,53 @@ function spriteConfigFor(type) {
     return ENEMY_SPRITE_CONFIG[type] || null;
 }
 
-console.log('✅ config.js cargado');
+// --- CARGA DE CONFIGURACIÓN GUARDADA ---
+(function() {
+    try {
+        const saved = localStorage.getItem('sz_sprite_config_v3.22_FINAL');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            Object.keys(parsed).forEach(key => {
+                if (SPRITE_CONFIG[key]) {
+                    Object.assign(SPRITE_CONFIG[key], parsed[key]);
+                }
+            });
+        }
+        const iceSaved = localStorage.getItem('sz_ice_align');
+        if (iceSaved) {
+            const parsed = JSON.parse(iceSaved);
+            if (parsed) Object.assign(ICE_ALIGN, parsed);
+        }
+        const floorOffset = localStorage.getItem('sz_floor_offset');
+        if (floorOffset) FLOOR_REF_OFFSET = parseInt(floorOffset) || 32;
+        const topLimit = localStorage.getItem('sz_top_limit');
+        if (topLimit) TOP_LIMIT_OFFSET = parseInt(topLimit) || 0;
+    } catch (e) {
+        console.warn('Error cargando configuración guardada:', e);
+    }
+})();
+
+// --- Sincronizar variables locales con window para compatibilidad ---
+window.GRAVITY = GRAVITY;
+window.JUMP_FORCE = JUMP_FORCE;
+window.JUMP_POWER = JUMP_POWER;
+window.ICE_SPEED = ICE_SPEED;
+window.GAME_SPEED = GAME_SPEED;
+window.DIST_STOP = DIST_STOP;
+window.DIST_DMG = DIST_DMG;
+window.DIST_BODY = DIST_BODY;
+window.laneTop = laneTop;
+window.laneBottom = laneBottom;
+window.playerLaneY = playerLaneY;
+window.FLOOR_REF_OFFSET = FLOOR_REF_OFFSET;
+window.TOP_LIMIT_OFFSET = TOP_LIMIT_OFFSET;
+window.LANE_BOTTOM_RATIO = LANE_BOTTOM_RATIO;
+window.HITBOX_W = HITBOX_W;
+window.HITBOX_H = HITBOX_H;
+window.PLAYER_GLOBAL_SCALE = PLAYER_GLOBAL_SCALE;
+window.PLAYER_SCALE = PLAYER_SCALE;
+window.baseDrawWidth = baseDrawWidth;
+window.baseDrawHeight = baseDrawHeight;
+
+console.log('✅ config.js cargado correctamente');
+console.log('🔧 Variables globales: GRAVITY=' + GRAVITY + ', GAME_SPEED=' + GAME_SPEED);
