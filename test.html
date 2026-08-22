@@ -197,6 +197,10 @@ let buildNum=57; try{ document.getElementById('build-num').textContent=buildNum;
 
 console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","background:#001a33;color:#7ef0ff;font-size:14px;padding:8px 12px;border-radius:8px;border:1px solid #0ff");
 
+// Gravedad y salto (restaurados)
+const GRAVITY = 0.78;
+const JUMP_FORCE = -14.5;
+const JUMP_POWER = 1.25;
 
 // Sistema de sprites - carga desde archivos externos
 
@@ -205,16 +209,14 @@ const SPRITE_CONFIG = {
   walk: { file: "walk.png", frames: 10, cols: 5, speed: 70, scaleX: 1.85, scaleY: 1.80, anchorX: 1, anchorY: -1 },
   punch: { file: "punch.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 14, anchorY: 32 },
   kick: { file: "kick.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 9, anchorY: 33 },
-  // NUEVO JUMP CON LOS VALORES SOLICITADOS
   jump: { file:'jump.png', frames:12, cols:4, rows:3, speed:60, scaleX:1.90, scaleY:1.20, anchorX:0, anchorY:1, integerFrames:true },
-  ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 1.70, scaleY: 1.75, anchorX: 0, anchorY: 5 },
-  ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 2.00, scaleY: 1.80, anchorX: 0, anchorY: 3 },
+  // NUEVO: ataque de hielo en 4 frames (idle, agacharse, lanzar, volver)
+  ice_attack: { file: "ice_attack.png", frames: 4, cols: 4, speed: 120, scaleX: 2.00, scaleY: 2.00, anchorX: 0, anchorY: 0 },
   punch_air: { file: "punch_air.png", frames: 1, cols: 1, speed: 350, scaleX: 1.80, scaleY: 1.60, anchorX: 13, anchorY: 5 },
   kick_air: { file: "kick_air.png", frames: 1, cols: 1, speed: 350, scaleX: 2.00, scaleY: 1.70, anchorX: 15, anchorY: 0 },
 };
-// v2.68 ICE ALIGN - configurado por usuario: charging 20/-28 loaded 21/-45
-const ICE_ALIGN = {
-  charging: { x: 15.895,  y: -55.25,  scale: 1 },
+// v2.68 ICE ALIGN - solo para posicionar la bola en el frame de lanzamiento
+var ICE_ALIGN = {
   loaded:   { x: 15.1725, y: -105.4,  scale: 1 },
   ballRadius: 14
 };
@@ -363,22 +365,18 @@ function changeCharacter(c){
   buildLiveEditor();
 }
 
-
+// Editor de posición de la bola de hielo (solo loaded)
 function buildIceEditor(){
   try{
     if(currentEditChar!=='player') return null;
     var div=document.createElement('div');
     div.className='live-item';
     div.style.border='1px solid rgba(126,240,255,0.3)';
-    var ca = (typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.charging) ? ICE_ALIGN.charging : {x:20,y:-28,scale:1};
-    var la = (typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.loaded) ? ICE_ALIGN.loaded : {x:21,y:-45,scale:1};
-    var rad = (typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.ballRadius) ? ICE_ALIGN.ballRadius : 13;
-    div.innerHTML='<div style="font-size:11px;font-weight:900;color:#7ef0ff;margin-bottom:10px">❄️ EDICION HIELO - ICE_ALIGN</div>'+
-      '<div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:8px">Ajusta posicion de la bola de hielo sobre manos. charging=cargando, loaded=lista</div>'+
-      '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px"><div style="font-size:9px;color:#4ecca3;font-weight:800">CHARGING (cargando)</div>'+
-      '<div class="live-control"><label>X</label><input type="range" min="-40" max="60" step="1" value="'+ca.x+'" oninput="onIceAlign(\'charging\',\'x\',this.value,this)"><input type="number" value="'+ca.x+'" oninput="onIceAlign(\'charging\',\'x\',this.value,this)"></div>'+
-      '<div class="live-control"><label>Y</label><input type="range" min="-150" max="50" step="1" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"><input type="number" value="'+ca.y+'" oninput="onIceAlign(\'charging\',\'y\',this.value,this)"></div></div>'+
-      '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px"><div style="font-size:9px;color:#4ecca3;font-weight:800">LOADED (lista para disparar)</div>'+
+    var la = (typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.loaded) ? ICE_ALIGN.loaded : {x:15.1725, y:-105.4, scale:1};
+    var rad = (typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.ballRadius) ? ICE_ALIGN.ballRadius : 14;
+    div.innerHTML='<div style="font-size:11px;font-weight:900;color:#7ef0ff;margin-bottom:10px">❄️ POSICIÓN DE LA BOLA (al lanzar)</div>'+
+      '<div style="font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:8px">Ajusta dónde aparece la bola en el frame de lanzamiento (frame 2)</div>'+
+      '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;margin-bottom:8px">'+
       '<div class="live-control"><label>X</label><input type="range" min="-40" max="60" step="1" value="'+la.x+'" oninput="onIceAlign(\'loaded\',\'x\',this.value,this)"><input type="number" value="'+la.x+'" oninput="onIceAlign(\'loaded\',\'x\',this.value,this)"></div>'+
       '<div class="live-control"><label>Y</label><input type="range" min="-150" max="50" step="1" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"><input type="number" value="'+la.y+'" oninput="onIceAlign(\'loaded\',\'y\',this.value,this)"></div></div>'+
       '<div class="live-control"><label>RADIO BOLA</label><input type="range" min="5" max="30" step="1" value="'+rad+'" oninput="onIceRadius(this.value,this)"><input type="number" value="'+rad+'" oninput="onIceRadius(this.value,this)"></div>'+
@@ -389,7 +387,7 @@ function buildIceEditor(){
 function onIceAlign(mode, axis, v, el){
   try{
     v=parseInt(v);
-    if(typeof ICE_ALIGN==='undefined') window.ICE_ALIGN={charging:{x:20,y:-28,scale:1},loaded:{x:21,y:-45,scale:1},ballRadius:13};
+    if(typeof ICE_ALIGN==='undefined') window.ICE_ALIGN={loaded:{x:15.1725,y:-105.4,scale:1},ballRadius:14};
     if(!ICE_ALIGN[mode]) ICE_ALIGN[mode]={x:0,y:0,scale:1};
     ICE_ALIGN[mode][axis]=v;
     localStorage.setItem('sz_ice_align', JSON.stringify(ICE_ALIGN));
@@ -403,7 +401,7 @@ function onIceAlign(mode, axis, v, el){
 function onIceRadius(v, el){
   try{
     v=parseInt(v);
-    if(typeof ICE_ALIGN==='undefined') window.ICE_ALIGN={charging:{x:20,y:-28,scale:1},loaded:{x:21,y:-45,scale:1},ballRadius:13};
+    if(typeof ICE_ALIGN==='undefined') window.ICE_ALIGN={loaded:{x:15.1725,y:-105.4,scale:1},ballRadius:14};
     ICE_ALIGN.ballRadius=v;
     localStorage.setItem('sz_ice_align', JSON.stringify(ICE_ALIGN));
     if(el){
@@ -413,19 +411,10 @@ function onIceRadius(v, el){
     }
   }catch(e){}
 }
-function onIceAlignNumber(mode, axis, v, el){
-  onIceAlign(mode, axis, v, el);
-  try{ var parent=el.parentElement; var range=parent.querySelector('input[type="range"]'); if(range) range.value=v; }catch(e){}
-}
-function onIceRadiusNumber(v, el){
-  onIceRadius(v, el);
-  try{ var parent=el.parentElement; var range=parent.querySelector('input[type="range"]'); if(range) range.value=v; }catch(e){}
-}
 function exportIceAlign(){
   try{
     var lines=[];
     lines.push('const ICE_ALIGN = {');
-    lines.push('  charging: { x: '+(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', y: '+(ICE_ALIGN.charging.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', scale: '+(ICE_ALIGN.charging.scale||1)+' },');
     lines.push('  loaded: { x: '+(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', y: '+(ICE_ALIGN.loaded.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))+', scale: '+(ICE_ALIGN.loaded.scale||1)+' },');
     lines.push('  ballRadius: '+ICE_ALIGN.ballRadius);
     lines.push('};');
@@ -464,12 +453,12 @@ function buildLiveEditor(){
     statusDiv.innerHTML='<div style="font-weight:800;margin-bottom:4px">SPRITE STATUS: '+okCount+'/'+totalCount+' OK</div><div style="display:flex;flex-wrap:wrap;gap:6px">'+statusLines.join(' ')+'</div>';
     list.appendChild(statusDiv);
   }
-  // Add ICE editor if player
+  // Agregar editor de posición de la bola (solo para player)
   if(currentEditChar==='player'){
     var iceDiv=buildIceEditor();
     if(iceDiv) list.appendChild(iceDiv);
   }
-  var order=['idle','walk','punch','kick','hit','jump','ice_charge','ice_shoot','punch_air','kick_air','frozen','dead'];
+  var order=['idle','walk','punch','kick','hit','jump','ice_attack','punch_air','kick_air','frozen','dead'];
   var keys=Object.keys(cfgSet).sort(function(a,b){ var ia=order.indexOf(a), ib=order.indexOf(b); if(ia==-1) ia=999; if(ib==-1) ib=999; return ia-ib; });
   keys.forEach(function(k){
     var cfg=cfgSet[k]; if(!cfg) return;
@@ -488,6 +477,7 @@ function previewAnim(anim){
     if(anim==='punch'){ player.isPunching=true; player.punchTimer=0; }
     if(anim==='kick'){ player.isKicking=true; player.kickTimer=0; }
     if(anim==='jump'){ player.grounded=false; player.vy=-12; }
+    if(anim==='ice_attack'){ player.isIceAttacking=true; player.iceAttackTimer=0; player.iceShotFired=false; }
   } else {
     if(!dummyEnemy){ console.warn('no dummyEnemy for preview'); return; }
     dummyEnemy.previewAnim=anim; dummyEnemy.previewTimer=900; dummyEnemy.frame=0; dummyEnemy.frameTime=0;
@@ -657,9 +647,6 @@ function updateLiveButtonVisibility(){
   if(!b) return; 
   if(typeof currentState!=='undefined' && currentState==='PLAYING' && LEVELS[currentLevel] && LEVELS[currentLevel].isEditor){
     b.style.display='block';
-    // Auto open editor in editor level if not open
-    // Auto open eliminado - apertura solo via startLevel
-
   } else {
     b.style.display='none';
   }
@@ -830,11 +817,11 @@ const BOSS_CONFIGS = {
 };
 
 // Core
-let player={x:120,y:0,width:HITBOX_W,height:HITBOX_H,speed:5.0,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8,idleBob:0, jumpOffset:0, vy:0,width:HITBOX_W,height:HITBOX_H, grounded:true, landingTimer:0, isChargingIce:false, isIceLoaded:false, iceChargeTimer:0, isShootingIce:false, shootIceTimer:0, iceTarget:null};
-let ICE_CHARGE_TIME=750;
-let ICE_HOLD_MAX=2500;
-let GRAVITY=0.78; let JUMP_FORCE=-14.5;
-var JUMP_POWER=1.25;
+let player = {x:120, y:0, width:HITBOX_W, height:HITBOX_H, speed:5.0, facingRight:true, health:100, maxHealth:100, anim:'idle', frame:0, frameTime:0, scale:1.8, idleBob:0, jumpOffset:0, vy:0, grounded:true, landingTimer:0, 
+              isPunching:false, punchTimer:0, attackHit:false, 
+              isKicking:false, kickTimer:0, kickHit:false, 
+              hurtFlash:0,
+              isIceAttacking: false, iceAttackTimer: 0, iceShotFired: false };
 
 let _oldPlayer={x:120,y:0,speed:3.2,facingRight:true,health:100,maxHealth:100,anim:'idle',frame:0,frameTime:0,scale:1.8};
 let baseDrawWidth=90, baseDrawHeight=110, laneTop=180, laneBottom=360, playerLaneY=360;
@@ -864,7 +851,7 @@ const canvas=document.getElementById('gameCanvas');
 
 // --- ICE TARGET MANUAL SELECT - toque en enemigo ---
 canvas.addEventListener('click', function(ev){
-  if(!player.isChargingIce && !player.isIceLoaded) return;
+  if(!player.isIceAttacking) return;
   var rect=canvas.getBoundingClientRect();
   var sx=ev.clientX - rect.left;
   var sy=ev.clientY - rect.top;
@@ -876,7 +863,7 @@ canvas.addEventListener('click', function(ev){
   }
 });
 canvas.addEventListener('touchstart', function(ev){
-  if(!player.isChargingIce && !player.isIceLoaded) return;
+  if(!player.isIceAttacking) return;
   if(ev.touches.length===0) return;
   var rect=canvas.getBoundingClientRect();
   var t=ev.touches[0];
@@ -1096,12 +1083,21 @@ if(!DEBUG_MODE){
   console.info=function(){};
 }  // distancia mínima cuerpo a cuerpo (anti-empuje)
 
-function tryKick(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='kick'; dummyEnemy.previewTimer=800; return; } }catch(e){}
- if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; }
-function tryPunch(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.attacking=true; dummyEnemy.isMoving=false; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.attackTimer=0; dummyEnemy.previewAnim='punch'; dummyEnemy.previewTimer=800; return; } }catch(e){}
- if(player.isPunching || player.isKicking || player.isChargingIce || player.isIceLoaded || player.isShootingIce) return; if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH AIR"); return; } player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; console.log("PUNCH"); }
-function tryJump(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='jump'; dummyEnemy.previewTimer=600; return; } }catch(e){}
- if(!player.grounded) return; if(player.landingTimer>0) return; if(player.isChargingIce || player.isIceLoaded) return; if(player.isPunching || player.isKicking) return; player.grounded=false; player.vy=JUMP_FORCE*JUMP_POWER; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; }
+function tryKick(){ 
+  if(player.isIceAttacking || player.isPunching || player.isKicking) return; 
+  if(!player.grounded){ player.isKicking=true; player.anim="kick_air"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; return; } 
+  player.isKicking=true; player.anim="kick"; player.frame=0; player.frameTime=0; player.kickHit=false; player.kickTimer=0; 
+}
+function tryPunch(){ 
+  if(player.isIceAttacking || player.isPunching || player.isKicking) return; 
+  if(!player.grounded){ player.isPunching=true; player.anim="punch_air"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; return; } 
+  player.isPunching=true; player.anim="punch"; player.frame=0; player.frameTime=0; player.attackHit=false; player.punchTimer=0; 
+}
+function tryJump(){ 
+  if(player.isIceAttacking || !player.grounded) return; 
+  if(player.landingTimer>0) return; 
+  player.grounded=false; player.vy=JUMP_FORCE*JUMP_POWER; player.jumpOffset=-2; player.frame=0; player.frameTime=0; player.anim='jump'; 
+}
 
 function getIceCandidates(){
   var list=[];
@@ -1160,7 +1156,7 @@ function selectIceTargetAt(worldX, worldY){
 }
 
 function drawIceTargeting(){
-  if(!player.isChargingIce && !player.isIceLoaded) return;
+  if(!player.iceTarget) return;
   var target=player.iceTarget;
   if(!target || target.dead) return;
   var tx=target.x - camera.x;
@@ -1207,93 +1203,45 @@ function drawIceTargeting(){
   ctx.restore();
 }
 
-
-function findIceTarget(){
-  var cands=getIceCandidates();
-  return cands.length>0 ? cands[0] : null;
-}
-function cycleIceTarget(dir){
-  var cands=getIceCandidates();
-  if(cands.length===0){ player.iceTarget=null; return; }
-  if(!player.iceTarget){ player.iceTarget=cands[0]; return; }
-  var idx=cands.indexOf(player.iceTarget);
-  if(idx===-1){ player.iceTarget=cands[0]; return; }
-  idx=(idx+dir+cands.length)%cands.length;
-  player.iceTarget=cands[idx];
-  if(typeof spawnText==='function') spawnText(player.iceTarget.x, player.iceTarget.laneY-50, '❄ TARGET ❄', '#7ef0ff');
-}
-
-
-
 function fireIceProjectile(){
-  var gScale=(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1);
-  var pScale=(typeof PLAYER_SCALE!=='undefined'?PLAYER_SCALE:1);
-  var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*pScale;
-  var al=ICE_ALIGN.loaded;
-  // CAMBIO 1 — MISMA fórmula que preview de bola LOADED en editor
-  var px, py;
-  if(attachedIce && typeof attachedIce.x==='number' && typeof attachedIce.y==='number'){
-    // WYSIWYG exacto: donde el editor muestra la bola
-    px=attachedIce.x;
-    py=attachedIce.y;
-  } else {
-    // Fallback idéntico a preview loaded: x con _sc, y con playerEffY + al.y*GLOBAL
-    px=player.x + (player.facingRight?1:-1)*(al.x*gScale)*_sc;
-    py=playerEffY() + (al.y*gScale);
-  }
-  var target=player.iceTarget;
-  var vx=(player.facingRight?1:-1)*7.5, vy=0;
-  if(target && !target.dead && target.frozen<=0){
-    var dx=(target.x - px);
-    var dy=(target.laneY - py);
-    var dist=Math.hypot(dx,dy);
-    if(dist>0 && dist<560){
-      var speed=(window.ICE_SPEED||7.5);
-      vx=(dx/dist)*speed;
-      vy=(dy/dist)*speed*0.55;
+  var gScale = (typeof PLAYER_GLOBAL_SCALE !== 'undefined' ? PLAYER_GLOBAL_SCALE : 1);
+  var pScale = (typeof PLAYER_SCALE !== 'undefined' ? PLAYER_SCALE : 1);
+  var _sc = (1 - ((laneBottom - playerLaneY) / Math.max(1, laneBottom - laneTop)) * 0.12) * pScale;
+  var al = ICE_ALIGN.loaded;
+  // Posición de la bola en el frame de lanzamiento (manos)
+  var px = player.x + (player.facingRight ? 1 : -1) * (al.x * gScale) * _sc;
+  var py = playerEffY() + (al.y * gScale);
+  
+  var target = player.iceTarget || null;
+  var vx = (player.facingRight ? 1 : -1) * (window.ICE_SPEED || 7.5), vy = 0;
+  if (target && !target.dead && target.frozen <= 0) {
+    var dx = (target.x - px);
+    var dy = (target.laneY - py);
+    var dist = Math.hypot(dx, dy);
+    if (dist > 0 && dist < 560) {
+      var speed = (window.ICE_SPEED || 7.5);
+      vx = (dx / dist) * speed;
+      vy = (dy / dist) * speed * 0.55;
     }
   }
-  // CAMBIO 2 — radio = ballRadius escalado por GLOBAL
-  var baseR=(typeof ICE_ALIGN!=='undefined' && ICE_ALIGN.ballRadius)?ICE_ALIGN.ballRadius:13;
-  var r=baseR*gScale;
-  projectiles.push({x:px,y:py,vx:vx,vy:vy,type:'ice',life:3000, homing: target?true:false, target: target, r:r, trail:[]});
-  attachedIce=null;
-  player.isChargingIce=false;
-  player.isIceLoaded=false;
-  player.iceTarget=null;
-  player._manualLock=false;
-  player._upHeld=false; player._downHeld=false;
-  player.iceChargeTimer=0;
-  player.isShootingIce=true;
-  player.shootIceTimer=0;
-  player.anim='ice_shoot';
-  player.frame=0;
-  player.frameTime=0;
-  spawnText(player.x,playerLaneY-20,'HIELO DISPARADO!','#7ef0ff');
+  var baseR = (typeof ICE_ALIGN !== 'undefined' && ICE_ALIGN.ballRadius) ? ICE_ALIGN.ballRadius : 13;
+  var r = baseR * gScale;
+  projectiles.push({ x: px, y: py, vx: vx, vy: vy, type: 'ice', life: 3000, homing: target ? true : false, target: target, r: r, trail: [] });
+  spawnText(player.x, playerLaneY - 20, 'HIELO!', '#7ef0ff');
 }
 
-
-function tryIce(){ try{ var isEd=LEVELS[currentLevel] && LEVELS[currentLevel].isEditor; if(isEd && currentEditChar!=='player' && dummyEnemy){ dummyEnemy.hitTimer=90; dummyEnemy.frame=0; dummyEnemy.frameTime=0; dummyEnemy.previewAnim='hit'; dummyEnemy.previewTimer=600; return; } }catch(e){}
-
-  if(player.isChargingIce || player.isShootingIce) return;
-  if(player.isPunching || player.isKicking) return;
-  if(!player.grounded) return;
-  if(player.isIceLoaded && attachedIce && attachedIce.attached){
-    fireIceProjectile();
-    return;
-  }
-  player.isChargingIce=true;
-  player.isIceLoaded=false;
-  player.isShootingIce=false;
-  player.iceChargeTimer=0;
-  player._manualLock=false;
-
-  player.anim='ice_charge';
-  player.frame=0;
-  player.frameTime=0;
-  attachedIce={x:player.x+(player.facingRight?48:-8),y:playerLaneY-28,attached:true,charging:true,life:5000,chargeProgress:0,holdTimer:0};
-  spawnText(player.x,playerLaneY-20,'CARGANDO HIELO...','#7ef0ff');
+function tryIce(){
+  if (player.isIceAttacking || player.isPunching || player.isKicking || !player.grounded) return;
+  player.isIceAttacking = true;
+  player.anim = 'ice_attack';
+  player.frame = 0;
+  player.frameTime = 0;
+  player.iceAttackTimer = 0;
+  player.iceShotFired = false;
+  // Auto-target si no hay target
+  if (!player.iceTarget) player.iceTarget = findIceTarget();
 }
+
 function setupCanvas(){
   try{
     var wrapper=document.getElementById('canvas-wrapper');
@@ -2049,59 +1997,31 @@ ts=frameDt/16;
       }
     } else { player.kickTimer=0; }
 
-    // --- ICE CHARGE LOGIC v2.10: bloquea caminata mientras carga, libera al disparar ---
-    if(player.isShootingIce){
-      player.shootIceTimer+=16;
-      if(player.shootIceTimer>300){
-        player.isShootingIce=false;
-        player.anim='idle';
-        player.shootIceTimer=0;
-      }
-    }
-    if(player.isChargingIce){
-      player.iceChargeTimer+=16;
-      // targeting hielo - busca enemigo al frente
-      if(player.iceChargeTimer%100<16 && !player._manualLock){ player.iceTarget=findIceTarget(); }
-      // ciclo manual con arriba/abajo mientras cargas
-      if(keys.up && !player._upHeld){ player._upHeld=true; player._manualLock=true; cycleIceTarget(-1); }
-      if(!keys.up) player._upHeld=false;
-      if(keys.down && !player._downHeld){ player._downHeld=true; player._manualLock=true; cycleIceTarget(1); }
-      if(!keys.down) player._downHeld=false;
-
-      var _sc=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
-      if(attachedIce){
-        attachedIce.x=player.x+(player.facingRight?(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)):-(ICE_ALIGN.charging.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)))*_sc;
-        attachedIce.y=playerLaneY+(ICE_ALIGN.charging.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1))*_sc + (player.jumpOffset||0);
-        attachedIce.chargeProgress=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
-      }
-      if(player.iceChargeTimer>=ICE_CHARGE_TIME){
-        player.isChargingIce=false;
-        player.isIceLoaded=true;
-        if(attachedIce){
-          attachedIce.charging=false;
-          attachedIce.chargeProgress=1;
-          attachedIce.life=5000;
-          attachedIce.holdTimer=0;
+    // --- ATAQUE DE HIELO (nuevo) ---
+    if(player.isIceAttacking){
+      var iceCfg = SPRITE_CONFIG['ice_attack'];
+      var iceSpd = iceCfg ? iceCfg.speed : 120;
+      if (player.frameTime > iceSpd) {
+        player.frameTime = 0;
+        player.frame++;
+        // Disparar en el frame 2 (índice 2) si no se ha disparado
+        if (player.frame === 2 && !player.iceShotFired) {
+          fireIceProjectile();
+          player.iceShotFired = true;
         }
-        if(!player.iceTarget) player.iceTarget=findIceTarget();
-        spawnText(player.x,playerLaneY-30, player.iceTarget ? '¡LOCK: '+(player.iceTarget.type||'ENEMIGO')+'!': '¡HIELO CARGADO!','#7ef0ff');
-        setTimeout(function(){ if(player.isIceLoaded && attachedIce){ fireIceProjectile(); } }, 200);
+        // Si termina la animación (frames totales)
+        if (player.frame >= iceCfg.frames) {
+          player.isIceAttacking = false;
+          player.anim = 'idle';
+          player.frame = 0;
+          player.frameTime = 0;
+        }
       }
-    }
-    if(player.isIceLoaded && attachedIce){
-      attachedIce.holdTimer+=16;
-      var _sc2=(1-((laneBottom-playerLaneY)/Math.max(1,laneBottom-laneTop))*0.12)*PLAYER_SCALE;
-      attachedIce.x=player.x+(player.facingRight?(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)):-(ICE_ALIGN.loaded.x*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)))*_sc2;
-      attachedIce.y=playerLaneY + (ICE_ALIGN.loaded.y*(typeof PLAYER_GLOBAL_SCALE!=='undefined'?PLAYER_GLOBAL_SCALE:1)) + (player.jumpOffset||0);
-      if(attachedIce.holdTimer>=ICE_HOLD_MAX){ fireIceProjectile(); }
     }
 
     var moving=false;
-    var iceBlocking = player.isChargingIce || player.isIceLoaded;
-    // Guardar posición previa para colisión sólida
-    var _prevPx = player.x;
-    var _prevPy = playerLaneY;
-    if(!iceBlocking){
+    // El jugador no puede moverse mientras ataca con hielo (similar a puño/patada)
+    if(!player.isIceAttacking && !player.isPunching && !player.isKicking){
       if(keys.right){ player.x+=player.speed; player.facingRight=true; moving=true; }
       if(keys.left){ player.x-=player.speed; player.facingRight=false; moving=true; }
       if(player.grounded){
@@ -2109,6 +2029,9 @@ ts=frameDt/16;
         if(keys.down){ playerLaneY=Math.min(laneBottom,playerLaneY+player.speed*0.6); moving=true; }
       }
     }
+    // Guardar posición previa para colisión sólida
+    var _prevPx = player.x;
+    var _prevPy = playerLaneY;
     // === COLISION SOLIDA PLAYER vs ENEMIGOS - FIX: no empuja al player, solo bloquea ===
     try{
       if(enemies && enemies.length>0){
@@ -2159,8 +2082,7 @@ ts=frameDt/16;
     }catch(e){}
     if(player.anim==='punch_air' || player.anim==='kick_air'){
       // mantener animaciones aéreas ya establecidas por tryPunch/tryKick
-    } else if(player.isShootingIce){ player.anim='ice_shoot'; }
-    else if(player.isChargingIce || player.isIceLoaded){ player.anim='ice_charge'; }
+    } else if(player.isIceAttacking){ player.anim='ice_attack'; }
     else if(player.isPunching){ player.anim='punch'; }
     else if(player.isKicking){ player.anim='kick'; }
     else if(!player.grounded){ player.anim='jump'; }
@@ -2252,27 +2174,53 @@ ts=frameDt/16;
 
 
 // --- ANIMACION PLAYER ---
-    if(player.frameTime===undefined) player.frameTime=0;
-    if(player.anim==='jump'){
-      player.frameTime=(player.frameTime||0)+16;
-      if(player.frameTime>60){ player.frameTime=0; if(player.frame<11) player.frame++; }
-    } else {
-      player.frameTime+=16;
-      var cfg=SPRITE_CONFIG[player.anim];
-      var spd=cfg?cfg.speed:120;
-      if(player.frameTime>spd){
-        player.frameTime=0;
-        player.frame++;
-        var frames=cfg?cfg.frames:4;
-        if(player.frame>=frames){
-          if(player.anim==='punch' || player.anim==='kick' || player.anim==='punch_air' || player.anim==='kick_air' || player.anim==='ice_shoot'){
-            player.frame=frames-1;
-          } else {
-            player.frame=0;
-          }
+if (player.isIceAttacking) {
+  // Manejo exclusivo del ataque de hielo
+  var iceCfg = SPRITE_CONFIG['ice_attack'];
+  var iceSpd = iceCfg ? iceCfg.speed : 120;
+  player.frameTime = (player.frameTime || 0) + 16;
+  if (player.frameTime > iceSpd) {
+    player.frameTime = 0;
+    player.frame++;
+    // Disparar en el frame 2 (tercer frame, brazos extendidos)
+    if (player.frame === 2 && !player.iceShotFired) {
+      fireIceProjectile();
+      player.iceShotFired = true;
+    }
+    // Finalizar animación al llegar al último frame
+    if (player.frame >= iceCfg.frames) {
+      player.isIceAttacking = false;
+      player.anim = 'idle';
+      player.frame = 0;
+      player.frameTime = 0;
+    }
+  }
+} else {
+  // Animación normal para el resto de estados (idle, walk, punch, kick, jump, etc.)
+  if (player.anim === 'jump') {
+    player.frameTime = (player.frameTime || 0) + 16;
+    if (player.frameTime > 60) {
+      player.frameTime = 0;
+      if (player.frame < 11) player.frame++;
+    }
+  } else {
+    player.frameTime = (player.frameTime || 0) + 16;
+    var cfg = SPRITE_CONFIG[player.anim];
+    var spd = cfg ? cfg.speed : 120;
+    if (player.frameTime > spd) {
+      player.frameTime = 0;
+      player.frame++;
+      var frames = cfg ? cfg.frames : 4;
+      if (player.frame >= frames) {
+        if (player.anim === 'punch' || player.anim === 'kick' || player.anim === 'punch_air' || player.anim === 'kick_air') {
+          player.frame = frames - 1;
+        } else {
+          player.frame = 0;
         }
       }
     }
+  }
+}
 
 // --- ANIMACION ENEMIGOS ---
     for(var ei=0;ei<enemies.length;ei++){
@@ -2849,31 +2797,7 @@ function drawIceBall(p){
       }
     }catch(e){}
     if(typeof drawIceTargeting==='function') drawIceTargeting();
-    if(typeof drawIceTargeting==='function') drawIceTargeting();
 
-
-    // v2.15d FINAL - Bola CHICA 13px sobre manos - scale 0.6 - Y10 X29 / Y18 X40
-    if(attachedIce){
-      var asx=Math.round(attachedIce.x-camera.x);
-      var prog = attachedIce.chargeProgress!=null ? attachedIce.chargeProgress : 1;
-      var r = attachedIce.charging ? (8 + prog*5) : 13;
-      ctx.save();
-      ctx.fillStyle='rgba(0,0,0,0.28)';
-      ctx.beginPath();
-      ctx.ellipse(asx, attachedIce.y + r*0.5, r*0.6, r*0.25, 0, 0, Math.PI*2);
-      ctx.fill();
-      ctx.restore();
-      var g2=ctx.createRadialGradient(asx-2, attachedIce.y-2, 1, asx, attachedIce.y, r);
-      if(attachedIce.charging){
-        g2.addColorStop(0,'#ffffff'); g2.addColorStop(0.3,'#c8f5ff'); g2.addColorStop(0.55,'#7ef0ff'); g2.addColorStop(0.85,'#2ea8b0'); g2.addColorStop(1,'rgba(10,92,92,0.3)');
-      } else {
-        g2.addColorStop(0,'#fff'); g2.addColorStop(0.4,'#a0f0ff'); g2.addColorStop(0.7,'#4ecca3'); g2.addColorStop(1,'#0a5c5c');
-      }
-      ctx.save(); ctx.globalCompositeOperation='source-over'; ctx.shadowColor='#7ef0ff'; ctx.shadowBlur=8; ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
-      ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.beginPath(); ctx.arc(asx - r*0.25, attachedIce.y - r*0.25, r*0.22, 0, Math.PI*2); ctx.fill(); ctx.restore();
-      if(attachedIce.charging){ ctx.strokeStyle='rgba(126,240,255,0.85)'; ctx.lineWidth=1.5; ctx.beginPath(); ctx.arc(asx,attachedIce.y,r+3, -Math.PI/2, -Math.PI/2 + Math.PI*2*prog); ctx.stroke(); }
-    }
-    
     for(var fi=floatingTexts.length-1;fi>=0;fi--){
       var ft=floatingTexts[fi]; ft.timer+=16; ft.y+=ft.vy;
       ctx.fillStyle=ft.color; ctx.font='bold 12px sans-serif'; ctx.fillText(ft.text, ft.x-camera.x, ft.y);
@@ -2887,16 +2811,7 @@ function drawIceBall(p){
       document.getElementById('hud-health').textContent=Math.round(player.health)+'%';
       document.getElementById('health-bar').style.width=player.health+'%';
       document.getElementById('hud-level').textContent=currentLevel+'/'+(LEVELS.length-1);
-      var iceProgDisplay=0;
-      if(player && player.isChargingIce && typeof player.iceChargeTimer!=='undefined'){
-        iceProgDisplay=Math.min(1, player.iceChargeTimer/ICE_CHARGE_TIME);
-      } else if(player && player.isIceLoaded){
-        iceProgDisplay=1;
-      } else if(typeof attachedIce!=='undefined' && attachedIce && attachedIce.chargeProgress!=null){
-        iceProgDisplay=attachedIce.chargeProgress;
-      } else {
-        iceProgDisplay=0;
-      }
+      var iceProgDisplay = player.isIceAttacking ? 1 : 0;
       document.getElementById('hud-progress').textContent=Math.round(iceProgDisplay*100)+'%';
       document.getElementById('hud-enemies').textContent=enemiesDefeated+'/'+LEVELS[currentLevel].enemyCount;
       document.getElementById('hud-score').textContent=score+' pts';
@@ -3087,7 +3002,7 @@ try{ updateLiveButtonVisibility(); }catch(e){}
 try{ refreshContinueButton(); }catch(e){}
 }
 function showHowToPlay(){ showMenu('howtoplay'); }
-function checkUpdate(){ var el=document.getElementById('update-result'); var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var mv=document.getElementById('menu-version'); if(mv) mv.textContent='ADVENTURES v'+GAME_VERSION;  if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_charge.png 1F + ice_shoot.png 1F'; }
+function checkUpdate(){ var el=document.getElementById('update-result'); var vb=document.getElementById('version-badge'); if(vb) vb.textContent='v'+GAME_VERSION; var mv=document.getElementById('menu-version'); if(mv) mv.textContent='ADVENTURES v'+GAME_VERSION;  if(!el) return; el.textContent='v'+GAME_VERSION+' CELESTE DARK\nSingle file • Sprites configurables\n'+Object.keys(spriteStatus).length+' sprites • '+Object.values(spriteStatus).filter(function(s){return s==='ok'}).length+' OK\n\nTodo en index.html, sin dependencias\nIce: ice_attack.png 4F'; }
 
 function bindKeys(id,dir){
   var el=document.getElementById(id); if(!el) return;
