@@ -8,16 +8,15 @@ console.log("%c SUB-ZERO v1.80 - CELESTE DARK + SPRITES CONFIGURABLES ","backgro
 // Sistema de sprites - carga desde archivos externos
 
 const SPRITE_CONFIG = {
-    idle: { file: "idle.png", frames: 4, cols: 4, speed: 130, scaleX: 1.55, scaleY: 1.75, anchorX: 0, anchorY: -2 },
-    walk: { file: "walk.png", frames: 10, cols: 5, speed: 70, scaleX: 1.85, scaleY: 1.80, anchorX: 1, anchorY: -1 },
-    punch: { file: "punch.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 14, anchorY: 32 },
+    idle: { file: "idle.png", frames: 4, cols: 4, speed: 130, scaleX: 2.15, scaleY: 2.45, anchorX: 0, anchorY: -2 },
+    walk: { file: "walk.png", frames: 10, cols: 5, speed: 70, scaleX: 2.65, scaleY: 2.50, anchorX: 1, anchorY: -1 },
+    punch: { file: "punch.png", frames: 4, cols: 4, speed: 100, scaleX: 4.00, scaleY: 3.50, anchorX: 14, anchorY: 66 },
     kick: { file: "kick.png", frames: 4, cols: 4, speed: 100, scaleX: 3.50, scaleY: 2.40, anchorX: 9, anchorY: 33 },
-    // NUEVO JUMP CON LOS VALORES SOLICITADOS
-    jump: { file:'jump.png', frames:12, cols:4, rows:3, speed:60, scaleX:1.90, scaleY:1.20, anchorX:0, anchorY:1, integerFrames:true },
-    ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 1.70, scaleY: 1.75, anchorX: 0, anchorY: 5 },
-    ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 2.00, scaleY: 1.80, anchorX: 0, anchorY: 3 },
-    punch_air: { file: "punch_air.png", frames: 1, cols: 1, speed: 350, scaleX: 1.80, scaleY: 1.60, anchorX: 13, anchorY: 5 },
-    kick_air: { file: "kick_air.png", frames: 1, cols: 1, speed: 350, scaleX: 2.00, scaleY: 1.70, anchorX: 15, anchorY: 0 },
+    jump: { file: "jump.png", frames: 12, cols: 4, rows: 3, speed: 60, scaleX: 3.45, scaleY: 3.75, anchorX: 0, anchorY: 1, integerFrames: true },
+    ice_charge: { file: "ice_charge.png", frames: 1, cols: 1, speed: 300, scaleX: 2.65, scaleY: 2.50, anchorX: 0, anchorY: 5 },
+    ice_shoot: { file: "ice_shoot.png", frames: 1, cols: 1, speed: 300, scaleX: 2.85, scaleY: 1.80, anchorX: 0, anchorY: 3 },
+    punch_air: { file: "punch_air.png", frames: 1, cols: 1, speed: 350, scaleX: 3.00, scaleY: 2.20, anchorX: 13, anchorY: 5 },
+    kick_air: { file: "kick_air.png", frames: 1, cols: 1, speed: 350, scaleX: 3.25, scaleY: 2.50, anchorX: 15, anchorY: 0 },
 };
 // v2.68 ICE ALIGN - configurado por usuario: charging 20/-28 loaded 21/-45
 const ICE_ALIGN = {
