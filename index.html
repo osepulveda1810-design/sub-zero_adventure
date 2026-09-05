@@ -453,7 +453,7 @@ function burst(x,y,z,color,n){let c=0;for(const s of sparks){if(s.t<s.life)conti
  s.m.visible=true;s.m.material.color.set(color);s.m.position.set(x,y,z);
  s.vx=rnd(-4,4);s.vy=rnd(1,6);s.vz=rnd(-4,4);s.t=0;s.life=rnd(.25,.55);if(++c>=n)break;}}
 /* ---------- SPRITES ---------- */
-const SPR_CLEAN_BG=false; /* true si usas tiras con fondo verde/blanco */
+const SPR_CLEAN_BG=true; /* true si usas tiras con fondo verde/blanco */
 const SPR_CFG={h:2.05,wRatio:.55,
  frames:{idle:4,walk:10,punch:3,kick:3,ice:2,jump:1,hurt:1,frozen:1,down:1,idleF:4,idleB:4,walkF:10,walkB:10},
  grid:{walk:[5,2],walkF:[5,2],walkB:[5,2]}};
@@ -490,6 +490,8 @@ function prepCanvas(im){
     if(dr*dr+dg*dg+db*db<tol*tol){seen[p+w]=1;st.push(p+w);}}
    if(y>0&&!seen[p-w]){const j=(p-w)*4,dr=px[j]-bg[0],dg=px[j+1]-bg[1],db=px[j+2]-bg[2];
     if(dr*dr+dg*dg+db*db<tol*tol){seen[p-w]=1;st.push(p-w);}}}
+  for(let i=0;i<px.length;i+=4){if(px[i+3]>0){const r=px[i],gg=px[i+1],b=px[i+2];
+   if(gg>90&&gg>r+24&&gg>b+24)px[i+3]=0;}}
   g.putImageData(d,0,0);}
  return c;}
 function mkTex(cn){const t=new THREE.CanvasTexture(cn);t.anisotropy=4;return t;}
@@ -498,19 +500,34 @@ function buildSheets(){const names=Object.keys(SPR_FILES);const imgs={};let done
  function check(){if(doneN<names.length)return;
   const base=imgs.idle||imgs.idleF||imgs.idleB||imgs.walk||null;
   if(!base){toast('⚠ Sprites no encontrados: uso stickmen');return;}
-  for(const nm of names){const cn=imgs[nm]||base;
+    for(const nm of names){const cn=imgs[nm]||base;
    let n=SPR_CFG.frames[nm]||4;
-   const asp=cn.width/cn.height;
-   if(n>1&&asp<1.2)n=1; /* imagen única en vez de tira */
+   const asp0=cn.width/cn.height;
+   if(n>1&&asp0<1.2)n=1;
    const grid=SPR_CFG.grid?SPR_CFG.grid[nm]:null;
    const cols=grid?grid[0]:n,rows=grid?grid[1]:1;
    if(grid)n=cols*rows;
-   const fw=cn.width/cols,fh=cn.height/rows,arr=[];
-   for(let f=0;f<n;f++){const col=f%cols,row=(f/cols)|0;
+   const INSET=0.04;
+   const w=cn.width,h=cn.height,fw=w/cols,fh=h/rows;
+   const dd=cn.getContext('2d').getImageData(0,0,w,h).data;
+   let minx=1e9,miny=1e9,maxx=-1,maxy=-1;
+   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+    const ox=(c*fw)|0,oy=(r*fh)|0;
+    const ix=(fw*INSET)|0,iy=(fh*INSET)|0;
+    for(let y=iy;y<fh-iy;y++)for(let x=ix;x<fw-ix;x++){
+     if(dd[((oy+y)*w+(ox+x))*4+3]>10){
+      if(x<minx)minx=x;if(x>maxx)maxx=x;
+      if(y<miny)miny=y;if(y>maxy)maxy=y;}}}
+   const okBox=maxx>=0;
+   const bw=okBox?(maxx-minx+1):fw,bh=okBox?(maxy-miny+1):fh;
+   const arr=[];
+   for(let f=0;f<n;f++){const c=f%cols,r=(f/cols)|0;
     const fc=document.createElement('canvas');
-    fc.width=Math.max(2,Math.floor(fw));fc.height=Math.max(2,Math.floor(fh));
-    fc.getContext('2d').drawImage(cn,col*fw,row*fh,fw,fh,0,0,fc.width,fc.height);
+    fc.width=Math.max(2,Math.floor(bw));fc.height=Math.max(2,Math.floor(bh));
+    const sx=((c*fw)|0)+(okBox?minx:0),sy=((r*fh)|0)+(okBox?miny:0);
+    fc.getContext('2d').drawImage(cn,sx,sy,bw,bh,0,0,fc.width,fc.height);
     arr.push(mkTex(fc));}
+   arr.asp=bw/bh;
    ROWTEX[nm]=arr;}
   SHEETS.P=ROWTEX;SHEETS.E=ROWTEX;SHEETS.EL=ROWTEX;
   eachFighter(useSprite);
@@ -752,7 +769,7 @@ function syncMesh(f){
   const tex=(arr&&arr[rf.frame%arr.length])||(rt.idle&&rt.idle[0])||null;
   if(!tex){f.spOn=false;f.spMesh.visible=false;f.parts.group.visible=true;return;}
   if(f.spFrameTex!==tex){f.spFrameTex=tex;f.spMat.map=tex;f.spMat.needsUpdate=true;}
-  const H=SPR_CFG.h*(f.elite?1.12:1),W=H*SPR_CFG.wRatio;
+  const H=SPR_CFG.h*(f.elite?1.12:1),W=H*(arr.asp||SPR_CFG.wRatio);
   const ori=viewOri(f);
   const flip=ori==='S'?(Math.sin(f.face-camYaw)<0?-1:1):1;
   f.spMesh.scale.set(W*flip,H,1);
