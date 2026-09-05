@@ -453,7 +453,7 @@ function burst(x,y,z,color,n){let c=0;for(const s of sparks){if(s.t<s.life)conti
  s.m.visible=true;s.m.material.color.set(color);s.m.position.set(x,y,z);
  s.vx=rnd(-4,4);s.vy=rnd(1,6);s.vz=rnd(-4,4);s.t=0;s.life=rnd(.25,.55);if(++c>=n)break;}}
 /* ---------- SPRITES ---------- */
-const SPR_CLEAN_BG=true; /* true si usas tiras con fondo verde/blanco */
+const SPR_CLEAN_BG=false; /* true si usas tiras con fondo verde/blanco */
 const SPR_CFG={h:2.05,wRatio:.55,
  frames:{idle:4,walk:10,punch:3,kick:3,ice:2,jump:1,hurt:1,frozen:1,down:1,idleF:4,idleB:4,walkF:10,walkB:10},
  grid:{walk:[5,2],walkF:[5,2],walkB:[5,2]}};
