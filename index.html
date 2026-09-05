@@ -453,14 +453,18 @@ function burst(x,y,z,color,n){let c=0;for(const s of sparks){if(s.t<s.life)conti
  s.m.visible=true;s.m.material.color.set(color);s.m.position.set(x,y,z);
  s.vx=rnd(-4,4);s.vy=rnd(1,6);s.vz=rnd(-4,4);s.t=0;s.life=rnd(.25,.55);if(++c>=n)break;}}
 /* ---------- SPRITES ---------- */
-const SPR_CLEAN_BG=false; /* true si usas tiras con fondo verde/blanco */
+const SPR_CLEAN_BG=true; /* true si usas tiras con fondo verde/blanco */
 const SPR_CFG={h:2.05,wRatio:.55,
- frames:{idle:4,walk:4,punch:3,kick:3,ice:2,jump:1,hurt:1,frozen:1,down:1,idleF:4,idleB:4}};
+ frames:{idle:4,walk:10,punch:3,kick:3,ice:2,jump:1,hurt:1,frozen:1,down:1,idleF:4,idleB:4,walkF:10,walkB:10},
+ grid:{walk:[5,2],walkF:[5,2],walkB:[5,2]}};
 const SHEETS={P:null,E:null,EL:null};
 const SPR_FILES={idle:['sprites/idle_side.png','sprites/subzero_idle.png'],
  idleF:['sprites/idle_front.png','sprites/idle_front.PNG','sprites/idle_front.jpg'],
  idleB:['sprites/idle_back.png','sprites/idle_back.PNG','sprites/idle_back.jpg'],
- walk:['sprites/subzero_walk.png'],punch:['sprites/subzero_punch.png'],
+ walk:['sprites/subzero_walk_side.png','sprites/walk_side.png','sprites/walk_side.jpg','sprites/subzero_walk.png'],
+ walkF:['sprites/subzero_walk_front.jpg','sprites/walk_front.png','sprites/walk_front.jpg'],
+ walkB:['sprites/subzero_walk_back.jpg','sprites/walk_back.png','sprites/walk_back.jpg'],
+ punch:['sprites/subzero_punch.png'],
  kick:['sprites/subzero_kick.png'],ice:['sprites/subzero_ice.png'],
  jump:['sprites/subzero_jump.png'],hurt:['sprites/subzero_hurt.png'],
  frozen:['sprites/subzero_frozen.png'],down:['sprites/subzero_down.png']};
@@ -498,10 +502,14 @@ function buildSheets(){const names=Object.keys(SPR_FILES);const imgs={};let done
    let n=SPR_CFG.frames[nm]||4;
    const asp=cn.width/cn.height;
    if(n>1&&asp<1.2)n=1; /* imagen única en vez de tira */
-   const fw=cn.width/n,arr=[];
-   for(let f=0;f<n;f++){const fc=document.createElement('canvas');
-    fc.width=Math.max(2,Math.floor(fw));fc.height=cn.height;
-    fc.getContext('2d').drawImage(cn,f*fw,0,fw,cn.height,0,0,fc.width,fc.height);
+   const grid=SPR_CFG.grid?SPR_CFG.grid[nm]:null;
+   const cols=grid?grid[0]:n,rows=grid?grid[1]:1;
+   if(grid)n=cols*rows;
+   const fw=cn.width/cols,fh=cn.height/rows,arr=[];
+   for(let f=0;f<n;f++){const col=f%cols,row=(f/cols)|0;
+    const fc=document.createElement('canvas');
+    fc.width=Math.max(2,Math.floor(fw));fc.height=Math.max(2,Math.floor(fh));
+    fc.getContext('2d').drawImage(cn,col*fw,row*fh,fw,fh,0,0,fc.width,fc.height);
     arr.push(mkTex(fc));}
    ROWTEX[nm]=arr;}
   SHEETS.P=ROWTEX;SHEETS.E=ROWTEX;SHEETS.EL=ROWTEX;
@@ -527,7 +535,10 @@ function viewOri(f){const c=Math.cos(f.face-camYaw);
 function animSafe(f){return (typeof f.anim==='number'&&!isNaN(f.anim))?f.anim:0;}
 function spriteRowFrame(f){const F=SPR_CFG.frames,s=f.state,A=animSafe(f);
  let name='idle',frame=0;
- if(s==='walk'||s==='chase'){name='walk';frame=Math.floor(A*8)%(F.walk||4);}
+ if(s==='walk'||s==='chase'){const o=viewOri(f);
+  if(o==='F'){name='walkF';frame=Math.floor(A*9)%(F.walkF||F.walk||10);}
+  else if(o==='B'){name='walkB';frame=Math.floor(A*9)%(F.walkB||F.walk||10);}
+  else{name='walk';frame=Math.floor(A*9)%(F.walk||10);}}
  else if(s==='punch'||s==='strike'||s==='windup'){name='punch';
   frame=s==='windup'?0:Math.round(clamp(f.atk?f.atk.t/f.atk.dur:f.t/.25,0,1)*((F.punch||3)-1));}
  else if(s==='kick'){name='kick';frame=Math.round(clamp(f.atk?f.atk.t/f.atk.dur:0,0,1)*((F.kick||3)-1));}
