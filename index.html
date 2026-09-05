@@ -294,6 +294,9 @@ try{
   card.rotation.y=st.x<0?0.22:-0.22;
   card.position.set(st.x,0,st.z);card.visible=false;scene.add(card);statueCards.push(card);});
 }catch(e){console.error('statues:',e);}
+const STATUE_COL=[{x:-4,z:-3,r:1.2},{x:4,z:-3,r:1.2},{x:-4,z:-118,r:1.2},{x:4,z:-118,r:1.2},{x:-6.6,z:-122,r:1.6},{x:6.6,z:-122,r:1.6}];
+function collideStatues(f){for(const c of STATUE_COL){const dx=f.x-c.x,dz=f.z-c.z;const d=Math.hypot(dx,dz);
+ if(d<c.r&&d>1e-4){const k=c.r-d;f.x+=dx/d*k;f.z+=dz/d*k;}}}
 function chromaKey(img){const scale=Math.min(1,1024/img.width);
  const w0=Math.max(2,Math.floor(img.width*scale)),h0=Math.max(2,Math.floor(img.height*scale));
  const c=document.createElement('canvas');c.width=w0;c.height=h0;
@@ -730,6 +733,7 @@ function stepPlay(dt){G.hint-=dt;
  P.x=clamp(P.x,-WORLD.xLim,WORLD.xLim);
  const zMin=G.gateZ<1e8?G.gateZ:WORLD.zMin;
  P.z=clamp(P.z,zMin,WORLD.zMax);
+ collideStatues(P);
  if(P.atk){const a=P.atk;a.t+=dt;
   if(a.type==='punch'&&!a.hit&&a.t>a.dur*.4){a.hit=true;meleeHit(2,1.15,6+a.step*2,2.5);}
   if(a.type==='kick'&&!a.hit&&a.t>a.dur*.45){a.hit=true;meleeHit(2.3,1.25,12,7);}
@@ -805,6 +809,7 @@ function updateFoes(dt){
    if(!f.did&&f.t>.08){f.did=true;
     if(Math.hypot(P.x-f.x,P.z-f.z)<2&&P.inv<=0&&P.hp>0)hurtPlayer(f.elite?12:8,f.face);}
    if(f.t>.25){f.state='chase';f.cd=rnd(.9,1.8);}}
+  collideStatues(f);
   if(!f.spOn)poseFighter(f);syncMesh(f);}}
 function updateProjs(dt){
  for(let i=projs.length-1;i>=0;i--){const p=projs[i];p.t+=dt;p.x+=p.vx*dt;p.z+=p.vz*dt;
