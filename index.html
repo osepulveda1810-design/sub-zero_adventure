@@ -671,16 +671,31 @@ stickZone.addEventListener('pointermove',e=>{if(input.joy.active&&e.pointerId===
 const joyEnd=e=>{if(e.pointerId!==input.joy.id)return;input.joy.active=false;input.joy.x=0;input.joy.y=0;knob.style.transform='translate(-50%,-50%)';};
 stickZone.addEventListener('pointerup',joyEnd);stickZone.addEventListener('pointercancel',joyEnd);
 let camYaw=0,camPitch=.34,camId=-1,camLX=0,camLY=0,camYawGoal=null,camLastDown=0;
-camZone.addEventListener('pointerdown',e=>{e.preventDefault();camZone.setPointerCapture(e.pointerId);camId=e.pointerId;camLX=e.clientX;camLY=e.clientY;
- const now=performance.now();
- if(now-camLastDown<300&&P){camYawGoal=P.face+Math.PI;}
- camLastDown=now;});
-camZone.addEventListener('pointermove',e=>{if(e.pointerId!==camId)return;
+let camDist=6.4;const CAMD_MIN=3.2,CAMD_MAX=9.5; /* límites del zoom */
+const pts=new Map();let pinchD0=0,camD0=6.4;
+function pinchDist(){const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);}
+camZone.addEventListener('pointerdown',e=>{e.preventDefault();camZone.setPointerCapture(e.pointerId);
+ pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pts.size===2){pinchD0=pinchDist();camD0=camDist;camId=-1;}
+ else if(pts.size===1){camId=e.pointerId;camLX=e.clientX;camLY=e.clientY;
+  const now=performance.now();
+  if(now-camLastDown<300&&P){camYawGoal=P.face+Math.PI;}
+  camLastDown=now;}});
+camZone.addEventListener('pointermove',e=>{
+ if(pts.has(e.pointerId))pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(pts.size>=2){const dnow=pinchDist();
+  if(pinchD0>10){camDist=clamp(camD0*(pinchD0/dnow),CAMD_MIN,CAMD_MAX);}
+  return;}
+ if(e.pointerId!==camId)return;
  camYawGoal=null;
  camYaw-=(e.clientX-camLX)*.005;camPitch=clamp(camPitch+(e.clientY-camLY)*.004,.16,.62);
  camLX=e.clientX;camLY=e.clientY;});
-const camEnd=e=>{if(e.pointerId===camId)camId=-1;};
+const camEnd=e=>{pts.delete(e.pointerId);
+ if(pts.size<2)pinchD0=0;
+ if(e.pointerId===camId)camId=-1;
+ if(pts.size===1){const k=[...pts.keys()][0],p=pts.get(k);camId=k;camLX=p.x;camLY=p.y;}};
 camZone.addEventListener('pointerup',camEnd);camZone.addEventListener('pointercancel',camEnd);
+addEventListener('wheel',e=>{camDist=clamp(camDist+e.deltaY*.01,CAMD_MIN,CAMD_MAX);},{passive:true});
 document.querySelectorAll('.ctl').forEach(el=>{const a=el.dataset.a;
  el.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();input.press[a]=true;el.classList.add('on');});
  const up=()=>el.classList.remove('on');
