@@ -840,7 +840,7 @@ let last=0;
 function loop(ts){const dt=Math.min(.033,(ts-last)/1000||.016);last=ts;
  try{update(dt);}catch(err){console.error('update:',err);}
  try{
-  const d=6.4,ox=Math.sin(camYaw)*Math.cos(camPitch)*d,oz=Math.cos(camYaw)*Math.cos(camPitch)*d,oy=Math.sin(camPitch)*d+1.5;
+  const d=camDist,ox=Math.sin(camYaw)*Math.cos(camPitch)*d,oz=Math.cos(camYaw)*Math.cos(camPitch)*d,oy=Math.sin(camPitch)*d+1.5;
   const shx=(Math.random()-.5)*G.shake,shy=(Math.random()-.5)*G.shake;
   camera.position.set(P.x+ox+shx,oy+shy,P.z+oz);
   camera.lookAt(P.x,1.4,P.z);
