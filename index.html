@@ -761,8 +761,9 @@ function stepPlay(dt){G.hint-=dt;
  const moving=(mx!==0||mz!==0)&&!P.atk;
  if(moving){const sp=P.h>0?4.6:5.2;P.x+=mx*sp*dt;P.z+=mz*sp*dt;}
  if(input.press.jump&&P.h===0&&!P.atk){P.vh=6.8;burst(P.x,.2,P.z,0xeaf6ff,5);}
- if(P.h>0||P.vh!==0){P.h+=P.vh*dt;P.vh-=18*dt;if(P.h<=0){P.h=0;P.vh=0;burst(P.x,.2,P.z,0xeaf6ff,6);G.shake=Math.max(G.shake,.06);}}
- if(!P.atk&&P.hurtT<=0&&P.h===0){
+if(P.h>0||P.vh!==0){P.h+=P.vh*dt;P.vh-=18*dt;if(P.h<=0){P.h=0;P.vh=0;burst(P.x,.2,P.z,0xeaf6ff,6);G.shake=Math.max(G.shake,.06);}}
+ P.jumpT=P.h>0?(P.jumpT||0)+dt:0; 
+  if(!P.atk&&P.hurtT<=0&&P.h===0){
   if(input.press.punch)startAtk('punch',P.comboStep||0);
   else if(input.press.kick)startAtk('kick',0);
   else if(input.press.ice)startAtk('ice',0);}
