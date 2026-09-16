@@ -583,7 +583,11 @@ function spriteRowFrame(f){const F=SPR_CFG.frames,s=f.state,A=animSafe(f);
   frame=s==='windup'?0:Math.round(clamp(f.atk?f.atk.t/f.atk.dur:f.t/.25,0,1)*((F.punch||3)-1));}
  else if(s==='kick'){name='kick';frame=Math.round(clamp(f.atk?f.atk.t/f.atk.dur:0,0,1)*((F.kick||3)-1));}
  else if(s==='ice'){name='ice';frame=Math.round(clamp(f.atk?f.atk.t/f.atk.dur:0,0,1)*((F.ice||2)-1));}
- else if(s==='jump'){name='jump';frame=0;}
+ else if(s==='jump'){const o=viewOri(f);
+  const fr=Math.min(4,Math.floor((f.jumpT||0)/0.15));
+  if(o==='F'){name='jumpF';frame=fr;}
+  else if(o==='B'){name='jumpB';frame=fr;}
+  else{name='jump';frame=fr;}}
  else if(s==='hurt'){name='hurt';frame=0;}
  else if(s==='frozen'){name='frozen';frame=0;}
  else if(s==='down'){name='down';frame=0;}
