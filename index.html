@@ -519,14 +519,19 @@ function buildSheets(){const names=Object.keys(SPR_FILES);const imgs={};let done
    const INSETX=0.015; /* solo horizontal: quita el pie colado sin cortar cabeza/pies */
    const w=cn.width,h=cn.height,fw=w/cols,fh=h/rows;
    const dd=cn.getContext('2d').getImageData(0,0,w,h).data;
+   const cellB=[];
    let minx=1e9,miny=1e9,maxx=-1,maxy=-1;
    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
     const ox=(c*fw)|0,oy=(r*fh)|0;
     const ix=(fw*INSETX)|0;
+    let cx0=1e9,cy0=1e9,cx1=-1,cy1=-1;
     for(let y=0;y<fh;y++)for(let x=ix;x<fw-ix;x++){
      if(dd[((oy+y)*w+(ox+x))*4+3]>10){
-      if(x<minx)minx=x;if(x>maxx)maxx=x;
-      if(y<miny)miny=y;if(y>maxy)maxy=y;}}}
+      if(x<cx0)cx0=x;if(x>cx1)cx1=x;
+      if(y<cy0)cy0=y;if(y>cy1)cy1=y;}}
+    cellB.push([cx0,cy0,cx1,cy1]);
+    if(cx1>=0){if(cx0<minx)minx=cx0;if(cx1>maxx)maxx=cx1;
+     if(cy0<miny)miny=cy0;if(cy1>maxy)maxy=cy1;}}
    const okBox=maxx>=0;
    const bw=okBox?(maxx-minx+1):fw,bh=okBox?(maxy-miny+1):fh;
    const fit=FITM[nm]||0;
