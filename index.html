@@ -471,7 +471,10 @@ const SPR_FILES={idle:['sprites/idle_side.png','sprites/subzero_idle.png'],
  walkB:['sprites/subzero_walk_back.jpg','sprites/walk_back.png','sprites/walk_back.jpg'],
  punch:['sprites/subzero_punch.png'],
  kick:['sprites/subzero_kick.png'],ice:['sprites/subzero_ice.png'],
- jump:['sprites/jump_side.png','sprites/jump_side.jpg','sprites/subzero_jump.png'],  jumpF:['sprites/jump_front.png','sprites/jump_front.jpg'],  jumpB:['sprites/jump_back.png','sprites/jump_back.jpg'],  hurt:['sprites/subzero_hurt.png'],
+ jump:['sprites/jump_side.png','sprites/jump_side.jpg','sprites/subzero_jump.png'],
+jumpF:['sprites/jump_front.png','sprites/jump_front.jpg'],
+jumpB:['sprites/jump_back.png','sprites/jump_back.jpg'],
+hurt:['sprites/subzero_hurt.png'],
  frozen:['sprites/subzero_frozen.png'],down:['sprites/subzero_down.png']};
 function prepCanvas(im){
  const sc=Math.min(1,1024/im.width);
@@ -525,14 +528,23 @@ function buildSheets(){const names=Object.keys(SPR_FILES);const imgs={};let done
       if(y<miny)miny=y;if(y>maxy)maxy=y;}}}
    const okBox=maxx>=0;
    const bw=okBox?(maxx-minx+1):fw,bh=okBox?(maxy-miny+1):fh;
+   const fit=FITM[nm]||0;
    const arr=[];
    for(let f=0;f<n;f++){const c=f%cols,r=(f/cols)|0;
     const fc=document.createElement('canvas');
     fc.width=Math.max(2,Math.floor(bw));fc.height=Math.max(2,Math.floor(bh));
-    const sx=((c*fw)|0)+(okBox?minx:0),sy=((r*fh)|0)+(okBox?miny:0);
-    fc.getContext('2d').drawImage(cn,sx,sy,bw,bh,0,0,fc.width,fc.height);
+    const g2=fc.getContext('2d');
+    const cb=cellB[f];
+    if(okBox&&cb&&cb[2]>=0){
+     const cw=cb[2]-cb[0]+1,chh=cb[3]-cb[1]+1;
+     const s=1+fit*((bh/chh)-1);
+     const dw=cw*s,dh=chh*s;
+     g2.drawImage(cn,((c*fw)|0)+cb[0],((r*fh)|0)+cb[1],cw,chh,
+      Math.floor((bw-dw)/2),Math.floor(bh-dh),Math.ceil(dw),Math.ceil(dh));
+    }else{
+     g2.drawImage(cn,(c*fw)|0,(r*fh)|0,fw,fh,0,0,fc.width,fc.height);}
     arr.push(mkTex(fc));}
-   arr.asp=(bw/bh)*ASP_FIX;
+   arr.asp=bw/bh;
    ROWTEX[nm]=arr;}
   SHEETS.P=ROWTEX;SHEETS.E=ROWTEX;SHEETS.EL=ROWTEX;
   eachFighter(useSprite);
