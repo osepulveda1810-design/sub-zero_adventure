@@ -458,7 +458,8 @@ function burst(x,y,z,color,n){let c=0;for(const s of sparks){if(s.t<s.life)conti
 /* ---------- SPRITES ---------- */
 const SPR_CLEAN_BG=true; /* true si usas tiras con fondo verde/blanco */
 const ASP_FIX=1.0; /* si algún set se ve ancho/angosto, cámbialo a 0.9 / 1.1 */
-const ASPM={walk:.9,walkF:.9,walkB:.9}; /* adelgaza solo el caminar (0.85–0.95) */ const FITM={jump:.7,jumpF:.7,jumpB:.7}; /* 0=natural, 1=tamaño constante por frame */
+const ASPM={walk:.9,walkF:.9,walkB:.9}; /* adelgaza solo el caminar (0.85–0.95) */ 
+const FITM={jump:.7,jumpF:.7,jumpB:.7}; /* 0=natural, 1=tamaño constante por frame */
 const SPR_CFG={h:2.05,wRatio:.55,
  frames:{idle:4,walk:8,punch:3,kick:3,ice:2,jump:5,hurt:1,frozen:1,down:1,idleF:4,idleB:4,walkF:8,walkB:8,jumpF:5,jumpB:5},
  grid:{walk:[4,2],walkF:[4,2],walkB:[4,2]}};
