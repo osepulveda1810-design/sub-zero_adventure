@@ -509,46 +509,45 @@ function buildSheets(){const names=Object.keys(SPR_FILES);const imgs={};let done
  function check(){if(doneN<names.length)return;
   const base=imgs.idle||imgs.idleF||imgs.idleB||imgs.walk||null;
   if(!base){toast('⚠ Sprites no encontrados: uso stickmen');return;}
-    for(const nm of names){const cn=imgs[nm]||base;
-   let n=SPR_CFG.frames[nm]||4;
-   const asp0=cn.width/cn.height;
-   if(n>1&&asp0<1.2)n=1;
-   const grid=SPR_CFG.grid?SPR_CFG.grid[nm]:null;
-   const cols=grid?grid[0]:n,rows=grid?grid[1]:1;
-   if(grid)n=cols*rows;
-   const INSETX=0.015; /* solo horizontal: quita el pie colado sin cortar cabeza/pies */
-   const w=cn.width,h=cn.height,fw=w/cols,fh=h/rows;
+      for(const nm of names){const cn=imgs[nm]||base;
+   const w=cn.width,h=cn.height;
    const dd=cn.getContext('2d').getImageData(0,0,w,h).data;
-   const cellB=[];
-   let minx=1e9,miny=1e9,maxx=-1,maxy=-1;
-   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
-    const ox=(c*fw)|0,oy=(r*fh)|0;
-    const ix=(fw*INSETX)|0;
-    let cx0=1e9,cy0=1e9,cx1=-1,cy1=-1;
-    for(let y=0;y<fh;y++)for(let x=ix;x<fw-ix;x++){
-     if(dd[((oy+y)*w+(ox+x))*4+3]>10){
-      if(x<cx0)cx0=x;if(x>cx1)cx1=x;
-      if(y<cy0)cy0=y;if(y>cy1)cy1=y;}}
-    cellB.push([cx0,cy0,cx1,cy1]);
-    if(cx1>=0){if(cx0<minx)minx=cx0;if(cx1>maxx)maxx=cx1;
-     if(cy0<miny)miny=cy0;if(cy1>maxy)maxy=cy1;}}
-   const okBox=maxx>=0;
-   const bw=okBox?(maxx-minx+1):fw,bh=okBox?(maxy-miny+1):fh;
+   let boxes=[];
+   const grid=SPR_CFG.grid?SPR_CFG.grid[nm]:null;
+   if(grid){const cols=grid[0],rows=grid[1],fw=w/cols,fh=h/rows,ix=(fw*0.015)|0;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+     const ox=(c*fw)|0,oy=(r*fh)|0;
+     let cx0=1e9,cy0=1e9,cx1=-1,cy1=-1;
+     for(let y=0;y<fh;y++)for(let x=ix;x<fw-ix;x++){
+      if(dd[((oy+y)*w+(ox+x))*4+3]>10){
+       if(x<cx0)cx0=x;if(x>cx1)cx1=x;if(y<cy0)cy0=y;if(y>cy1)cy1=y;}}
+     if(cx1>=0)boxes.push([ox+cx0,oy+cy0,ox+cx1,oy+cy1]);
+     else boxes.push([ox,oy,ox+Math.floor(fw)-1,oy+Math.floor(fh)-1]);}}
+   else{ /* detección automática (tiras con espaciado irregular) */
+    const bands=[];{let inB=false,st=0;
+     for(let y=0;y<h;y++){let s=0;for(let x=0;x<w;x+=2){if(dd[(y*w+x)*4+3]>10)s++;}
+      const on=s>2;
+      if(on&&!inB){inB=true;st=y;}else if(!on&&inB){inB=false;if(y-st>h*.08)bands.push([st,y]);}}
+     if(inB&&h-st>h*.08)bands.push([st,h]);}
+    if(!bands.length)bands.push([0,h]);
+    for(const bd of bands){const y0=bd[0],y1=bd[1];let inC=false,cs=0;
+     for(let x=0;x<w;x++){let s=0;for(let y=y0;y<y1;y+=2){if(dd[(y*w+x)*4+3]>10)s++;}
+      const on=s>2;
+      if(on&&!inC){inC=true;cs=x;}else if(!on&&inC){inC=false;if(x-cs>w*.02)boxes.push([cs,y0,x-1,y1-1]);}}
+     if(inC&&w-cs>w*.02)boxes.push([cs,y0,w-1,y1-1]);}}
+   if(!boxes.length)boxes.push([0,0,w-1,h-1]);
+   const n=boxes.length;
+   let bw=0,bh=0;
+   for(const b of boxes){bw=Math.max(bw,b[2]-b[0]+1);bh=Math.max(bh,b[3]-b[1]+1);}
    const fit=FITM[nm]||0;
    const arr=[];
-   for(let f=0;f<n;f++){const c=f%cols,r=(f/cols)|0;
+   for(let f=0;f<n;f++){const b=boxes[f],cw=b[2]-b[0]+1,chh=b[3]-b[1]+1;
     const fc=document.createElement('canvas');
     fc.width=Math.max(2,Math.floor(bw));fc.height=Math.max(2,Math.floor(bh));
     const g2=fc.getContext('2d');
-    const cb=cellB[f];
-    if(okBox&&cb&&cb[2]>=0){
-     const cw=cb[2]-cb[0]+1,chh=cb[3]-cb[1]+1;
-     const s=1+fit*((bh/chh)-1);
-     const dw=cw*s,dh=chh*s;
-     g2.drawImage(cn,((c*fw)|0)+cb[0],((r*fh)|0)+cb[1],cw,chh,
-      Math.floor((bw-dw)/2),Math.floor(bh-dh),Math.ceil(dw),Math.ceil(dh));
-    }else{
-     g2.drawImage(cn,(c*fw)|0,(r*fh)|0,fw,fh,0,0,fc.width,fc.height);}
+    const s=1+fit*((bh/chh)-1);
+    const dw=cw*s,dh=chh*s;
+    g2.drawImage(cn,b[0],b[1],cw,chh,Math.floor((bw-dw)/2),Math.floor(bh-dh),Math.ceil(dw),Math.ceil(dh));
     arr.push(mkTex(fc));}
    arr.asp=bw/bh;
    ROWTEX[nm]=arr;}
