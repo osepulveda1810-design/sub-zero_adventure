@@ -583,7 +583,10 @@ function spriteRowFrame(f){const F=SPR_CFG.frames,s=f.state,A=animSafe(f);
  else if(s==='kick'){name='kick';frame=Math.round(clamp(f.atk?f.atk.t/f.atk.dur:0,0,1)*((F.kick||3)-1));}
  else if(s==='ice'){name='ice';frame=Math.round(clamp(f.atk?f.atk.t/f.atk.dur:0,0,1)*((F.ice||2)-1));}
  else if(s==='jump'){const o=viewOri(f);
-  const fr=Math.min(4,Math.floor((f.jumpT||0)/0.15));
+  let fr;
+  if(f.jumpCharge>0)fr=0;                                /* impulso en el suelo */
+  else if(f.h>0)fr=1+Math.min(2,Math.floor((f.airT||0)/0.28)); /* aire: frames 1-3 */
+  else fr=4;                                             /* aterrizaje: solo al tocar suelo */
   if(o==='F'){name='jumpF';frame=fr;}
   else if(o==='B'){name='jumpB';frame=fr;}
   else{name='jump';frame=fr;}}
@@ -642,7 +645,7 @@ function eachFighter(fn){if(P)fn(P);for(const f of foes)fn(f);}
 function newFighter(cols,kind){const parts=makeFighter(cols,kind);
  const f={x:0,z:0,h:0,vh:0,face:Math.PI,hp:30,sp:3.4,state:'idle',anim:rnd(9),t:0,cd:rnd(.6,1.4),
   frozen:0,kx:0,kz:0,downT:0,atk:null,elite:kind==='EL',dead:false,
-  hurtT:0,inv:0,buffer:false,comboStep:0,comboT:0,en:0,
+  hurtT:0,inv:0,buffer:false,comboStep:0,comboT:0,en:0,jumpCharge:0,airT:0,landT:0,
   tint:kind==='EL'?0xd6a8ff:(kind==='E'?0xff9a9a:0xffffff),
   kind:kind,spOn:false,spTex:null,spMat:parts.spMat,spMesh:parts.spMesh,parts};
  if(SHEETS[kind])useSprite(f);
@@ -757,11 +760,14 @@ function stepPlay(dt){G.hint-=dt;
   const fx=-Math.sin(camYaw),fz=-Math.cos(camYaw),rx=Math.cos(camYaw),rz=-Math.sin(camYaw);
   mx=fx*(-iz)+rx*ix;mz=fz*(-iz)+rz*ix;
   P.face=Math.atan2(mx,mz);}
- const moving=(mx!==0||mz!==0)&&!P.atk;
+ const moving=(mx!==0||mz!==0)&&!P.atk&&P.jumpCharge<=0;
  if(moving){const sp=P.h>0?4.6:5.2;P.x+=mx*sp*dt;P.z+=mz*sp*dt;}
- if(input.press.jump&&P.h===0&&!P.atk){P.vh=6.8;burst(P.x,.2,P.z,0xeaf6ff,5);}
-if(P.h>0||P.vh!==0){P.h+=P.vh*dt;P.vh-=18*dt;if(P.h<=0){P.h=0;P.vh=0;burst(P.x,.2,P.z,0xeaf6ff,6);G.shake=Math.max(G.shake,.06);}}
- P.jumpT=P.h>0?(P.jumpT||0)+dt:0; 
+  if(input.press.jump&&P.h===0&&!P.atk&&P.jumpCharge<=0&&P.landT<=0){P.jumpCharge=0.14;P.jumpT=0;}
+ if(P.jumpCharge>0){P.jumpCharge-=dt;P.jumpT+=dt;
+  if(P.jumpCharge<=0){P.jumpCharge=0;P.vh=6.8;P.airT=0;burst(P.x,.2,P.z,0xeaf6ff,5);}}
+ if(P.h>0||P.vh!==0){P.h+=P.vh*dt;P.vh-=18*dt;P.airT+=dt;P.jumpT+=dt;
+  if(P.h<=0){P.h=0;P.vh=0;P.landT=0.2;burst(P.x,.2,P.z,0xeaf6ff,6);G.shake=Math.max(G.shake,.06);}}
+ if(P.landT>0){P.landT-=dt;P.jumpT+=dt;}
   if(!P.atk&&P.hurtT<=0&&P.h===0){
   if(input.press.punch)startAtk('punch',P.comboStep||0);
   else if(input.press.kick)startAtk('kick',0);
@@ -785,7 +791,7 @@ if(P.h>0||P.vh!==0){P.h+=P.vh*dt;P.vh-=18*dt;if(P.h<=0){P.h=0;P.vh=0;burst(P.x,.
     else{P.atk=null;P.buffer=false;}}
    else{P.atk=null;P.buffer=false;}}}
  P.comboT=Math.max(0,(P.comboT||0)-dt);if(P.comboT===0&&!P.atk)P.comboStep=0;
- P.state=P.hurtT>0?'hurt':P.atk?P.atk.type:(P.h>0?'jump':(moving?'walk':'idle'));
+ P.state=P.hurtT>0?'hurt':P.atk?P.atk.type:((P.h>0||P.jumpCharge>0||P.landT>0)?'jump':(moving?'walk':'idle'));
  P.anim=(P.anim||0)+dt*(P.state==='walk'?1:.5);
  applyPhysics(P,dt);
  if(G.wave<WAVES.length&&P.z<WAVES[G.wave].z){G.gateZ=WAVES[G.wave].z-4;gate.position.z=G.gateZ;gate.visible=true;spawnWave(G.wave);G.wave++;}
